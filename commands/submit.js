@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
+const googleSheets = require('../utils/googleSheets');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -36,16 +37,22 @@ module.exports = {
 
         // Logic to handle proof submission
         team.proofs[tileNumber] = proofAttachment.url;
-
-        // Allow the team to use the /roll command
         team.canRoll = true;
 
         const userMention = `<@${interaction.user.id}>`;
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
-        await interaction.reply({
-            content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from ${teamRoleMention}. Any member of ${teamRoleMention} can now use the /roll command!`,
-            files: [proofAttachment]
-        });
+        try {
+            // Write to the Submissions sheet
+            const submissionData = [teamName, 'Submit', tileNumber, proofAttachment.url, new Date().toISOString()];
+            await googleSheets.writeToSheet('Submissions', submissionData);
+
+            await interaction.reply({
+                content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
+                files: [proofAttachment]
+            });
+        } catch (error) {
+            await interaction.reply(error.message);
+        }
     },
 };
