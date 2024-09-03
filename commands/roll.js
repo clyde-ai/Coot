@@ -35,7 +35,7 @@ module.exports = {
 
         if (ladder) {
             newTile = ladder.top;
-            await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a ladder! Climbing from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+            await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a ladder! Climbing from tile ${team.currentTile} to tile ${newTile}.\n${getTileDetails(newTile)}`);
         } else {
             // Check if the new tile is a snake head
             const snakes = createSnake.getSnakes();
@@ -43,9 +43,9 @@ module.exports = {
 
             if (snake) {
                 newTile = snake.tail;
-                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a snake! Moving from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a snake! Moving from tile ${team.currentTile} to tile ${newTile}.\n${getTileDetails(newTile)}`);
             } else {
-                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} moves from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} moves from tile ${team.currentTile} to tile ${newTile}.\n${getTileDetails(newTile)}`);
             }
         }
 
