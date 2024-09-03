@@ -27,6 +27,10 @@ module.exports = {
             return interaction.reply('Please provide at least one member.');
         }
 
+        if (memberIds.length > 10) {
+            return interaction.reply('A team can have a maximum of 10 members.');
+        }
+
         if (teams[teamName]) {
             return interaction.reply('A team with this name already exists.');
         }
