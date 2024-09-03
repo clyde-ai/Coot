@@ -38,11 +38,11 @@ module.exports = {
             reason: `Role created for team ${teamName}`
         });
 
-        const memberNicknames = memberIds.map(id => {
+        const memberMentions = memberIds.map(id => {
             const member = interaction.guild.members.cache.get(id);
             if (member) {
                 member.roles.add(role); // Assign the new role to the member
-                return member.displayName;
+                return `<@${member.id}>`;
             }
             return null;
         }).filter(Boolean);
@@ -54,7 +54,7 @@ module.exports = {
             proofs: {}
         };
 
-        await interaction.reply(`Team ${teamName} created with members: ${memberNicknames.join(', ')}. Role ${role.name} has been assigned to the team members.`);
+        await interaction.reply(`Team ${teamName} created with members: ${memberMentions.join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
     },
     getTeams() {
         return teams;
