@@ -31,9 +31,20 @@ module.exports = {
             return interaction.reply('A team with this name already exists.');
         }
 
+        // Create a new role for the team with "Team" appended before the team name
+        const role = await interaction.guild.roles.create({
+            name: `Team ${teamName}`,
+            mentionable: true,
+            reason: `Role created for team ${teamName}`
+        });
+
         const memberNicknames = memberIds.map(id => {
             const member = interaction.guild.members.cache.get(id);
-            return member ? member.displayName : null;
+            if (member) {
+                member.roles.add(role); // Assign the new role to the member
+                return member.displayName;
+            }
+            return null;
         }).filter(Boolean);
 
         teams[teamName] = {
@@ -43,7 +54,7 @@ module.exports = {
             proofs: {}
         };
 
-        await interaction.reply(`Team ${teamName} created with members: ${memberNicknames.join(', ')}`);
+        await interaction.reply(`Team ${teamName} created with members: ${memberNicknames.join(', ')}. Role ${role.name} has been assigned to the team members.`);
     },
     getTeams() {
         return teams;
