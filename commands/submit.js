@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
-const googleSheets = require('../utils/googleSheets');
+const googleSheets = require('../src/utils/googleSheets');
 
 module.exports = {
     data: new SlashCommandBuilder()

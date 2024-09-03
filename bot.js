@@ -2,6 +2,8 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const googleSheets = require('./src/utils/googleSheets'); // Import the googleSheets module
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 client.commands = new Collection();
@@ -21,9 +23,24 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     require('./deploy-commands'); // Run the deployment script
+
+    // Initialize Google Sheets with headers
+    try {
+        const teamHeaders = ['Team Name', 'Members', 'Date Created'];
+        const rollHeaders = ['Team Name', 'Action', 'Roll', 'New Tile', 'Timestamp'];
+        const submissionHeaders = ['Team Name', 'Action', 'Tile Number', 'Proof URL', 'Timestamp'];
+
+        await googleSheets.setHeaders('Teams', teamHeaders);
+        await googleSheets.setHeaders('Rolls', rollHeaders);
+        await googleSheets.setHeaders('Submissions', submissionHeaders);
+
+        console.log('Headers set successfully.');
+    } catch (error) {
+        console.error('Error setting headers:', error);
+    }
 });
 
 client.on('interactionCreate', async interaction => {

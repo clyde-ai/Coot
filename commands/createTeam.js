@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
-const googleSheets = require('../utils/googleSheets');
+const googleSheets = require('../src/utils/googleSheets');
 const teams = {};
 
 module.exports = {
@@ -67,30 +67,31 @@ module.exports = {
             };
         }
 
-        // Assign the new role to the members
-        const memberMentions = memberIds.map(id => {
+        // Assign the new role to the members and get their nicknames
+        const memberNicknames = memberIds.map(id => {
             const member = interaction.guild.members.cache.get(id);
             if (member) {
                 member.roles.add(role);
-                return `<@${member.id}>`;
+                return member.nickname || member.user.username; // Use nickname if available, otherwise username
             }
             return null;
         }).filter(Boolean);
 
         try {
             // Write to Google Sheets
-            const teamData = [teamName, memberIds.join(','), new Date().toISOString()];
+            const teamData = [teamName, memberNicknames.join(', '), new Date().toISOString()];
             if (teams[teamName]) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${Object.keys(teams).indexOf(teamName) + 2}:C`, [teamData]);
+                await googleSheets.updateSheet('Teams', `A${Object.keys(teams).indexOf(teamName) + 2}:C`, teamData);
             } else {
-                // Write new team
+                // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);
             }
 
-            await interaction.reply(`Team ${teamName} ${teams[teamName] ? 'updated' : 'created'} with members: ${memberMentions.join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
+            await interaction.reply(`Team ${teamName} ${teams[teamName] ? 'updated' : 'created'} with members: ${memberNicknames.join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
         } catch (error) {
-            await interaction.reply(error.message);
+            console.error(`Error writing to Google Sheets: ${error.message}`);
+            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
         }
     },
     getTeams() {

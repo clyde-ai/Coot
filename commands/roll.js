@@ -3,7 +3,7 @@ const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
 const tiles = require('../src/tiles');
-const googleSheets = require('../utils/googleSheets');
+const googleSheets = require('../src/utils/googleSheets');
 
 module.exports = {
     data: new SlashCommandBuilder()
