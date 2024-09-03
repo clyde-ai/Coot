@@ -1,16 +1,12 @@
 {
-  "name": "coot",
+  "name": "coot-bot",
   "version": "1.0.0",
-  "description": "OSRS Discord bot for fun clan events",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "main": "bot.js",
   "dependencies": {
-    "discord.js": "^14.16.1"
+    "discord.js": "^14.0.0",
+    "node-fetch": "^2.6.1"
+  },
+  "scripts": {
+    "start": "node bot.js"
   }
 }
