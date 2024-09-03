@@ -10,11 +10,13 @@ module.exports = {
         .setDescription('Roll a 6-sided dice'),
     async execute(interaction) {
         const teams = createTeam.getTeams();
-        const team = Object.values(teams).find(t => t.members.includes(interaction.user.id));
+        const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
-        if (!team) {
+        if (!teamEntry) {
             return interaction.reply('You are not part of any team.');
         }
+
+        const [teamName, team] = teamEntry;
 
         // Allow rolling if it's the first tile
         if (team.currentTile !== 0 && !team.canRoll) {
@@ -24,13 +26,16 @@ module.exports = {
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.currentTile + roll;
 
+        const userMention = `<@${interaction.user.id}>`;
+        const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
+
         // Check if the new tile is a ladder bottom
         const ladders = createLadder.getLadders();
         const ladder = ladders.find(l => l.bottom === newTile);
 
         if (ladder) {
             newTile = ladder.top;
-            await interaction.reply(`You rolled a ${roll}. Your team landed on a ladder! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+            await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a ladder! Climbing from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
         } else {
             // Check if the new tile is a snake head
             const snakes = createSnake.getSnakes();
@@ -38,9 +43,9 @@ module.exports = {
 
             if (snake) {
                 newTile = snake.tail;
-                await interaction.reply(`You rolled a ${roll}. Your team landed on a snake! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} landed on a snake! Moving from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
             } else {
-                await interaction.reply(`You rolled a ${roll}. Your team moves from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} moves from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
             }
         }
 
