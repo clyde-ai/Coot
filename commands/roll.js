@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
-const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
 
 module.exports = {
@@ -53,7 +52,8 @@ module.exports = {
 
             await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}.`);
         } catch (error) {
-            await interaction.reply(error.message);
+            console.error(`Error writing to Google Sheets: ${error.message}`);
+            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
         }
     },
 };

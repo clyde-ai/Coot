@@ -19,7 +19,7 @@ async function writeToSheet(sheetName, data) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            range: `${sheetName}!A:C`,
+            range: `${sheetName}!A:E`, // Adjust the range to include the new column
             valueInputOption: 'RAW',
             resource: {
                 values: [data],

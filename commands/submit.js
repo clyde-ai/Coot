@@ -41,10 +41,11 @@ module.exports = {
 
         const userMention = `<@${interaction.user.id}>`;
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
+        const memberName = interaction.member.nickname || interaction.user.username; // Use nickname if available, otherwise username
 
         try {
             // Write to the Submissions sheet
-            const submissionData = [teamName, 'Submit', tileNumber, proofAttachment.url, new Date().toISOString()];
+            const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString()];
             await googleSheets.writeToSheet('Submissions', submissionData);
 
             await interaction.reply({
@@ -52,7 +53,8 @@ module.exports = {
                 files: [proofAttachment]
             });
         } catch (error) {
-            await interaction.reply(error.message);
+            console.error(`Error writing to Google Sheets: ${error.message}`);
+            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
         }
     },
 };
