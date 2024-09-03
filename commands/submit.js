@@ -9,35 +9,39 @@ module.exports = {
             option.setName('tile')
                 .setDescription('The tile number')
                 .setRequired(true))
-        .addStringOption(option => 
-            option.setName('proofs')
-                .setDescription('Proof of tile completion (URLs or descriptions)')
+        .addAttachmentOption(option => 
+            option.setName('proof')
+                .setDescription('Proof of tile completion (image)')
                 .setRequired(true)),
     async execute(interaction) {
         const tileNumber = interaction.options.getInteger('tile');
-        const proofs = interaction.options.getString('proofs').split(',');
+        const proofAttachment = interaction.options.getAttachment('proof');
 
         if (isNaN(tileNumber)) {
             return interaction.reply('The first parameter must be a valid tile number.');
         }
 
         const teams = createTeam.getTeams();
-        const team = Object.values(teams).find(t => t.members.includes(interaction.user.id));
+        const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
-        if (!team) {
+        if (!teamEntry) {
             return interaction.reply('You are not part of any team.');
         }
+
+        const [teamName, team] = teamEntry;
 
         if (team.currentTile !== tileNumber) {
             return interaction.reply(`Your team is currently on tile ${team.currentTile}, not tile ${tileNumber}.`);
         }
 
         // Logic to handle proof submission
-        team.proofs[tileNumber] = proofs;
+        team.proofs[tileNumber] = proofAttachment.url;
 
         // Allow the team to use the /roll command
         team.canRoll = true;
 
-        await interaction.reply(`Proof for tile ${tileNumber} submitted successfully. Your team can now use the /roll command.`);
+        const memberNickname = interaction.member.displayName;
+
+        await interaction.reply(`Proof for tile ${tileNumber} submitted successfully by ${memberNickname} from team ${teamName}. Any member of team ${teamName} can now use the /roll command!`);
     },
 };

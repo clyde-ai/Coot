@@ -31,6 +31,11 @@ module.exports = {
             return interaction.reply('A team with this name already exists.');
         }
 
+        const memberNicknames = memberIds.map(id => {
+            const member = interaction.guild.members.cache.get(id);
+            return member ? member.displayName : null;
+        }).filter(Boolean);
+
         teams[teamName] = {
             members: memberIds,
             currentTile: 0, // Set initial tile to 0
@@ -38,7 +43,7 @@ module.exports = {
             proofs: {}
         };
 
-        await interaction.reply(`Team ${teamName} created with members: ${memberIds.join(', ')}`);
+        await interaction.reply(`Team ${teamName} created with members: ${memberNicknames.join(', ')}`);
     },
     getTeams() {
         return teams;
