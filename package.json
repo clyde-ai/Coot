@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "bot.js",
   "dependencies": {
+    "@discordjs/builders": "^1.9.0",
+    "@discordjs/rest": "^2.4.0",
+    "discord-api-types": "^0.37.99",
     "discord.js": "^14.0.0",
     "dotenv": "^16.4.5",
     "node-fetch": "^2.6.1"

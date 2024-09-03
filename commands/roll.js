@@ -1,21 +1,23 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
 const tiles = require('../src/tiles');
 
 module.exports = {
-    name: 'roll',
-    description: 'Roll a 6-sided dice',
-    execute(message, args) {
+    data: new SlashCommandBuilder()
+        .setName('roll')
+        .setDescription('Roll a 6-sided dice'),
+    async execute(interaction) {
         const teams = createTeam.getTeams();
-        const team = Object.values(teams).find(t => t.members.includes(message.author.id));
+        const team = Object.values(teams).find(t => t.members.includes(interaction.user.id));
 
         if (!team) {
-            return message.reply('You are not part of any team.');
+            return interaction.reply('You are not part of any team.');
         }
 
         if (!team.canRoll) {
-            return message.reply('Your team has not submitted proof for the current tile.');
+            return interaction.reply('Your team has not submitted proof for the current tile.');
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
@@ -27,7 +29,7 @@ module.exports = {
 
         if (ladder) {
             newTile = ladder.top;
-            message.channel.send(`You rolled a ${roll}. Your team landed on a ladder! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+            await interaction.reply(`You rolled a ${roll}. Your team landed on a ladder! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
         } else {
             // Check if the new tile is a snake head
             const snakes = createSnake.getSnakes();
@@ -35,9 +37,9 @@ module.exports = {
 
             if (snake) {
                 newTile = snake.tail;
-                message.channel.send(`You rolled a ${roll}. Your team landed on a snake! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`You rolled a ${roll}. Your team landed on a snake! You move from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
             } else {
-                message.channel.send(`You rolled a ${roll}. Your team moves from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
+                await interaction.reply(`You rolled a ${roll}. Your team moves from tile ${team.currentTile} to tile ${newTile}. ${getTileDetails(newTile)}`);
             }
         }
 
