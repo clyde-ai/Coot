@@ -1,28 +1,35 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionsBitField } = require('discord.js');
 const snakes = [];
 
 module.exports = {
-    name: 'create-snake',
-    description: 'Create a snake with a head and tail tile number',
-    execute(message, args) {
-        if (!message.member.permissions.has('ADMINISTRATOR')) {
-            return message.reply('You do not have permission to use this command.');
+    data: new SlashCommandBuilder()
+        .setName('create-snake')
+        .setDescription('Create a snake with a head and tail tile number')
+        .addIntegerOption(option => 
+            option.setName('head')
+                .setDescription('The head tile number of the snake')
+                .setRequired(true))
+        .addIntegerOption(option => 
+            option.setName('tail')
+                .setDescription('The tail tile number of the snake')
+                .setRequired(true)),
+    async execute(interaction) {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return interaction.reply('You do not have permission to use this command.');
         }
 
-        if (args.length !== 2) {
-            return message.reply('Please provide exactly two tile numbers: the head and tail of the snake.');
-        }
-
-        const headTile = parseInt(args[0]);
-        const tailTile = parseInt(args[1]);
+        const headTile = interaction.options.getInteger('head');
+        const tailTile = interaction.options.getInteger('tail');
 
         if (isNaN(headTile) || isNaN(tailTile)) {
-            return message.reply('Both parameters must be valid tile numbers.');
+            return interaction.reply('Both parameters must be valid tile numbers.');
         }
 
         // Store the snake in memory
         snakes.push({ head: headTile, tail: tailTile });
 
-        message.channel.send(`Snake created: from tile ${headTile} to tile ${tailTile}.`);
+        await interaction.reply(`Snake created: from tile ${headTile} to tile ${tailTile}.`);
     },
     getSnakes() {
         return snakes;

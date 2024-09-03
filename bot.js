@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -7,31 +8,37 @@ client.commands = new Collection();
 
 const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
 
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+for (const key in config) {
+    if (config[key].startsWith('${') && config[key].endsWith('}')) {
+        const envVar = config[key].slice(2, -1);
+        config[key] = process.env[envVar];
+    }
+}
+
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    client.commands.set(command.data.name, command);
 }
 
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    require('./deploy-commands'); // Run the deployment script
 });
 
-client.on('messageCreate', message => {
-    if (!message.content.startsWith('/') || message.author.bot) return;
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
 
-    const args = message.content.slice(1).split(/ +/);
-    const commandName = args.shift().toLowerCase();
+    const command = client.commands.get(interaction.commandName);
 
-    if (!client.commands.has(commandName)) return;
-
-    const command = client.commands.get(commandName);
+    if (!command) return;
 
     try {
-        command.execute(message, args);
+        await command.execute(interaction);
     } catch (error) {
         console.error(error);
-        message.reply('There was an error trying to execute that command!');
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
 
-client.login({DISCORD_TOKEN});
+client.login(process.env.DISCORD_TOKEN);
