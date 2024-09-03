@@ -40,8 +40,12 @@ module.exports = {
         // Allow the team to use the /roll command
         team.canRoll = true;
 
-        const memberNickname = interaction.member.displayName;
+        const userMention = `<@${interaction.user.id}>`;
+        const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
-        await interaction.reply(`Proof for tile ${tileNumber} submitted successfully by ${memberNickname} from team ${teamName}. Any member of team ${teamName} can now use the /roll command!`);
+        await interaction.reply({
+            content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
+            files: [proofAttachment]
+        });
     },
 };
