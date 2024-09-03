@@ -1,32 +1,44 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionsBitField } = require('discord.js');
 const teams = {};
 
 module.exports = {
-    name: 'create-team',
-    description: 'Create a new team with specified members',
-    execute(message, args) {
-        if (!message.member.permissions.has('ADMINISTRATOR')) {
-            return message.reply('You do not have permission to use this command.');
+    data: new SlashCommandBuilder()
+        .setName('create-team')
+        .setDescription('Create a new team with specified members')
+        .addStringOption(option => 
+            option.setName('teamname')
+                .setDescription('The name of the team')
+                .setRequired(true))
+        .addStringOption(option => 
+            option.setName('members')
+                .setDescription('The members to add to the team (mention them)')
+                .setRequired(true)),
+    async execute(interaction) {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return interaction.reply('You do not have permission to use this command.');
         }
 
-        if (args.length < 2) {
-            return message.reply('Please provide a team name and at least one member.');
-        }
+        const teamName = interaction.options.getString('teamname');
+        const membersArg = interaction.options.getString('members');
+        const memberIds = membersArg.match(/<@!?(\d+)>/g)?.map(id => id.replace(/[<@!>]/g, ''));
 
-        const teamName = args.shift();
-        const members = args.map(arg => arg.replace(/[<@!>]/g, ''));
+        if (!memberIds || memberIds.length === 0) {
+            return interaction.reply('Please provide at least one member.');
+        }
 
         if (teams[teamName]) {
-            return message.reply('A team with this name already exists.');
+            return interaction.reply('A team with this name already exists.');
         }
 
         teams[teamName] = {
-            members: members,
-            currentTile: 1, // Assuming teams start at tile 1
+            members: memberIds,
+            currentTile: 0, // Set initial tile to 0
             canRoll: false,
             proofs: {}
         };
 
-        message.channel.send(`Team ${teamName} created with members: ${members.join(', ')}`);
+        await interaction.reply(`Team ${teamName} created with members: ${memberIds.join(', ')}`);
     },
     getTeams() {
         return teams;

@@ -1,29 +1,35 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 
 module.exports = {
-    name: 'submit',
-    description: 'Submit proof of tile completion',
-    async execute(message, args) {
-        if (args.length < 2) {
-            return message.reply('Please provide a tile number and at least one image as proof.');
-        }
-
-        const tileNumber = parseInt(args[0]);
-        const proofs = args.slice(1);
+    data: new SlashCommandBuilder()
+        .setName('submit')
+        .setDescription('Submit proof of tile completion')
+        .addIntegerOption(option => 
+            option.setName('tile')
+                .setDescription('The tile number')
+                .setRequired(true))
+        .addStringOption(option => 
+            option.setName('proofs')
+                .setDescription('Proof of tile completion (URLs or descriptions)')
+                .setRequired(true)),
+    async execute(interaction) {
+        const tileNumber = interaction.options.getInteger('tile');
+        const proofs = interaction.options.getString('proofs').split(',');
 
         if (isNaN(tileNumber)) {
-            return message.reply('The first parameter must be a valid tile number.');
+            return interaction.reply('The first parameter must be a valid tile number.');
         }
 
         const teams = createTeam.getTeams();
-        const team = Object.values(teams).find(t => t.members.includes(message.author.id));
+        const team = Object.values(teams).find(t => t.members.includes(interaction.user.id));
 
         if (!team) {
-            return message.reply('You are not part of any team.');
+            return interaction.reply('You are not part of any team.');
         }
 
         if (team.currentTile !== tileNumber) {
-            return message.reply(`Your team is currently on tile ${team.currentTile}, not tile ${tileNumber}.`);
+            return interaction.reply(`Your team is currently on tile ${team.currentTile}, not tile ${tileNumber}.`);
         }
 
         // Logic to handle proof submission
@@ -32,6 +38,6 @@ module.exports = {
         // Allow the team to use the /roll command
         team.canRoll = true;
 
-        message.channel.send(`Proof for tile ${tileNumber} submitted successfully. Your team can now use the /roll command.`);
+        await interaction.reply(`Proof for tile ${tileNumber} submitted successfully. Your team can now use the /roll command.`);
     },
 };

@@ -8,6 +8,14 @@ client.commands = new Collection();
 
 const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
 
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+for (const key in config) {
+    if (config[key].startsWith('${') && config[key].endsWith('}')) {
+        const envVar = config[key].slice(2, -1);
+        config[key] = process.env[envVar];
+    }
+}
+
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.data.name, command);

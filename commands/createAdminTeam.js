@@ -1,21 +1,31 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionsBitField } = require('discord.js');
 const adminTeam = [];
 
 module.exports = {
-    name: 'create-admin-team',
-    description: 'Create an admin team with specified members',
-    execute(message, args) {
-        if (!message.member.permissions.has('ADMINISTRATOR')) {
-            return message.reply('You do not have permission to use this command.');
+    data: new SlashCommandBuilder()
+        .setName('create-admin-team')
+        .setDescription('Create an admin team with specified members')
+        .addStringOption(option => 
+            option.setName('members')
+                .setDescription('The members to add to the admin team (mention them)')
+                .setRequired(true)),
+    async execute(interaction) {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return interaction.reply('You do not have permission to use this command.');
         }
 
-        if (args.length === 0) {
-            return message.reply('Please provide at least one member to add to the admin team.');
+        const membersArg = interaction.options.getString('members');
+        const memberIds = membersArg.match(/<@!?(\d+)>/g)?.map(id => id.replace(/[<@!>]/g, ''));
+
+        if (!memberIds || memberIds.length === 0) {
+            return interaction.reply('Please provide at least one member to add to the admin team.');
         }
 
-        const members = args.map(arg => {
-            const member = message.guild.members.cache.get(arg.replace(/[<@!>]/g, ''));
+        const members = memberIds.map(id => {
+            const member = interaction.guild.members.cache.get(id);
             if (member) {
-                member.roles.add('ADMIN_ROLE_ID'); // Replace with your admin role ID
+                member.roles.add(process.env.ADMIN_ROLE_ID); // Replace with your admin role ID
                 adminTeam.push(member.id);
                 return member.user.username;
             }
@@ -23,10 +33,10 @@ module.exports = {
         }).filter(Boolean);
 
         if (members.length === 0) {
-            return message.reply('No valid members provided.');
+            return interaction.reply('No valid members provided.');
         }
 
-        message.channel.send(`Admin team created with members: ${members.join(', ')}`);
+        await interaction.reply(`Admin team created with members: ${members.join(', ')}`);
     },
     getAdminTeam() {
         return adminTeam;

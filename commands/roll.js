@@ -16,7 +16,8 @@ module.exports = {
             return interaction.reply('You are not part of any team.');
         }
 
-        if (!team.canRoll) {
+        // Allow rolling if it's the first tile
+        if (team.currentTile !== 0 && !team.canRoll) {
             return interaction.reply('Your team has not submitted proof for the current tile.');
         }
 
