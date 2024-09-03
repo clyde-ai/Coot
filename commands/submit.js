@@ -44,7 +44,7 @@ module.exports = {
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
         await interaction.reply({
-            content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
+            content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from ${teamRoleMention}. Any member of ${teamRoleMention} can now use the /roll command!`,
             files: [proofAttachment]
         });
     },
