@@ -62,6 +62,7 @@ module.exports = {
             teams[teamName] = {
                 members: memberIds,
                 currentTile: 0, // Set initial tile to 0
+                previousTile: 0, // Set initial previous tile to 0
                 canRoll: false,
                 proofs: {}
             };
@@ -96,5 +97,21 @@ module.exports = {
     },
     getTeams() {
         return teams;
+    },
+    updateTeamTile(teamName, newTile) {
+        if (teams[teamName]) {
+            teams[teamName].previousTile = teams[teamName].currentTile;
+            teams[teamName].currentTile = newTile;
+        }
+    },
+    resetCanRoll(teamName) {
+        if (teams[teamName]) {
+            teams[teamName].canRoll = false;
+        }
+    },
+    allowRoll(teamName) {
+        if (teams[teamName]) {
+            teams[teamName].canRoll = true;
+        }
     }
 };
