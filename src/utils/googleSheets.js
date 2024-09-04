@@ -1,12 +1,13 @@
 const { google } = require('googleapis');
 const fs = require('fs');
-const path = process.env.GOOGLE_CREDENTIALS;
+const path = require('path');
 
-if (!process.env.GOOGLE_CREDENTIALS) {
-    throw new Error('GOOGLE_CREDENTIALS environment variable is not set.');
+if (!process.env.GOOGLE_CREDENTIALS_PATH) {
+    throw new Error('GOOGLE_CREDENTIALS_PATH environment variable is not set.');
 }
 
-const credentials = JSON.parse(fs.readFileSync(path, 'utf8'));
+const credentialsPath = path.resolve(process.env.GOOGLE_CREDENTIALS_PATH);
+const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
 
 const auth = new google.auth.GoogleAuth({
     credentials,
