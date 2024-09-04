@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const googleSheets = require('../src/utils/googleSheets');
+const fs = require('fs'); // Import the fs module
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -44,14 +45,19 @@ module.exports = {
         const memberName = interaction.member.nickname || interaction.user.username; // Use nickname if available, otherwise username
 
         try {
-            // Write to the Submissions sheet
-            const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString()];
-            await googleSheets.writeToSheet('Submissions', submissionData);
+            // Check if the image file exists
+            if (fs.existsSync(proofAttachment.url)) {
+                // Write to the Submissions sheet
+                const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString()];
+                await googleSheets.writeToSheet('Submissions', submissionData);
 
-            await interaction.reply({
-                content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
-                files: [proofAttachment]
-            });
+                await interaction.reply({
+                    content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
+                    files: [proofAttachment]
+                });
+            } else {
+                await interaction.reply('The proof image does not exist. Please upload a valid image.');
+            }
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             await interaction.reply('There was an error updating the Google Sheet. Please try again later.');

@@ -5,6 +5,7 @@ const createSnake = require('./createSnake');
 const tiles = require('../src/tiles'); // Import the tiles module
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
+const fs = require('fs'); // Import the fs module
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -71,9 +72,13 @@ module.exports = {
             } else if (landedOnSnake) {
                 replyContent = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on the head of a snake! Sliding back down, moves to tile ${newTile}. ${tileDescription}`;
             }
-            const replyOptions = tileImage ? { content: replyContent, files: [tileImage] } : { content: replyContent };
 
-            await interaction.reply(replyOptions);
+            // Check if the tile image file exists
+            if (tileImage && fs.existsSync(tileImage)) {
+                await interaction.reply({ content: replyContent, files: [tileImage] });
+            } else {
+                await interaction.reply({ content: replyContent });
+            }
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
