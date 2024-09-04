@@ -12,6 +12,10 @@
     "node-fetch": "^2.6.1"
   },
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "test": "jest --config tests/jest.config.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

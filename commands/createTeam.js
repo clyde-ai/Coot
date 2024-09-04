@@ -40,12 +40,14 @@ module.exports = {
                 return interaction.reply('The role for this team does not exist.');
             }
 
-            // Remove existing members from the role
+            // Remove members who are no longer in the team
             const existingMembers = teams[teamName].members;
             existingMembers.forEach(id => {
-                const member = interaction.guild.members.cache.get(id);
-                if (member) {
-                    member.roles.remove(role);
+                if (!memberIds.includes(id)) {
+                    const member = interaction.guild.members.cache.get(id);
+                    if (member) {
+                        member.roles.remove(role);
+                    }
                 }
             });
 
