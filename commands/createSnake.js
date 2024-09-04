@@ -33,5 +33,8 @@ module.exports = {
     },
     getSnakes() {
         return snakes;
+    },
+    clearSnakes() {
+        snakes.length = 0;
     }
 };

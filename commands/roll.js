@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
+const tiles = require('../src/tiles'); // Import the tiles module
 const googleSheets = require('../src/utils/googleSheets');
 
 module.exports = {
@@ -31,13 +32,17 @@ module.exports = {
         // Check for ladders and snakes
         const ladders = createLadder.getLadders();
         const ladder = ladders.find(l => l.bottom === newTile);
+        let landedOnLadder = false;
+        let landedOnSnake = false;
         if (ladder) {
             newTile = ladder.top;
+            landedOnLadder = true;
         } else {
             const snakes = createSnake.getSnakes();
             const snake = snakes.find(s => s.head === newTile);
             if (snake) {
                 newTile = snake.tail;
+                landedOnSnake = true;
             }
         }
 
@@ -45,12 +50,25 @@ module.exports = {
         team.currentTile = newTile;
         team.canRoll = false; // Reset the roll permission until the next proof is submitted
 
+        // Get tile description and image
+        const tile = tiles.find(t => t.tileNumber === newTile);
+        const tileDescription = tile ? tile.description : 'No description available';
+        const tileImage = tile ? tile.image : null;
+
         try {
             // Write to the Rolls sheet
             const rollData = [teamName, 'Roll', roll, newTile, new Date().toISOString()];
             await googleSheets.writeToSheet('Rolls', rollData);
 
-            await interaction.reply(`${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}.`);
+            let replyContent = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            if (landedOnLadder) {
+                replyContent = `${userMention} rolled ${roll} and landed on a ladder! After climbing up, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            } else if (landedOnSnake) {
+                replyContent = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            }
+            const replyOptions = tileImage ? { content: replyContent, files: [tileImage] } : { content: replyContent };
+
+            await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
