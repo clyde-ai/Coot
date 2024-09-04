@@ -2,6 +2,8 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const googleSheets = require('./src/utils/googleSheets'); // Import the googleSheets module
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 client.commands = new Collection();
@@ -21,9 +23,24 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     require('./deploy-commands'); // Run the deployment script
+
+    // Initialize Google Sheets with headers
+    try {
+        const teamHeaders = ['Team Name', 'Members', 'Date Created'];
+        const rollHeaders = ['Team Name', 'Action', 'Roll', 'New Tile', 'Timestamp'];
+        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp'];
+
+        await googleSheets.setHeaders('Teams', teamHeaders);
+        await googleSheets.setHeaders('Rolls', rollHeaders);
+        await googleSheets.setHeaders('Submissions', submissionHeaders);
+
+        console.log('Headers set successfully.');
+    } catch (error) {
+        console.error('Error setting headers:', error);
+    }
 });
 
 client.on('interactionCreate', async interaction => {
@@ -40,5 +57,19 @@ client.on('interactionCreate', async interaction => {
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
+
+/* meme stuff
+// Respond to mentions of users with the nickname 'Clyde Cooter' or user ID '285252032959348736'
+client.on('messageCreate', async message => {
+    if (message.author.bot) return;
+
+    const mentionedMembers = message.mentions.members;
+    if (mentionedMembers.some(member => member.nickname === 'Clyde Cooter')) {
+        await message.reply('Still no shadow, dumb iron <:custom_emoji:1066592195538333717>');
+    } else if (mentionedMembers.some(member => member.id === '285252032959348736')) {
+        await message.reply('Nice clue scrolls, Uri <:clown:1077588545818071161>');
+    }
+});
+*/
 
 client.login(process.env.DISCORD_TOKEN);

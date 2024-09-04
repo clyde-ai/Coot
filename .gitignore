@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Google credentials
+*credentials.json
+
+# Profile script for Heroku
+.profile

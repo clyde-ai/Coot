@@ -2,6 +2,7 @@
     "token": "${DISCORD_TOKEN}",
     "clientId": "${CLIENT_ID}",
     "guildId": "${GUILD_ID}",
-    "adminRoleId": "${ADMIN_ROLE_ID}"
+    "adminRoleId": "${ADMIN_ROLE_ID}",
+    "googleSheetId": "${GOOGLE_SHEET_ID}"
   }
   
