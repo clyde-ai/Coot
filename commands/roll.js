@@ -4,6 +4,8 @@ const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
 const tiles = require('../src/tiles'); // Import the tiles module
 const googleSheets = require('../src/utils/googleSheets');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -67,7 +69,16 @@ module.exports = {
             } else if (landedOnSnake) {
                 replyContent = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             }
-            const replyOptions = tileImage ? { content: replyContent, files: [tileImage] } : { content: replyContent };
+
+            const replyOptions = { content: replyContent };
+            if (tileImage) {
+                const imagePath = path.join(__dirname, '..', tileImage);
+                if (fs.existsSync(imagePath)) {
+                    replyOptions.files = [imagePath];
+                } else {
+                    console.warn(`Image file not found: ${imagePath}`);
+                }
+            }
 
             await interaction.reply(replyOptions);
         } catch (error) {
