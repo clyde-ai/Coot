@@ -58,6 +58,20 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+// Respond to meme messages
+client.on('messageCreate', message => {
+    if (message.content === '!roll') {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        message.reply(`You rolled a ${roll}`);
+    } else if (message.content === '!snake') {
+        const gifPath = path.join(__dirname, 'src/images/memes/snake.gif');
+        message.reply({ files: [gifPath] });
+    } else if (message.content === '!ladder') {
+        const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
+        message.reply({ files: [gifPath] });
+    }
+});
+
 /* meme stuff
 // Respond to mentions of users with the nickname 'Clyde Cooter' or user ID '285252032959348736'
 client.on('messageCreate', async message => {
