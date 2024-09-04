@@ -58,4 +58,18 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+/* meme stuff
+// Respond to mentions of users with the nickname 'Clyde Cooter' or user ID '285252032959348736'
+client.on('messageCreate', async message => {
+    if (message.author.bot) return;
+
+    const mentionedMembers = message.mentions.members;
+    if (mentionedMembers.some(member => member.nickname === 'Clyde Cooter')) {
+        await message.reply('Still no shadow, dumb iron <:custom_emoji:1066592195538333717>');
+    } else if (mentionedMembers.some(member => member.id === '285252032959348736')) {
+        await message.reply('Nice clue scrolls, Uri <:clown:1077588545818071161>');
+    }
+});
+*/
+
 client.login(process.env.DISCORD_TOKEN);
