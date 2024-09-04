@@ -3,19 +3,19 @@
 Welcome to **Coot**, a versatile Discord bot designed to enhance your server's gaming experience with fun and interactive commands. This README will guide you through the setup and usage of Coot's commands.
 
 ## Table of Contents
-- Installation
-- Commands
-  - /clear-ladders
-  - /clear-snakes
-  - /create-admin-team
-  - /create-ladder
-  - /create-snake
-  - /create-team
-  - /reroll
-  - /roll
-  - /submit
-- Contributing
-- License
+* Installation
+* Commands
+  * /clear-ladders
+  * /clear-snakes
+  * /create-admin-team
+  * /create-ladder
+  * /create-snake
+  * /create-team
+  * /reroll
+  * /roll
+  * /submit
+* Contributing
+* License
 
 ## Installation
 
@@ -33,7 +33,15 @@ To add Coot to your Discord server, follow these steps:
     ```bash
     npm install
     ```
-4. Run the bot:
+4. Create your .env file:
+    ```bash
+    DISCORD_TOKEN=discord-token-of-your-bot
+    CLIENT_ID=client-id-of-your-bot
+    GUILD_ID=discord-server-id
+    ADMIN_ROLE_ID=admin-role-id
+    GOOGLE_SHEET_ID=google-sheet-id
+    GOOGLE_CREDENTIALS_PATH=path-to-google-credentials
+5. Run the bot:
     ```bash
     npm start
     ```
