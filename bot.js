@@ -30,7 +30,7 @@ client.once('ready', async () => {
     // Initialize Google Sheets with headers
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created'];
-        const rollHeaders = ['Team Name', 'Action', 'Roll', 'New Tile', 'Timestamp'];
+        const rollHeaders = ['Team Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp'];
 
         await googleSheets.setHeaders('Teams', teamHeaders);

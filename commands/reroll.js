@@ -4,29 +4,33 @@ const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
 const tiles = require('../src/tiles'); // Import the tiles module
 const googleSheets = require('../src/utils/googleSheets');
+const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('roll')
-        .setDescription('Roll a 6-sided dice'),
+        .setName('reroll')
+        .setDescription('Reroll a 6-sided dice for a specified team')
+        .addStringOption(option => 
+            option.setName('teamname')
+                .setDescription('The name of the team')
+                .setRequired(true))
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
     async execute(interaction) {
-        const teams = createTeam.getTeams();
-        const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
-
-        if (!teamEntry) {
-            return interaction.reply('You are not part of any team.');
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return interaction.reply('You do not have permission to use this command.');
         }
 
-        const [teamName, team] = teamEntry;
+        const teamName = interaction.options.getString('teamname');
+        const teams = createTeam.getTeams();
+        const team = teams[teamName];
 
-        if (team.currentTile !== 0 && !team.canRoll) {
-            return interaction.reply('Your team has not submitted proof for the current tile.');
+        if (!team) {
+            return interaction.reply(`Team ${teamName} does not exist.`);
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
-        let newTile = team.currentTile + roll;
+        let newTile = team.previousTile + roll;
 
-        const userMention = `<@${interaction.user.id}>`;
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
         // Check for ladders and snakes
@@ -47,7 +51,7 @@ module.exports = {
         }
 
         // Update the team's current tile
-        const previousTile = team.currentTile;
+        const previousTile = team.previousTile;
         createTeam.updateTeamTile(teamName, newTile);
         createTeam.resetCanRoll(teamName); // Reset the roll permission until the next proof is submitted
 
@@ -58,14 +62,14 @@ module.exports = {
 
         try {
             // Write to the Rolls sheet
-            const rollData = [teamName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
+            const rollData = [teamName, 'Reroll', roll, previousTile, newTile, new Date().toISOString()];
             await googleSheets.writeToSheet('Rolls', rollData);
 
-            let replyContent = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            let replyContent = `Reroll for ${teamRoleMention}: rolled ${roll}. Moves to tile ${newTile}. ${tileDescription}`;
             if (landedOnLadder) {
-                replyContent = `${userMention} rolled ${roll} and landed on a ladder! After climbing up, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                replyContent = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on a ladder! After climbing up, moves to tile ${newTile}. ${tileDescription}`;
             } else if (landedOnSnake) {
-                replyContent = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                replyContent = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on the head of a snake! Sliding back down, moves to tile ${newTile}. ${tileDescription}`;
             }
             const replyOptions = tileImage ? { content: replyContent, files: [tileImage] } : { content: replyContent };
 

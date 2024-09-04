@@ -1,17 +1,17 @@
 const tiles = [
     {
         tileNumber: 1,
-        description: 'Start tile. Welcome to the game!',
+        description: 'Dragon from a dragon',
         image: 'src/images/1.png'
     },
     {
         tileNumber: 2,
-        description: 'Complete a simple task to move forward.',
+        description: 'Any Demonic Gorilla unique',
         image: 'src/images/2.png'
     },
     {
         tileNumber: 3,
-        description: 'Answer a trivia question correctly.',
+        description: '1x Abyssal Whip',
         image: 'src/images/3.png'
     },
     // Add more tiles as needed

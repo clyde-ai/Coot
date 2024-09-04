@@ -33,5 +33,8 @@ module.exports = {
     },
     getLadders() {
         return ladders;
+    },
+    clearLadders() {
+        ladders.length = 0;
     }
 };
