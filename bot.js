@@ -2,7 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const googleSheets = require('./src/utils/googleSheets'); // Import the googleSheets module
+const googleSheets = require('./src/utils/googleSheets');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -25,7 +25,7 @@ for (const file of commandFiles) {
 
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    require('./deploy-commands'); // Run the deployment script
+    require('./deploy-commands');
 
     // Initialize Google Sheets with headers
     try {
