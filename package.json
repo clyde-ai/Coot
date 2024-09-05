@@ -5,11 +5,15 @@
   "dependencies": {
     "@discordjs/builders": "^1.9.0",
     "@discordjs/rest": "^2.4.0",
+    "@google-cloud/vision": "^4.3.2",
+    "axios": "^1.7.7",
     "discord-api-types": "^0.37.99",
     "discord.js": "^14.0.0",
     "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "googleapis": "^144.0.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "sharp": "^0.33.5"
   },
   "scripts": {
     "start": "node bot.js",
