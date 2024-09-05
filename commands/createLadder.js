@@ -16,20 +16,24 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply('You do not have permission to use this command.');
+            return interaction.reply(':face_with_raised_eyebrow: You do not have permission to use this command.');
         }
 
         const bottomTile = interaction.options.getInteger('bottom');
         const topTile = interaction.options.getInteger('top');
 
         if (isNaN(bottomTile) || isNaN(topTile)) {
-            return interaction.reply('Both parameters must be valid tile numbers.');
+            return interaction.reply(':face_with_raised_eyebrow: Both parameters must be valid tile numbers.');
+        }
+
+        if (bottomTile >= topTile) {
+            return interaction.reply(':face_with_raised_eyebrow: The bottom tile number must be lower than the top tile number.');
         }
 
         // Store the ladder in memory
         ladders.push({ bottom: bottomTile, top: topTile });
 
-        await interaction.reply(`Ladder created: from tile ${bottomTile} to tile ${topTile}.`);
+        await interaction.reply(`:ladder: Ladder created: from tile ${bottomTile} to tile ${topTile}.`);
     },
     getLadders() {
         return ladders;

@@ -42,14 +42,18 @@ async function createEmbed({
     let attachment;
     if (imageUrl) {
         try {
-            let resizedImageBuffer;
-            if (command === 'roll' || command === 'reroll') {
-                resizedImageBuffer = await resizeImage(imageUrl, 64, 64);
-            } else if (command === 'submit') {
-                resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
+            if (fs.existsSync(imageUrl)) {
+                let resizedImageBuffer;
+                if (command === 'roll' || command === 'reroll') {
+                    resizedImageBuffer = await resizeImage(imageUrl, 64, 64);
+                } else if (command === 'submit') {
+                    resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
+                }
+                attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                embed.setImage(`attachment://${path.basename(imageUrl)}`);
+            } else {
+                console.warn(`Image file not found: ${imageUrl}`);
             }
-            attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-            embed.setImage(`attachment://${path.basename(imageUrl)}`);
         } catch (error) {
             console.error('Error resizing image:', error);
         }

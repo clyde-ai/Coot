@@ -16,20 +16,24 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply('You do not have permission to use this command.');
+            return interaction.reply(':face_with_raised_eyebrow: You do not have permission to use this command.');
         }
 
         const headTile = interaction.options.getInteger('head');
         const tailTile = interaction.options.getInteger('tail');
 
         if (isNaN(headTile) || isNaN(tailTile)) {
-            return interaction.reply('Both parameters must be valid tile numbers.');
+            return interaction.reply(':face_with_raised_eyebrow: Both parameters must be valid tile numbers.');
+        }
+
+        if (headTile <= tailTile) {
+            return interaction.reply(':face_with_raised_eyebrow: The head tile number must be greater than the tail tile number.');
         }
 
         // Store the snake in memory
         snakes.push({ head: headTile, tail: tailTile });
 
-        await interaction.reply(`Snake created: from tile ${headTile} to tile ${tailTile}.`);
+        await interaction.reply(`:snake: Snake created: from tile ${headTile} to tile ${tailTile}.`);
     },
     getSnakes() {
         return snakes;

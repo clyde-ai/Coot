@@ -19,8 +19,8 @@ module.exports = {
         if (!teamEntry) {
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: 'User is not on a team',
-                description: 'You are not part of any team, ping an event admin for assistance.',
+                title: ':x: User is not on a team',
+                description: ':x: You are not part of any team, ping an event admin for assistance.',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -36,8 +36,8 @@ module.exports = {
         if (team.currentTile !== 0 && !team.canRoll) {
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: `${teamRole.name} Cannot Roll`,
-                description: `Your team has not submitted proof for the current assigned tile: ${team.currentTile}`,
+                title: `:x: ${teamRole.name} Cannot Roll`,
+                description: `:x: Your team has not submitted proof for the current assigned tile: ${team.currentTile}`,
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -86,16 +86,16 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            let description = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            let description = `${userMention} rolled **${roll}**. ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             if (landedOnLadder) {
-                description = `${userMention} rolled ${roll} and landed on a ladder! After climbing up, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                description = `${userMention} rolled **${roll}** and landed on a ladder! :ladder: After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
-                description = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                description = `${userMention} rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
                 command: 'roll',
-                title: 'Dice Roll Result',
+                title: ':game_die: Dice Roll',
                 description,
                 imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
                 color: '#8000ff',
@@ -114,8 +114,8 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: 'Google Sheets Error',
-                description: 'There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                title: ':x: Google Sheets Error',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,

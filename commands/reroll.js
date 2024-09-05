@@ -20,7 +20,7 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
     async execute(interaction) {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply('You do not have permission to use this command.');
+            return interaction.reply(':x: You do not have permission to use this command.');
         }
 
         const teamName = interaction.options.getString('teamname');
@@ -28,7 +28,7 @@ module.exports = {
         const team = teams[teamName];
 
         if (!team) {
-            return interaction.reply(`Team ${teamName} does not exist.`);
+            return interaction.reply(`:x: Team ${teamName} does not exist.`);
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
@@ -72,16 +72,16 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            let description = `Reroll for ${teamRoleMention}: rolled ${roll}. Moves to tile ${newTile}. ${tileDescription}`;
+            let description = `Reroll for ${teamRoleMention}: rolled **${roll}**. Moves to tile **${newTile}**.\n **${tileDescription}**`;
             if (landedOnLadder) {
-                description = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on a ladder! After climbing up, moves to tile ${newTile}. ${tileDescription}`;
+                description = `Reroll for ${teamRoleMention}: rolled **${roll}** and landed on a ladder! :ladder: After climbing up, moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
-                description = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on the head of a snake! Sliding back down, moves to tile ${newTile}. ${tileDescription}`;
+                description = `Reroll for ${teamRoleMention}: rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, moves to tile **${newTile}**.\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
                 command: 'reroll',
-                title: 'Dice Reroll Result',
+                title: ':game_die: Dice Reroll',
                 description,
                 imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
                 color: '#8000ff',
@@ -100,8 +100,8 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'reroll',
-                title: 'Google Sheets Error',
-                description: 'There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                title: ':x: Google Sheets Error',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
