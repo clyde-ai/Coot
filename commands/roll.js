@@ -4,6 +4,7 @@ const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
 const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
+const { createEmbed } = require('../src/utils/embeds');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,20 +17,33 @@ module.exports = {
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
         if (!teamEntry) {
-            return interaction.reply('You are not part of any team.');
+            const embed = createEmbed({
+                command: 'roll',
+                title: 'User is not on a team',
+                description: 'You are not part of any team, ping an event admin for assistance.',
+                color: '#ff0000'
+            });
+            return interaction.reply({ embeds: [embed] });
         }
 
         const [teamName, team] = teamEntry;
+        const teamRole = interaction.guild.roles.cache.get(team.roleId);
+        const teamRoleMention = `<@&${team.roleId}>`;
 
         if (team.currentTile !== 0 && !team.canRoll) {
-            return interaction.reply('Your team has not submitted proof for the current tile.');
+            const embed = createEmbed({
+                command: 'roll',
+                title: `${teamRole.name} Cannot Roll`,
+                description: `Your team has not submitted proof for the current assigned tile: ${team.currentTile}`,
+                color: '#ff0000'
+            });
+            return interaction.reply({ embeds: [embed] });
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.currentTile + roll;
 
         const userMention = `<@${interaction.user.id}>`;
-        const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
         // Check for ladders and snakes
         const ladders = createLadder.getLadders();
@@ -66,14 +80,22 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            let replyContent = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+            let description = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             if (landedOnLadder) {
-                replyContent = `${userMention} rolled ${roll} and landed on a ladder! After climbing up, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                description = `${userMention} rolled ${roll} and landed on a ladder! After climbing up, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             } else if (landedOnSnake) {
-                replyContent = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
+                description = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             }
 
-            const replyOptions = { content: replyContent };
+            const embed = createEmbed({
+                command: 'roll',
+                title: 'Dice Roll Result',
+                description,
+                imageUrl: tileImage ? `attachment://${path.basename(tileImage)}` : null,
+                color: '#8000ff'
+            });
+
+            const replyOptions = { embeds: [embed] };
             if (tileImage) {
                 const imagePath = path.join(__dirname, '..', tileImage);
                 if (fs.existsSync(imagePath)) {
@@ -86,7 +108,13 @@ module.exports = {
             await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
-            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
+            const embed = createEmbed({
+                command: 'roll',
+                title: 'Google Sheets Error',
+                description: 'There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                color: '#ff0000'
+            });
+            await interaction.reply({ embeds: [embed] });
         }
     },
 };

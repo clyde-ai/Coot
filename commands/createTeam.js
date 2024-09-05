@@ -63,6 +63,7 @@ module.exports = {
 
             teams[teamName] = {
                 members: memberIds,
+                roleId: role.id, // Store the role ID
                 currentTile: 0, // Set initial tile to 0
                 previousTile: 0, // Set initial previous tile to 0
                 canRoll: false,
