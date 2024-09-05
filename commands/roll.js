@@ -58,10 +58,15 @@ module.exports = {
         const tileDescription = tile ? tile.description : 'No description available';
         const tileImage = tile ? tile.image : null;
 
+        const memberName = interaction.member.nickname || interaction.user.username;
+
         try {
             // Write to the Rolls sheet
-            const rollData = [teamName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
+            const rollData = [teamName, memberName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
             await googleSheets.writeToSheet('Rolls', rollData);
+
+            // Sort the Rolls sheet by Team Name
+            await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
             let replyContent = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             if (landedOnLadder) {

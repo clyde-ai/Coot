@@ -30,7 +30,7 @@ client.once('ready', async () => {
     // Initialize Google Sheets with headers if they are not already set
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created'];
-        const rollHeaders = ['Team Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
+        const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
 
         await setHeadersIfNotExist('Teams', teamHeaders);
@@ -49,6 +49,8 @@ async function setHeadersIfNotExist(sheetName, headers) {
         if (!existingHeaders || existingHeaders.length === 0 || existingHeaders[0].length < headers.length) {
             await googleSheets.setHeaders(sheetName, headers);
         }
+        // Freeze the headers
+        await googleSheets.freezeHeaders(sheetName);
     } catch (error) {
         console.error(`Error reading from sheet ${sheetName}!A1:Z1:`, error);
         throw new Error('Failed to read from Google Sheets. Please try again later.');

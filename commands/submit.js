@@ -19,10 +19,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('submit')
         .setDescription('Submit proof of tile completion')
-        .addIntegerOption(option => 
-            option.setName('tile')
-                .setDescription('The tile number')
-                .setRequired(true))
         .addAttachmentOption(option => 
             option.setName('proof')
                 .setDescription('Proof of tile completion (image)')
@@ -30,12 +26,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply(); // Public response
 
-        const tileNumber = interaction.options.getInteger('tile');
         const proofAttachment = interaction.options.getAttachment('proof');
-
-        if (isNaN(tileNumber)) {
-            return interaction.editReply('The first parameter must be a valid tile number.');
-        }
 
         const teams = createTeam.getTeams();
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
@@ -45,10 +36,7 @@ module.exports = {
         }
 
         const [teamName, team] = teamEntry;
-
-        if (team.currentTile !== tileNumber) {
-            return interaction.editReply(`Your team is currently on tile ${team.currentTile}, not tile ${tileNumber}.`);
-        }
+        const tileNumber = team.currentTile;
 
         try {
             // Download the image with increased timeout
@@ -112,6 +100,9 @@ module.exports = {
                 // Write to the Submissions sheet
                 const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString()];
                 await googleSheets.writeToSheet('Submissions', submissionData);
+
+                // Sort the Submissions sheet by Team Name
+                await googleSheets.sortSheet('Submissions', 'A', 'asc');
 
                 await interaction.editReply({
                     content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
