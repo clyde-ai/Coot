@@ -31,7 +31,7 @@ client.once('ready', async () => {
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created'];
         const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
-        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
+        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
 
         await setHeadersIfNotExist('Teams', teamHeaders);
         await setHeadersIfNotExist('Rolls', rollHeaders);
@@ -49,7 +49,6 @@ async function setHeadersIfNotExist(sheetName, headers) {
         if (!existingHeaders || existingHeaders.length === 0 || existingHeaders[0].length < headers.length) {
             await googleSheets.setHeaders(sheetName, headers);
         }
-        // Freeze the headers
         await googleSheets.freezeHeaders(sheetName);
     } catch (error) {
         console.error(`Error reading from sheet ${sheetName}!A1:Z1:`, error);

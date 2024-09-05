@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
-const tiles = require('../src/tiles'); // Import the tiles module
+const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
 const fs = require('fs');
 const path = require('path');
@@ -48,24 +48,22 @@ module.exports = {
             }
         }
 
-        // Update the team's current tile
         const previousTile = team.currentTile;
         createTeam.updateTeamTile(teamName, newTile);
-        createTeam.resetCanRoll(teamName); // Reset the roll permission until the next proof is submitted
+        createTeam.resetCanRoll(teamName);
 
         // Get tile description and image
         const tile = tiles.find(t => t.tileNumber === newTile);
         const tileDescription = tile ? tile.description : 'No description available';
         const tileImage = tile ? tile.image : null;
 
-        const memberName = interaction.member.nickname || interaction.user.username;
+        const memberName = interaction.member.displayName;
 
         try {
             // Write to the Rolls sheet
             const rollData = [teamName, memberName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
             await googleSheets.writeToSheet('Rolls', rollData);
 
-            // Sort the Rolls sheet by Team Name
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
             let replyContent = `${userMention} rolled ${roll}. ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;

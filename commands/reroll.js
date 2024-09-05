@@ -2,10 +2,10 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
 const createLadder = require('./createLadder');
 const createSnake = require('./createSnake');
-const tiles = require('../src/tiles'); // Import the tiles module
+const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
-const fs = require('fs'); // Import the fs module
+const fs = require('fs');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -54,14 +54,14 @@ module.exports = {
         // Update the team's current tile
         const previousTile = team.previousTile;
         createTeam.updateTeamTile(teamName, newTile);
-        createTeam.resetCanRoll(teamName); // Reset the roll permission until the next proof is submitted
+        createTeam.resetCanRoll(teamName);
 
         // Get tile description and image
         const tile = tiles.find(t => t.tileNumber === newTile);
         const tileDescription = tile ? tile.description : 'No description available';
         const tileImage = tile ? tile.image : null;
 
-        const memberName = interaction.member.nickname || interaction.user.username;
+        const memberName = interaction.member.displayName;
 
         try {
             // Write to the Rolls sheet

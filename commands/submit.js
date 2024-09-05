@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const vision = require('@google-cloud/vision');
 const sharp = require('sharp');
 const { getEventPassword } = require('./setEventPassword');
+const tiles = require('../src/tiles');
 const path = require('path');
 
 const credentialsPath = path.resolve(process.env.GOOGLE_CREDENTIALS_PATH);
@@ -13,7 +14,7 @@ const client = new vision.ImageAnnotatorClient({
     keyFilename: credentialsPath
 });
 
-const failedAttempts = new Map(); // Track failed attempts
+const failedAttempts = new Map();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,7 +25,7 @@ module.exports = {
                 .setDescription('Proof of tile completion (image)')
                 .setRequired(true)),
     async execute(interaction) {
-        await interaction.deferReply(); // Public response
+        await interaction.deferReply();
 
         const proofAttachment = interaction.options.getAttachment('proof');
 
@@ -54,7 +55,7 @@ module.exports = {
             const detections = result.textAnnotations;
             const text = detections.length ? detections[0].description : '';
 
-            const eventPassword = getEventPassword(); // Get the event password
+            const eventPassword = getEventPassword();
 
             if (!text.includes(eventPassword)) {
                 const userId = interaction.user.id;
@@ -67,10 +68,10 @@ module.exports = {
 
                     const userMention = `<@${interaction.user.id}>`;
                     const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
-                    const memberName = interaction.member.nickname || interaction.user.username; // Use nickname if available, otherwise username
+                    const memberName = interaction.member.displayName;
 
                     // Write to the Submissions sheet with a flag for manual review
-                    const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString(), 'Manual Review Needed'];
+                    const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed'];
                     await googleSheets.writeToSheet('Submissions', submissionData);
 
                     await interaction.editReply({
@@ -78,10 +79,8 @@ module.exports = {
                         files: [proofAttachment]
                     });
 
-                    // Reset failed attempts
                     failedAttempts.delete(userId);
                 } else {
-                    // Increment failed attempts
                     failedAttempts.set(userId, attempts + 1);
                     return interaction.editReply('The submitted image does not contain the event password. Please upload a valid image.');
                 }
@@ -89,25 +88,38 @@ module.exports = {
                 // Reset failed attempts on successful submission
                 failedAttempts.delete(interaction.user.id);
 
-                // Logic to handle proof submission
-                team.proofs[tileNumber] = proofAttachment.url;
-                team.canRoll = true;
+                if (!team.proofs[tileNumber]) {
+                    team.proofs[tileNumber] = [];
+                }
+                team.proofs[tileNumber].push(proofAttachment.url);
+
+                const tile = tiles.find(t => t.tileNumber === tileNumber);
+                const imagesNeeded = tile ? tile.imagesNeeded : 1;
+                const imagesSubmitted = team.proofs[tileNumber].length;
 
                 const userMention = `<@${interaction.user.id}>`;
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
-                const memberName = interaction.member.nickname || interaction.user.username; // Use nickname if available, otherwise username
+                const memberName = interaction.member.displayName;
 
                 // Write to the Submissions sheet
-                const submissionData = [teamName, memberName, tileNumber, proofAttachment.url, new Date().toISOString()];
+                const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
+                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString()];
                 await googleSheets.writeToSheet('Submissions', submissionData);
 
-                // Sort the Submissions sheet by Team Name
-                await googleSheets.sortSheet('Submissions', 'A', 'asc');
+                await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name
 
-                await interaction.editReply({
-                    content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. Any member of team ${teamRoleMention} can now use the /roll command!`,
-                    files: [proofAttachment]
-                });
+                if (imagesSubmitted >= imagesNeeded) {
+                    team.canRoll = true;
+                    await interaction.editReply({
+                        content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. All required proofs have been submitted. Any member of team ${teamRoleMention} can now use the /roll command!`,
+                        files: [proofAttachment]
+                    });
+                } else {
+                    await interaction.editReply({
+                        content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. ${imagesNeeded - imagesSubmitted} more proof(s) needed.`,
+                        files: [proofAttachment]
+                    });
+                }
             }
         } catch (error) {
             console.error(`Error processing the image: ${error.message}`);
