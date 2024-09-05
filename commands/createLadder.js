@@ -64,7 +64,7 @@ module.exports = {
 
         try {
             // Append the ladder to the Google Sheet
-            const ladderData = [bottomTile, topTile, interaction.user.tag, new Date().toISOString()];
+            const ladderData = [bottomTile, topTile, interaction.user.displayName, new Date().toISOString()];
             await googleSheets.writeToSheet('Ladders', ladderData);
 
             const { embed } = await createEmbed({

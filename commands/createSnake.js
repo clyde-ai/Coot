@@ -64,7 +64,7 @@ module.exports = {
 
         try {
             // Append the snake to the Google Sheet
-            const snakeData = [headTile, tailTile, interaction.user.tag, new Date().toISOString()];
+            const snakeData = [headTile, tailTile, interaction.user.displayName, new Date().toISOString()];
             await googleSheets.writeToSheet('Snakes', snakeData);
 
             const { embed } = await createEmbed({
