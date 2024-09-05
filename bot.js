@@ -2,6 +2,8 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const axios = require('axios');
 const googleSheets = require('./src/utils/googleSheets');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -83,6 +85,51 @@ client.on('messageCreate', message => {
         const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
         message.reply({ files: [gifPath] });
     }
+});
+
+// OAuth2 setup
+const app = express();
+const port = 3000;
+const clientId = '1280587064609472635';
+const clientSecret = process.env.CLIENT_SECRET;
+const redirectUri = 'http://localhost:3000/callback';
+
+app.get('/login', (req, res) => {
+    const authorizeUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=bot`;
+    res.redirect(authorizeUrl);
+});
+
+app.get('/callback', async (req, res) => {
+    const code = req.query.code;
+    try {
+        const response = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectUri
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+
+        const { access_token } = response.data;
+        const userInfo = await axios.get('https://discord.com/api/users/@me', {
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        });
+
+        res.json(userInfo.data);
+    } catch (error) {
+        console.error('Error during OAuth2 flow:', error);
+        res.status(500).send('An error occurred during the OAuth2 flow.');
+    }
+});
+
+app.listen(port, () => {
+    console.log(`OAuth2 app listening at http://localhost:${port}`);
 });
 
 client.login(process.env.DISCORD_TOKEN);

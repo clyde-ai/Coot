@@ -5,7 +5,9 @@ const createSnake = require('./createSnake');
 const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
+const { createEmbed } = require('../src/utils/embeds');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -70,22 +72,42 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            let replyContent = `Reroll for ${teamRoleMention}: rolled ${roll}. Moves to tile ${newTile}. ${tileDescription}`;
+            let description = `Reroll for ${teamRoleMention}: rolled ${roll}. Moves to tile ${newTile}. ${tileDescription}`;
             if (landedOnLadder) {
-                replyContent = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on a ladder! After climbing up, moves to tile ${newTile}. ${tileDescription}`;
+                description = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on a ladder! After climbing up, moves to tile ${newTile}. ${tileDescription}`;
             } else if (landedOnSnake) {
-                replyContent = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on the head of a snake! Sliding back down, moves to tile ${newTile}. ${tileDescription}`;
+                description = `Reroll for ${teamRoleMention}: rolled ${roll} and landed on the head of a snake! Sliding back down, moves to tile ${newTile}. ${tileDescription}`;
             }
 
-            // Check if the tile image file exists
-            if (tileImage && fs.existsSync(tileImage)) {
-                await interaction.reply({ content: replyContent, files: [tileImage] });
-            } else {
-                await interaction.reply({ content: replyContent });
+            const { embed, attachment } = await createEmbed({
+                command: 'reroll',
+                title: 'Dice Reroll Result',
+                description,
+                imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
+                color: '#8000ff',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+
+            const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
             }
+
+            await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
-            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
+            const { embed } = await createEmbed({
+                command: 'reroll',
+                title: 'Google Sheets Error',
+                description: 'There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
         }
     },
 };

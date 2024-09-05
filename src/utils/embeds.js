@@ -1,4 +1,7 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Creates a well-formatted embed for bot responses.
@@ -12,9 +15,12 @@ const { EmbedBuilder } = require('discord.js');
  * @param {string} [options.footer] - The footer text of the embed.
  * @param {string} [options.color] - The color of the embed.
  * @param {Object} [options.imageOptions] - Options for configuring the image size.
- * @returns {EmbedBuilder} - The configured embed.
+ * @param {string} options.channelId - The ID of the channel where the command was used.
+ * @param {string} options.messageId - The ID of the message containing the attachment.
+ * @param {Object} options.client - The Discord client instance.
+ * @returns {Object} - The configured embed and attachment.
  */
-function createEmbed({
+async function createEmbed({
     command,
     title,
     description,
@@ -23,15 +29,30 @@ function createEmbed({
     fields = [],
     footer,
     color = '#0099ff',
-    imageOptions = {}
+    imageOptions = {},
+    channelId,
+    messageId,
+    client
 }) {
     const embed = new EmbedBuilder()
         .setTitle(title)
         .setDescription(description)
         .setColor(color);
 
+    let attachment;
     if (imageUrl) {
-        embed.setImage(imageUrl, imageOptions);
+        try {
+            let resizedImageBuffer;
+            if (command === 'roll' || command === 'reroll') {
+                resizedImageBuffer = await resizeImage(imageUrl, 64, 64);
+            } else if (command === 'submit') {
+                resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
+            }
+            attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+            embed.setImage(`attachment://${path.basename(imageUrl)}`);
+        } catch (error) {
+            console.error('Error resizing image:', error);
+        }
     }
 
     if (thumbnailUrl) {
@@ -46,7 +67,20 @@ function createEmbed({
         embed.setFooter({ text: footer });
     }
 
-    return embed;
+    return { embed, attachment };
+}
+
+async function resizeImage(filePath, width, height) {
+    try {
+        const buffer = fs.readFileSync(filePath);
+        const resizedBuffer = await sharp(buffer)
+            .resize(width, height)
+            .toBuffer();
+        return resizedBuffer;
+    } catch (error) {
+        console.error('Error resizing image:', error);
+        throw error;
+    }
 }
 
 module.exports = {

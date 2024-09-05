@@ -17,11 +17,14 @@ module.exports = {
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
         if (!teamEntry) {
-            const embed = createEmbed({
+            const { embed } = await createEmbed({
                 command: 'roll',
                 title: 'User is not on a team',
                 description: 'You are not part of any team, ping an event admin for assistance.',
-                color: '#ff0000'
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
             });
             return interaction.reply({ embeds: [embed] });
         }
@@ -31,11 +34,14 @@ module.exports = {
         const teamRoleMention = `<@&${team.roleId}>`;
 
         if (team.currentTile !== 0 && !team.canRoll) {
-            const embed = createEmbed({
+            const { embed } = await createEmbed({
                 command: 'roll',
                 title: `${teamRole.name} Cannot Roll`,
                 description: `Your team has not submitted proof for the current assigned tile: ${team.currentTile}`,
-                color: '#ff0000'
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
             });
             return interaction.reply({ embeds: [embed] });
         }
@@ -87,32 +93,33 @@ module.exports = {
                 description = `${userMention} rolled ${roll} and landed on the head of a snake! Sliding back down, ${teamRoleMention} moves to tile ${newTile}. ${tileDescription}`;
             }
 
-            const embed = createEmbed({
+            const { embed, attachment } = await createEmbed({
                 command: 'roll',
                 title: 'Dice Roll Result',
                 description,
-                imageUrl: tileImage ? `attachment://${path.basename(tileImage)}` : null,
-                color: '#8000ff'
+                imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
+                color: '#8000ff',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
             });
 
             const replyOptions = { embeds: [embed] };
-            if (tileImage) {
-                const imagePath = path.join(__dirname, '..', tileImage);
-                if (fs.existsSync(imagePath)) {
-                    replyOptions.files = [imagePath];
-                } else {
-                    console.warn(`Image file not found: ${imagePath}`);
-                }
+            if (attachment) {
+                replyOptions.files = [attachment];
             }
 
             await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
-            const embed = createEmbed({
+            const { embed } = await createEmbed({
                 command: 'roll',
                 title: 'Google Sheets Error',
                 description: 'There was an error updating the Google Sheet. Please ping Clyde or an admin.',
-                color: '#ff0000'
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
             });
             await interaction.reply({ embeds: [embed] });
         }
