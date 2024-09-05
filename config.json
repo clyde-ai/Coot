@@ -4,6 +4,7 @@
     "guildId": "${GUILD_ID}",
     "adminRoleId": "${ADMIN_ROLE_ID}",
     "googleSheetId": "${GOOGLE_SHEET_ID}",
-    "clientSecret": "${CLIENT_SECRET}"
+    "clientSecret": "${CLIENT_SECRET}",
+    "baseUrl": "${BASE_URL}"
   }
   
