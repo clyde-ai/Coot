@@ -7,6 +7,7 @@ const sharp = require('sharp');
 const { getEventPassword } = require('./setEventPassword');
 const tiles = require('../src/tiles');
 const path = require('path');
+const { createEmbed } = require('../src/utils/embeds');
 
 const credentialsPath = path.resolve(process.env.GOOGLE_CREDENTIALS_PATH);
 
@@ -33,7 +34,17 @@ module.exports = {
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
         if (!teamEntry) {
-            return interaction.editReply('You are not part of any team.');
+            const { embed } = await createEmbed({
+                command: 'submit',
+                title: ':x: Not in a Team',
+                description: 'You are not part of any team.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.editReply({ embeds: [embed] });
+            return;
         }
 
         const [teamName, team] = teamEntry;
@@ -64,7 +75,14 @@ module.exports = {
                 if (attempts >= 1) {
                     // Accept the image but flag for manual review
                     team.proofs[tileNumber] = proofAttachment.url;
-                    team.canRoll = true;
+
+                    const tile = tiles.find(t => t.tileNumber === tileNumber);
+                    const imagesNeeded = tile ? tile.imagesNeeded : 1;
+                    const imagesSubmitted = team.proofs[tileNumber].length;
+
+                    if (imagesSubmitted >= imagesNeeded) {
+                        team.canRoll = true;
+                    }
 
                     const userMention = `<@${interaction.user.id}>`;
                     const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
@@ -74,15 +92,30 @@ module.exports = {
                     const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed'];
                     await googleSheets.writeToSheet('Submissions', submissionData);
 
-                    await interaction.editReply({
-                        content: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review. Any member of team ${teamRoleMention} can now use the /roll command!`,
-                        files: [proofAttachment]
+                    const { embed } = await createEmbed({
+                        command: 'submit',
+                        title: ':warning: Manual Review Needed',
+                        description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
+                        color: '#FFA500',
+                        channelId: interaction.channelId,
+                        messageId: interaction.id,
+                        client: interaction.client
                     });
+                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
 
                     failedAttempts.delete(userId);
                 } else {
                     failedAttempts.set(userId, attempts + 1);
-                    return interaction.editReply('The submitted image does not contain the event password. Please upload a valid image.');
+                    const { embed } = await createEmbed({
+                        command: 'submit',
+                        title: ':x: Invalid Proof',
+                        description: 'The submitted image does not contain the event password.\n Please upload a clear and valid image.\n Make sure your event password is visible.\n i.e. Bright green text color placed in an open area, **not** on top of any objects, overlays, etc.',
+                        color: '#FF0000',
+                        channelId: interaction.channelId,
+                        messageId: interaction.id,
+                        client: interaction.client
+                    });
+                    await interaction.editReply({ embeds: [embed] });
                 }
             } else {
                 // Reset failed attempts on successful submission
@@ -110,20 +143,41 @@ module.exports = {
 
                 if (imagesSubmitted >= imagesNeeded) {
                     team.canRoll = true;
-                    await interaction.editReply({
-                        content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. All required proofs have been submitted. Any member of team ${teamRoleMention} can now use the /roll command!`,
-                        files: [proofAttachment]
+                    const { embed } = await createEmbed({
+                        command: 'submit',
+                        title: ':white_check_mark: Proof Submitted',
+                        description: `Proof for tile **${tileNumber}** submitted successfully by ${userMention} from team ${teamRoleMention}.\n :tada: **All required proofs have been submitted!** :tada:\n Any member of team ${teamRoleMention} can now use the */roll* command!`,
+                        color: '#00FF00',
+                        channelId: interaction.channelId,
+                        messageId: interaction.id,
+                        client: interaction.client
                     });
+                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
                 } else {
-                    await interaction.editReply({
-                        content: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}. ${imagesNeeded - imagesSubmitted} more proof(s) needed.`,
-                        files: [proofAttachment]
+                    const { embed } = await createEmbed({
+                        command: 'submit',
+                        title: ':ballot_box_with_check: Proof Submitted',
+                        description: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}.\n **${imagesNeeded - imagesSubmitted}** more proof(s) needed.`,
+                        color: '#004cff',
+                        channelId: interaction.channelId,
+                        messageId: interaction.id,
+                        client: interaction.client
                     });
+                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
                 }
             }
         } catch (error) {
             console.error(`Error processing the image: ${error.message}`);
-            await interaction.editReply('There was an error processing the image. Please try again later.');
+            const { embed } = await createEmbed({
+                command: 'submit',
+                title: ':x: Error',
+                description: 'There was an error processing the image. Please ping an event admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.editReply({ embeds: [embed] });
         }
     },
 };
