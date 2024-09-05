@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
 const googleSheets = require('../src/utils/googleSheets');
+const { createEmbed } = require('../src/utils/embeds');
 const teams = {};
 
 module.exports = {
@@ -76,7 +77,7 @@ module.exports = {
             const member = interaction.guild.members.cache.get(id);
             if (member) {
                 member.roles.add(role);
-                return `${member.displayName}:${id}`; // Use display name and Discord ID
+                return `${member.displayName}:${id}`;
             }
             return null;
         }).filter(Boolean);
@@ -96,7 +97,18 @@ module.exports = {
                 await googleSheets.writeToSheet('Teams', teamData);
             }
 
-            await interaction.reply(`Team ${teamName} ${teamIndex !== 0 ? 'updated' : 'created'} with members: ${memberDisplayNames.map(nameId => nameId.split(':')[0]).join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
+            const { embed, attachment } = await createEmbed({
+                command: 'create-team',
+                title: `:white_check_mark: Team ${teamName} ${teamIndex !== 0 ? 'Updated' : 'Created'}`,
+                description: `:busts_in_silhouette: **Members:** ${memberDisplayNames.map(nameId => nameId.split(':')[0]).join(', ')}`,
+                fields: [{ name: 'Role', value: `<@&${role.id}>`, inline: true }],
+                color: '#00FF00',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+
+            await interaction.reply({ embeds: [embed], files: attachment ? [attachment] : [] });
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
