@@ -81,17 +81,21 @@ module.exports = {
         }).filter(Boolean);
 
         try {
-            // Write to Google Sheets
+            // Read the existing teams from the Google Sheet
+            const existingTeams = await googleSheets.readSheet('Teams!A:C');
+            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
+
             const teamData = [teamName, memberNicknames.join(', '), new Date().toISOString()];
-            if (teams[teamName]) {
+
+            if (teamIndex !== 0) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${Object.keys(teams).indexOf(teamName) + 2}:C`, teamData);
+                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:C${teamIndex + 1}`, teamData);
             } else {
                 // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);
             }
 
-            await interaction.reply(`Team ${teamName} ${teams[teamName] ? 'updated' : 'created'} with members: ${memberNicknames.join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
+            await interaction.reply(`Team ${teamName} ${teamIndex !== 0 ? 'updated' : 'created'} with members: ${memberNicknames.join(', ')}. Role <@&${role.id}> has been assigned to the team members.`);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             await interaction.reply('There was an error updating the Google Sheet. Please try again later.');

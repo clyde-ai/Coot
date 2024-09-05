@@ -27,21 +27,33 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     require('./deploy-commands');
 
-    // Initialize Google Sheets with headers
+    // Initialize Google Sheets with headers if they are not already set
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created'];
         const rollHeaders = ['Team Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
-        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp'];
+        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
 
-        await googleSheets.setHeaders('Teams', teamHeaders);
-        await googleSheets.setHeaders('Rolls', rollHeaders);
-        await googleSheets.setHeaders('Submissions', submissionHeaders);
+        await setHeadersIfNotExist('Teams', teamHeaders);
+        await setHeadersIfNotExist('Rolls', rollHeaders);
+        await setHeadersIfNotExist('Submissions', submissionHeaders);
 
         console.log('Headers set successfully.');
     } catch (error) {
         console.error('Error setting headers:', error);
     }
 });
+
+async function setHeadersIfNotExist(sheetName, headers) {
+    try {
+        const existingHeaders = await googleSheets.readSheet(`${sheetName}!A1:Z1`);
+        if (!existingHeaders || existingHeaders.length === 0 || existingHeaders[0].length < headers.length) {
+            await googleSheets.setHeaders(sheetName, headers);
+        }
+    } catch (error) {
+        console.error(`Error reading from sheet ${sheetName}!A1:Z1:`, error);
+        throw new Error('Failed to read from Google Sheets. Please try again later.');
+    }
+}
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;

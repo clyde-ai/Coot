@@ -50,16 +50,16 @@ async function updateSheet(sheetName, range, data) {
     }
 }
 
-async function readSheet(sheetName, range) {
+async function readSheet(range) {
     try {
         const res = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            range: `${sheetName}!${range}`,
+            range,
         });
-        console.log(`Data read from sheet ${sheetName} at range ${range}`);
+        console.log(`Data read from sheet at range ${range}`);
         return res.data.values;
     } catch (error) {
-        console.error(`Error reading from sheet ${sheetName}:`, error);
+        console.error(`Error reading from sheet at range ${range}:`, error);
         throw new Error('Failed to read from Google Sheets. Please try again later.');
     }
 }
