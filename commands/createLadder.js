@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
-const { createEmbed } = require('../src/utils/embeds'); // Adjust the path as necessary
+const { createEmbed } = require('../src/utils/embeds');
+const googleSheets = require('../src/utils/googleSheets');
 const ladders = [];
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':face_with_raised_eyebrow: Permission Denied',
+                title: ':x: Permission Denied',
                 description: 'You do not have permission to use this command.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
@@ -61,16 +62,34 @@ module.exports = {
         // Store the ladder in memory
         ladders.push({ bottom: bottomTile, top: topTile });
 
-        const { embed } = await createEmbed({
-            command: 'create-ladder',
-            title: ':ladder: Ladder Created',
-            description: `Ladder created: from tile **${bottomTile}** to tile **${topTile}**.`,
-            color: '#00FF00',
-            channelId: interaction.channelId,
-            messageId: interaction.id,
-            client: interaction.client
-        });
-        await interaction.reply({ embeds: [embed] });
+        try {
+            // Append the ladder to the Google Sheet
+            const ladderData = [bottomTile, topTile, interaction.user.tag, new Date().toISOString()];
+            await googleSheets.writeToSheet('Ladders', ladderData);
+
+            const { embed } = await createEmbed({
+                command: 'create-ladder',
+                title: ':ladder: Ladder Created',
+                description: `Ladder created: from tile **${bottomTile}** to tile **${topTile}**.`,
+                color: '#00FF00',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error(`Error writing to Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'create-ladder',
+                title: ':x: Error',
+                description: 'There was an error updating the Google Sheet. Please try again later.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+        }
     },
     getLadders() {
         return ladders;

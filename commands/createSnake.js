@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
-const { createEmbed } = require('../src/utils/embeds'); // Adjust the path as necessary
+const { createEmbed } = require('../src/utils/embeds');
+const googleSheets = require('../src/utils/googleSheets');
 const snakes = [];
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':face_with_raised_eyebrow: Permission Denied',
+                title: ':x: Permission Denied',
                 description: 'You do not have permission to use this command.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
@@ -61,16 +62,34 @@ module.exports = {
         // Store the snake in memory
         snakes.push({ head: headTile, tail: tailTile });
 
-        const { embed } = await createEmbed({
-            command: 'create-snake',
-            title: ':snake: Snake Created',
-            description: `Snake created: from tile **${headTile}** to tile **${tailTile}**.`,
-            color: '#00FF00',
-            channelId: interaction.channelId,
-            messageId: interaction.id,
-            client: interaction.client
-        });
-        await interaction.reply({ embeds: [embed] });
+        try {
+            // Append the snake to the Google Sheet
+            const snakeData = [headTile, tailTile, interaction.user.tag, new Date().toISOString()];
+            await googleSheets.writeToSheet('Snakes', snakeData);
+
+            const { embed } = await createEmbed({
+                command: 'create-snake',
+                title: ':snake: Snake Created',
+                description: `Snake created: from tile **${headTile}** to tile **${tailTile}**.`,
+                color: '#00FF00',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error(`Error writing to Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'create-snake',
+                title: ':x: Error',
+                description: 'There was an error updating the Google Sheet. Please try again later.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+        }
     },
     getSnakes() {
         return snakes;
