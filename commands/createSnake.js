@@ -17,17 +17,21 @@ module.exports = {
                 .setDescription('The tail tile number of the snake')
                 .setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':x: Permission Denied',
+                title: ':x: Access Denied :x:',
                 description: 'You do not have permission to use this command.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const headTile = interaction.options.getInteger('head');
@@ -36,27 +40,27 @@ module.exports = {
         if (isNaN(headTile) || isNaN(tailTile)) {
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':x: Invalid Input',
+                title: ':x: Invalid Input :x:',
                 description: 'Both parameters must be valid tile numbers.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         if (headTile <= tailTile) {
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':x: Invalid Tile Numbers',
+                title: ':x: Invalid Tile Numbers :x:',
                 description: 'The head tile number must be greater than the tail tile number.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         // Store the snake in memory
@@ -69,7 +73,7 @@ module.exports = {
 
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':snake: Snake Created',
+                title: ':snake: Snake Created :snake:',
                 description: `Snake created: from tile **${headTile}** to tile **${tailTile}**.`,
                 color: '#00FF00',
                 channelId: interaction.channelId,
@@ -81,14 +85,14 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'create-snake',
-                title: ':x: Error',
-                description: 'There was an error updating the Google Sheet. Please try again later.',
+                title: ':x: Error :x:',
+                description: 'There was an error updating the Google Sheet. Please ping Clyde.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
     getSnakes() {

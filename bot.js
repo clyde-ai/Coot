@@ -93,7 +93,7 @@ client.on('messageCreate', message => {
 
 // OAuth2 setup
 const app = express();
-const port = process.env.PORT || 3000; // Use the port provided by host
+const port = process.env.PORT || 3000;
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 const redirectUri = `${process.env.BASE_URL}/callback`;

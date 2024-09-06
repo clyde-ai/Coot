@@ -48,8 +48,8 @@ module.exports = {
         if (!teamEntry) {
             const { embed } = await createEmbed({
                 command: 'submit',
-                title: ':x: Not in a Team',
-                description: 'You are not part of any team.',
+                title: ':x: Player Not In A Team :x:',
+                description: 'You are not part of any team. Ping an event admin for assistance.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -106,7 +106,7 @@ module.exports = {
 
                     const { embed } = await createEmbed({
                         command: 'submit',
-                        title: ':warning: Manual Review Needed',
+                        title: ':warning: Manual Review Needed :warning:',
                         description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
                         color: '#FFA500',
                         channelId: interaction.channelId,
@@ -120,8 +120,8 @@ module.exports = {
                     failedAttempts.set(userId, attempts + 1);
                     const { embed } = await createEmbed({
                         command: 'submit',
-                        title: ':x: Invalid Proof',
-                        description: 'The submitted image does not contain the event password.\n Please upload a clear and valid image.\n Make sure your event password is visible.\n i.e. Bright green text color placed in an open area, **not** on top of any objects, overlays, etc.',
+                        title: ':x: Invalid Proof :x:',
+                        description: 'The submitted image does not contain the event password.\n Please upload a clear and valid image.\n Make sure your event password is visible!\n i.e. bright green text placed in an open area, **not** on top of any objects, overlays, etc.',
                         color: '#FF0000',
                         channelId: interaction.channelId,
                         messageId: interaction.id,
@@ -157,7 +157,7 @@ module.exports = {
                     team.canRoll = true;
                     const { embed } = await createEmbed({
                         command: 'submit',
-                        title: ':white_check_mark: Proof Submitted',
+                        title: ':white_check_mark: Proof Submitted :white_check_mark:',
                         description: `Proof for tile **${tileNumber}** submitted successfully by ${userMention} from team ${teamRoleMention}.\n :tada: **All required proofs have been submitted!** :tada:\n Any member of team ${teamRoleMention} can now use the */roll* command!`,
                         color: '#00FF00',
                         channelId: interaction.channelId,
@@ -168,7 +168,7 @@ module.exports = {
                 } else {
                     const { embed } = await createEmbed({
                         command: 'submit',
-                        title: ':ballot_box_with_check: Proof Submitted',
+                        title: ':ballot_box_with_check: Proof Submitted :ballot_box_with_check:',
                         description: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}.\n **${imagesNeeded - imagesSubmitted}** more proof(s) needed.`,
                         color: '#004cff',
                         channelId: interaction.channelId,
@@ -182,7 +182,7 @@ module.exports = {
             console.error(`Error processing the image: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'submit',
-                title: ':x: Error',
+                title: ':x: Error :x:',
                 description: 'There was an error processing the image. Please ping an event admin.',
                 color: '#FF0000',
                 channelId: interaction.channelId,

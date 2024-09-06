@@ -16,10 +16,6 @@
     "sharp": "^0.33.5"
   },
   "scripts": {
-    "start": "node bot.js",
-    "test": "jest --config tests/jest.config.js"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0"
+    "start": "node bot.js"
   }
 }

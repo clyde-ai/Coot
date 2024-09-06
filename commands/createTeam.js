@@ -17,8 +17,21 @@ module.exports = {
                 .setDescription('The members to add to the team (mention them)')
                 .setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply('You do not have permission to use this command.');
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Access Denied :x:',
+                description: 'You do not have permission to use this command.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const teamName = interaction.options.getString('teamname');
@@ -26,11 +39,29 @@ module.exports = {
         const memberIds = membersArg.match(/<@!?(\d+)>/g)?.map(id => id.replace(/[<@!>]/g, ''));
 
         if (!memberIds || memberIds.length === 0) {
-            return interaction.reply('Please provide at least one member.');
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Invalid Input :x:',
+                description: 'Please provide at least one member.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         if (memberIds.length > 10) {
-            return interaction.reply('A team can have a maximum of 10 members.');
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Team Size Exceeded :x:',
+                description: 'A team can have a maximum of 10 members.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         let role;
@@ -38,7 +69,16 @@ module.exports = {
             // Edit existing team
             role = interaction.guild.roles.cache.find(r => r.name === `Team ${teamName}`);
             if (!role) {
-                return interaction.reply('The role for this team does not exist.');
+                const { embed } = await createEmbed({
+                    command: 'create-team',
+                    title: ':x: Role Not Found :x:',
+                    description: 'The role for this team does not exist.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
             // Remove members who are no longer in the team
@@ -67,7 +107,7 @@ module.exports = {
                 roleId: role.id, // Store the role ID
                 currentTile: 0, // Set initial tile to 0
                 previousTile: 0, // Set initial previous tile to 0
-                canRoll: false,
+                canRoll: false, // Set initial to false
                 proofs: {}
             };
         }
@@ -99,7 +139,7 @@ module.exports = {
 
             const { embed, attachment } = await createEmbed({
                 command: 'create-team',
-                title: `:white_check_mark: Team ${teamName} ${teamIndex !== 0 ? 'Updated' : 'Created'}`,
+                title: `:white_check_mark: Team ${teamName} ${teamIndex !== 0 ? 'Updated' : 'Created'} :white_check_mark:`,
                 description: `:busts_in_silhouette: **Members:** ${memberDisplayNames.map(nameId => nameId.split(':')[0]).join(', ')}`,
                 fields: [{ name: 'Role', value: `<@&${role.id}>`, inline: true }],
                 color: '#00FF00',
@@ -111,7 +151,16 @@ module.exports = {
             await interaction.reply({ embeds: [embed], files: attachment ? [attachment] : [] });
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
-            await interaction.reply('There was an error updating the Google Sheet. Please try again later.');
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Error :x:',
+                description: 'There was an error updating the Google Sheet. Please ping Clyde.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
     getTeams() {
