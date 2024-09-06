@@ -84,7 +84,7 @@ module.exports = {
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
-                if (attempts >= 1) {
+                if (attempts >= 0) { // Set to 1 if you want the invalid proof response
                     // Accept the image but flag for manual review
                     team.proofs[tileNumber] = proofAttachment.url;
 
