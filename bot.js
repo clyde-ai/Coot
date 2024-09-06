@@ -93,10 +93,10 @@ client.on('messageCreate', message => {
 
 // OAuth2 setup
 const app = express();
-const port = 3000;
-const clientId = '1280587064609472635';
+const port = process.env.PORT || 3000; // Use the port provided by host
+const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-const redirectUri = 'http://localhost:3000/callback';
+const redirectUri = `${process.env.BASE_URL}/callback`;
 
 app.get('/login', (req, res) => {
     const authorizeUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=bot`;

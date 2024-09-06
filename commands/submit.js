@@ -9,11 +9,23 @@ const tiles = require('../src/tiles');
 const path = require('path');
 const { createEmbed } = require('../src/utils/embeds');
 
-const credentialsPath = path.resolve(process.env.GOOGLE_CREDENTIALS_PATH);
+let client;
 
-const client = new vision.ImageAnnotatorClient({
-    keyFilename: credentialsPath
-});
+if (process.env.GOOGLE_CREDENTIALS_PATH) {
+    console.log('GOOGLE_CREDENTIALS_PATH found, proceeding with local function.');
+    const credentialsPath = path.resolve(process.env.GOOGLE_CREDENTIALS_PATH);
+    client = new vision.ImageAnnotatorClient({
+        keyFilename: credentialsPath
+    });
+} else if (process.env.GOOGLE_CREDENTIALS) {
+    console.log('GOOGLE_CREDENTIALS_PATH not found, proceeding with hosted function.');
+    const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    client = new vision.ImageAnnotatorClient({
+        credentials: credentials
+    });
+} else {
+    throw new Error('No Google Cloud credentials found. Please set either GOOGLE_CREDENTIALS_PATH or GOOGLE_CREDENTIALS environment variable.');
+}
 
 const failedAttempts = new Map();
 
