@@ -17,17 +17,21 @@ module.exports = {
                 .setDescription('The top tile number of the ladder')
                 .setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':x: Permission Denied',
+                title: ':x: Permission Denied :x:',
                 description: 'You do not have permission to use this command.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const bottomTile = interaction.options.getInteger('bottom');
@@ -36,27 +40,27 @@ module.exports = {
         if (isNaN(bottomTile) || isNaN(topTile)) {
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':x: Invalid Input',
+                title: ':x: Invalid Input :x:',
                 description: 'Both parameters must be valid tile numbers.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         if (bottomTile >= topTile) {
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':x: Invalid Tile Numbers',
+                title: ':x: Invalid Tile Numbers :x:',
                 description: 'The bottom tile number must be lower than the top tile number.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         // Store the ladder in memory
@@ -69,7 +73,7 @@ module.exports = {
 
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':ladder: Ladder Created',
+                title: ':ladder: Ladder Created :ladder:',
                 description: `Ladder created: from tile **${bottomTile}** to tile **${topTile}**.`,
                 color: '#00FF00',
                 channelId: interaction.channelId,
@@ -81,14 +85,14 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'create-ladder',
-                title: ':x: Error',
-                description: 'There was an error updating the Google Sheet. Please try again later.',
+                title: ':x: Error :x:',
+                description: 'There was an error updating the Google Sheet. Please ping Clyde.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
     getLadders() {

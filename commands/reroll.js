@@ -19,8 +19,21 @@ module.exports = {
                 .setRequired(true))
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            return interaction.reply(':x: You do not have permission to use this command.');
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
+            const { embed } = await createEmbed({
+                command: 'reroll',
+                title: ':x: Permission Denied',
+                description: 'You do not have permission to use this command.\n If you need a reroll ping an event admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const teamName = interaction.options.getString('teamname');
@@ -28,7 +41,16 @@ module.exports = {
         const team = teams[teamName];
 
         if (!team) {
-            return interaction.reply(`:x: Team ${teamName} does not exist.`);
+            const { embed } = await createEmbed({
+                command: 'reroll',
+                title: ':x: Team Not Found :x:',
+                description: `Team ${teamName} does not exist.`,
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
@@ -81,7 +103,7 @@ module.exports = {
 
             const { embed, attachment } = await createEmbed({
                 command: 'reroll',
-                title: ':game_die: Dice Reroll',
+                title: ':game_die: Dice Reroll :game_die:',
                 description,
                 imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
                 color: '#8000ff',
@@ -100,14 +122,14 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'reroll',
-                title: ':x: Google Sheets Error',
-                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde.',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
 };

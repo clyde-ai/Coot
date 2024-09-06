@@ -19,8 +19,8 @@ module.exports = {
         if (!teamEntry) {
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: ':x: User is not on a team',
-                description: ':x: You are not part of any team, ping an event admin for assistance.',
+                title: ':x: Player Not In A Team :x:',
+                description: '**You are not part of any team, ping an event admin for assistance.**',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -36,8 +36,8 @@ module.exports = {
         if (team.currentTile !== 0 && !team.canRoll) {
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: `:x: ${teamRole.name} Cannot Roll`,
-                description: `:x: Your team has not submitted proof for the current assigned tile: ${team.currentTile}`,
+                title: `:x: ${teamRole.name} Cannot Roll :x:`,
+                description: `**Your team has not submitted all required proof for tile: ${team.currentTile}**`,
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -95,7 +95,7 @@ module.exports = {
 
             const { embed, attachment } = await createEmbed({
                 command: 'roll',
-                title: ':game_die: Dice Roll',
+                title: ':game_die: Dice Roll :game_die:',
                 description,
                 imageUrl: tileImage ? path.join(__dirname, '..', tileImage) : null,
                 color: '#8000ff',
@@ -114,7 +114,7 @@ module.exports = {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'roll',
-                title: ':x: Google Sheets Error',
+                title: ':x: Google Sheets Error :x:',
                 description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
                 color: '#ff0000',
                 channelId: interaction.channelId,

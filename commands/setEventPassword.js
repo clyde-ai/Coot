@@ -12,17 +12,21 @@ module.exports = {
                 .setDescription('The event password to set')
                 .setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'set-event-password',
-                title: ':face_with_raised_eyebrow: Permission Denied',
+                title: ':x: Access Denied :x:',
                 description: 'You do not have permission to use this command.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         const password = interaction.options.getString('password');
@@ -30,8 +34,8 @@ module.exports = {
 
         const { embed } = await createEmbed({
             command: 'set-event-password',
-            title: ':lock: Event Password Set',
-            description: ':white_check_mark: Event password has been set successfully.',
+            title: ':lock: Event Password Set :lock:',
+            description: '**Event password has been set successfully!**',
             color: '#00FF00',
             channelId: interaction.channelId,
             messageId: interaction.id,
