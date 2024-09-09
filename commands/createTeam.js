@@ -140,13 +140,14 @@ module.exports = {
             }
         }
 
+        let existingTeams;
         try {
             // Read the existing teams from the Google Sheet
-            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            existingTeams = await googleSheets.readSheet('Teams!A:E');
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
             const currentTile = teams[teamName] ? teams[teamName].currentTile : 0;
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile]; // Include currentTile value
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile];
 
             if (teamIndex !== 0) {
                 // Update existing team

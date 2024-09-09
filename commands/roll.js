@@ -31,8 +31,9 @@ module.exports = {
         const teamRoleMention = `<@&${team.roleId}>`;
 
         // Fetch the current tile from the Teams sheet
+        let existingTeams;
         try {
-            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            existingTeams = await googleSheets.readSheet('Teams!A:E');
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
                 team.currentTile = parseInt(teamRow[4], 10);
