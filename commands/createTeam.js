@@ -4,6 +4,26 @@ const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
 const teams = {};
 
+async function loadTeamsFromSheet() {
+    try {
+        const rows = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+        rows.slice(1).forEach(row => {
+            const [teamName, members, dateCreated, roleId, currentTile] = row;
+            const memberIds = members.split(', ').map(member => member.split(':')[1]);
+            teams[teamName] = {
+                members: memberIds,
+                roleId: roleId,
+                currentTile: parseInt(currentTile, 10) || 0, // Parse currentTile
+                previousTile: 0,
+                canRoll: false,
+                proofs: {}
+            };
+        });
+    } catch (error) {
+        console.error('Error loading teams from Google Sheets:', error);
+    }
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('create-team')
@@ -124,14 +144,14 @@ module.exports = {
 
         try {
             // Read the existing teams from the Google Sheet
-            const existingTeams = await googleSheets.readSheet('Teams!A:C');
+            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
 
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString()];
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, 0]; // Include initial currentTile value
 
             if (teamIndex !== 0) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:C${teamIndex + 1}`, teamData);
+                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:E${teamIndex + 1}`, teamData);
             } else {
                 // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);
@@ -183,3 +203,6 @@ module.exports = {
         }
     }
 };
+
+// Load teams from Google Sheets on startup
+loadTeamsFromSheet();

@@ -60,6 +60,31 @@ module.exports = {
         }
 
         const [teamName, team] = teamEntry;
+
+        // Fetch the current tile from the Teams sheet
+        try {
+            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+            const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
+            if (teamRow) {
+                team.currentTile = parseInt(teamRow[4], 10); // Assuming the currentTile is in the fifth column
+            } else {
+                throw new Error('Team not found in Google Sheets');
+            }
+        } catch (error) {
+            console.error(`Error reading from Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'submit',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error reading the Google Sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.editReply({ embeds: [embed] });
+            return;
+        }
+
         const tileNumber = team.currentTile;
 
         try {

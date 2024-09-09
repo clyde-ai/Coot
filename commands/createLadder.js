@@ -95,10 +95,26 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
-    getLadders() {
-        return ladders;
+    getLadders: async function() {
+        try {
+            const laddersData = await googleSheets.readSheet('Ladders!A:B'); // Assuming ladders data is in columns A and B
+            return laddersData.slice(1).map(row => ({ bottom: parseInt(row[0], 10), top: parseInt(row[1], 10) }));
+        } catch (error) {
+            console.error(`Error reading ladders from Google Sheets: ${error.message}`);
+            return [];
+        }
     },
-    clearLadders() {
-        ladders.length = 0;
+    clearLadders: async function() {
+        try {
+            // Clear all data except headers in the Ladders sheet
+            await googleSheets.clearSheet('Ladders!A2:B'); // Assuming headers are in the first row
+
+            // Clear the in-memory ladders array
+            ladders.length = 0;
+
+            console.log('Ladders sheet cleared successfully.');
+        } catch (error) {
+            console.error(`Error clearing Ladders sheet: ${error.message}`);
+        }
     }
 };

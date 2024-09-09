@@ -26,7 +26,7 @@ async function writeToSheet(sheetName, data) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            range: `${sheetName}!A:F`, // Adjust the range to include the new column
+            range: `${sheetName}!A:E`, // Adjust the range to include the new column
             valueInputOption: 'RAW',
             resource: {
                 values: [data],
@@ -158,6 +158,19 @@ async function freezeHeaders(sheetName) {
     }
 }
 
+async function clearSheet(range) {
+    try {
+        await sheets.spreadsheets.values.clear({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range: range,
+        });
+        console.log(`Sheet cleared at range ${range}`);
+    } catch (error) {
+        console.error(`Error clearing sheet at range ${range}:`, error);
+        throw new Error('Failed to clear Google Sheets. Please try again later.');
+    }
+}
+
 module.exports = {
     writeToSheet,
     updateSheet,
@@ -165,4 +178,5 @@ module.exports = {
     setHeaders,
     sortSheet,
     freezeHeaders,
+    clearSheet
 };

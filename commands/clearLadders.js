@@ -23,14 +23,25 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        clearLadders();
+        try {
+            await clearLadders();
 
-        const { embed } = await createEmbed({
-            command: 'clear-ladders',
-            title: ':ladder: Ladders Cleared :ladder:',
-            description: '**All ladders have been removed from the board!**',
-            color: '#00ff00'
-        });
-        await interaction.reply({ embeds: [embed] });
+            const { embed } = await createEmbed({
+                command: 'clear-ladders',
+                title: ':ladder: Ladders Cleared :ladder:',
+                description: '**All ladders have been removed from the board!**',
+                color: '#00ff00'
+            });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error(`Error clearing ladders: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'clear-ladders',
+                title: ':x: Error :x:',
+                description: 'There was an error clearing the ladders. Please ping Clyde.',
+                color: '#ff0000'
+            });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
     }
 };
