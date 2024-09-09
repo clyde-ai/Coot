@@ -64,7 +64,18 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
-    getEventPassword() {
+    async getEventPassword() {
+        try {
+            const rows = await googleSheets.readSheet('EventPassword!A2:A');
+            if (rows.length > 0) {
+                eventPassword = rows[0][0];
+            } else {
+                eventPassword = '';
+            }
+        } catch (error) {
+            console.error(`ERROR reading Google Sheets: ${error.message}`);
+            eventPassword = '';
+        }
         return eventPassword;
     }
 };
