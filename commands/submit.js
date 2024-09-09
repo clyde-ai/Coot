@@ -60,6 +60,31 @@ module.exports = {
         }
 
         const [teamName, team] = teamEntry;
+
+        // Fetch the current tile from the Teams sheet
+        try {
+            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+            const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
+            if (teamRow) {
+                team.currentTile = parseInt(teamRow[4], 10); // Assuming the currentTile is in the fifth column
+            } else {
+                throw new Error('Team not found in Google Sheets');
+            }
+        } catch (error) {
+            console.error(`Error reading from Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'submit',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error reading the Google Sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.editReply({ embeds: [embed] });
+            return;
+        }
+
         const tileNumber = team.currentTile;
 
         try {
@@ -79,8 +104,10 @@ module.exports = {
             const text = detections.length ? detections[0].description : '';
 
             const eventPassword = getEventPassword();
+            const tile = tiles.find(t => t.tileNumber === tileNumber);
+            const dropMessage = tile ? tile.dropMessage : '';
 
-            if (!text.includes(eventPassword)) {
+            if (!text.includes(eventPassword) && (dropMessage && !text.includes(dropMessage))) {
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
@@ -88,7 +115,6 @@ module.exports = {
                     // Accept the image but flag for manual review
                     team.proofs[tileNumber] = proofAttachment.url;
 
-                    const tile = tiles.find(t => t.tileNumber === tileNumber);
                     const imagesNeeded = tile ? tile.imagesNeeded : 1;
                     const imagesSubmitted = team.proofs[tileNumber].length;
 
@@ -121,7 +147,7 @@ module.exports = {
                     const { embed } = await createEmbed({
                         command: 'submit',
                         title: ':x: Invalid Proof :x:',
-                        description: 'The submitted image does not contain the event password.\n Please upload a clear and valid image.\n Make sure your event password is visible!\n i.e. bright green text placed in an open area, **not** on top of any objects, overlays, etc.',
+                        description: 'The submitted image does not contain the event password and/or drop message.\n Please upload a clear and valid image.\n Make sure your event password or drop message is visible!\n i.e. bright green text placed in an open area, **not** on top of any objects, overlays, etc.',
                         color: '#FF0000',
                         channelId: interaction.channelId,
                         messageId: interaction.id,
@@ -138,7 +164,6 @@ module.exports = {
                 }
                 team.proofs[tileNumber].push(proofAttachment.url);
 
-                const tile = tiles.find(t => t.tileNumber === tileNumber);
                 const imagesNeeded = tile ? tile.imagesNeeded : 1;
                 const imagesSubmitted = team.proofs[tileNumber].length;
 

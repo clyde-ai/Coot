@@ -5,6 +5,9 @@ const path = require('path');
 const express = require('express');
 const axios = require('axios');
 const googleSheets = require('./src/utils/googleSheets');
+const createTeam = require('./commands/createTeam');
+const { getSnakes } = require('./commands/createSnake');
+const { getLadders } = require('./commands/createLadder');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -31,7 +34,7 @@ client.once('ready', async () => {
 
     // Initialize Google Sheets with headers if they are not already set
     try {
-        const teamHeaders = ['Team Name', 'Members', 'Date Created'];
+        const teamHeaders = ['Team Name', 'Members', 'Date Created', 'Role ID', 'Current Tile'];
         const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
@@ -44,8 +47,14 @@ client.once('ready', async () => {
         await setHeadersIfNotExist('Ladders', laddersHeaders);
 
         console.log('Headers set successfully.');
+
+        // Populate data from Google Sheets
+        await populateData();
+
+        // Set an interval to ensure the token is valid
+        setInterval(ensureValidToken, 15 * 60 * 1000); // Check every 15 minutes
     } catch (error) {
-        console.error('Error setting headers:', error);
+        console.error('Error setting headers or populating data:', error);
     }
 });
 
@@ -59,6 +68,25 @@ async function setHeadersIfNotExist(sheetName, headers) {
     } catch (error) {
         console.error(`Error reading from sheet ${sheetName}!A1:Z1:`, error);
         throw new Error('Failed to read from Google Sheets. Please try again later.');
+    }
+}
+
+async function populateData() {
+    try {
+        // Load teams from Google Sheets
+        await createTeam.loadTeamsFromSheet();
+
+        // Populate snakes
+        const snakes = await getSnakes();
+        global.snakes = snakes;
+
+        // Populate ladders
+        const ladders = await getLadders();
+        global.ladders = ladders;
+
+        console.log('Data populated successfully.');
+    } catch (error) {
+        console.error('Error populating data from Google Sheets:', error);
     }
 }
 

@@ -4,6 +4,26 @@ const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
 const teams = {};
 
+async function loadTeamsFromSheet() {
+    try {
+        const rows = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+        rows.slice(1).forEach(row => {
+            const [teamName, members, dateCreated, roleId, currentTile] = row;
+            const memberIds = members.split(', ').map(member => member.split(':')[1]);
+            teams[teamName] = {
+                members: memberIds,
+                roleId: roleId,
+                currentTile: parseInt(currentTile, 10) || 0, // Parse currentTile
+                previousTile: 0,
+                canRoll: false,
+                proofs: {}
+            };
+        });
+    } catch (error) {
+        console.error('Error loading teams from Google Sheets:', error);
+    }
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('create-team')
@@ -81,16 +101,14 @@ module.exports = {
                 return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
-            // Remove members who are no longer in the team
+            // Remove the role from all existing members
             const existingMembers = teams[teamName].members;
-            existingMembers.forEach(id => {
-                if (!memberIds.includes(id)) {
-                    const member = interaction.guild.members.cache.get(id);
-                    if (member) {
-                        member.roles.remove(role);
-                    }
+            for (const id of existingMembers) {
+                const member = interaction.guild.members.cache.get(id);
+                if (member) {
+                    await member.roles.remove(role).catch(console.error);
                 }
-            });
+            }
 
             // Update team members
             teams[teamName].members = memberIds;
@@ -113,25 +131,26 @@ module.exports = {
         }
 
         // Assign the new role to the members and get their display names and IDs
-        const memberDisplayNames = memberIds.map(id => {
+        const memberDisplayNames = [];
+        for (const id of memberIds) {
             const member = interaction.guild.members.cache.get(id);
             if (member) {
-                member.roles.add(role);
-                return `${member.displayName}:${id}`;
+                await member.roles.add(role).catch(console.error);
+                memberDisplayNames.push(`${member.displayName}:${id}`);
             }
-            return null;
-        }).filter(Boolean);
+        }
 
         try {
             // Read the existing teams from the Google Sheet
-            const existingTeams = await googleSheets.readSheet('Teams!A:C');
-            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
+            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString()];
+            const currentTile = teams[teamName] ? teams[teamName].currentTile : 0;
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile]; // Include currentTile value
 
             if (teamIndex !== 0) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:C${teamIndex + 1}`, teamData);
+                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:E${teamIndex + 1}`, teamData);
             } else {
                 // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);
@@ -183,3 +202,6 @@ module.exports = {
         }
     }
 };
+
+// Load teams from Google Sheets on startup
+loadTeamsFromSheet();

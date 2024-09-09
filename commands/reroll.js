@@ -1,12 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const createTeam = require('./createTeam');
-const createLadder = require('./createLadder');
-const createSnake = require('./createSnake');
-const tiles = require('../src/tiles');
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
-const fs = require('fs');
 const path = require('path');
 
 module.exports = {
@@ -53,13 +49,58 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
+        // Fetch the current tile from the Teams sheet
+        try {
+            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+            const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
+            if (teamRow) {
+                team.currentTile = parseInt(teamRow[4], 10); // Assuming the currentTile is in the fifth column
+            } else {
+                throw new Error('Team not found in Google Sheets');
+            }
+        } catch (error) {
+            console.error(`Error reading from Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'reroll',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error reading the Google Sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.previousTile + roll;
 
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
+        // Fetch ladders and snakes from Google Sheets
+        let ladders = [];
+        let snakes = [];
+        try {
+            const laddersData = await googleSheets.readSheet('Ladders!A:B'); // Assuming ladders data is in columns A and B
+            ladders = laddersData.slice(1).map(row => ({ bottom: parseInt(row[0], 10), top: parseInt(row[1], 10) }));
+
+            const snakesData = await googleSheets.readSheet('Snakes!A:B'); // Assuming snakes data is in columns A and B
+            snakes = snakesData.slice(1).map(row => ({ head: parseInt(row[0], 10), tail: parseInt(row[1], 10) }));
+        } catch (error) {
+            console.error(`Error reading ladders or snakes from Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'reroll',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error reading the Ladders or Snakes sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         // Check for ladders and snakes
-        const ladders = createLadder.getLadders();
         const ladder = ladders.find(l => l.bottom === newTile);
         let landedOnLadder = false;
         let landedOnSnake = false;
@@ -67,7 +108,6 @@ module.exports = {
             newTile = ladder.top;
             landedOnLadder = true;
         } else {
-            const snakes = createSnake.getSnakes();
             const snake = snakes.find(s => s.head === newTile);
             if (snake) {
                 newTile = snake.tail;
@@ -93,6 +133,13 @@ module.exports = {
             await googleSheets.writeToSheet('Rolls', rollData);
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
+
+            // Update the Teams sheet with the new tile position
+            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
+
+            if (teamIndex !== 0) {
+                await googleSheets.updateSheet('Teams', `E${teamIndex + 1}`, [newTile]); // Update currentTile in the fifth column
+            }
 
             let description = `Reroll for ${teamRoleMention}: rolled **${roll}**. Moves to tile **${newTile}**.\n **${tileDescription}**`;
             if (landedOnLadder) {

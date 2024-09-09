@@ -63,10 +63,32 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        // Store the snake in memory
-        snakes.push({ head: headTile, tail: tailTile });
-
         try {
+            // Read existing snakes from the Google Sheet
+            const existingSnakes = await googleSheets.readSheet('Snakes!A:B');
+            const snakeExists = existingSnakes.some(row => 
+                parseInt(row[0], 10) === headTile || 
+                parseInt(row[1], 10) === tailTile || 
+                parseInt(row[0], 10) === tailTile || 
+                parseInt(row[1], 10) === headTile
+            );
+
+            if (snakeExists) {
+                const { embed } = await createEmbed({
+                    command: 'create-snake',
+                    title: ':x: Snake Exists :x:',
+                    description: 'A snake with the same head or tail tile numbers already exists.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
+
+            // Store the snake in memory
+            snakes.push({ head: headTile, tail: tailTile });
+
             // Append the snake to the Google Sheet
             const snakeData = [headTile, tailTile, interaction.user.displayName, new Date().toISOString()];
             await googleSheets.writeToSheet('Snakes', snakeData);
@@ -95,10 +117,26 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
-    getSnakes() {
-        return snakes;
+    getSnakes: async function() {
+        try {
+            const snakesData = await googleSheets.readSheet('Snakes!A:B'); // Assuming snakes data is in columns A and B
+            return snakesData.slice(1).map(row => ({ head: parseInt(row[0], 10), tail: parseInt(row[1], 10) }));
+        } catch (error) {
+            console.error(`Error reading snakes from Google Sheets: ${error.message}`);
+            return [];
+        }
     },
-    clearSnakes() {
-        snakes.length = 0;
+    clearSnakes: async function() {
+        try {
+            // Clear all data except headers in the Snakes sheet
+            await googleSheets.clearSheet('Snakes!A2:B'); // Assuming headers are in the first row
+
+            // Clear the in-memory snakes array
+            snakes.length = 0;
+
+            console.log('Snakes sheet cleared successfully.');
+        } catch (error) {
+            console.error(`Error clearing Snakes sheet: ${error.message}`);
+        }
     }
 };

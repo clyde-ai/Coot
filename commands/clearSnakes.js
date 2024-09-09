@@ -23,14 +23,25 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        clearSnakes();
+        try {
+            await clearSnakes();
 
-        const { embed } = await createEmbed({
-            command: 'clear-snakes',
-            title: ':snake: Snakes Cleared :snake:',
-            description: '**All snakes have been removed from the board!** :snake:',
-            color: '#00ff00'
-        });
-        await interaction.reply({ embeds: [embed] });
+            const { embed } = await createEmbed({
+                command: 'clear-snakes',
+                title: ':snake: Snakes Cleared :snake:',
+                description: '**All snakes have been removed from the board!** :snake:',
+                color: '#00ff00'
+            });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error(`Error clearing snakes: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'clear-snakes',
+                title: ':x: Error :x:',
+                description: 'There was an error clearing the snakes. Please ping Clyde.',
+                color: '#ff0000'
+            });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
     }
 };
