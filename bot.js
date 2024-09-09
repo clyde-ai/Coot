@@ -8,6 +8,7 @@ const googleSheets = require('./src/utils/googleSheets');
 const { loadTeamsFromSheet } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
+const { getEventPassword } = require('./commands/setEventPassword');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -73,20 +74,30 @@ async function setHeadersIfNotExist(sheetName, headers) {
 
 async function populateData() {
     try {
+        console.log('------Starting Data Load from Google Sheets------');
+
         // Load teams from Google Sheets
         await loadTeamsFromSheet();
+        console.log('- Loaded data from: Teams sheet');
 
         // Populate snakes
         const snakes = await getSnakes();
         global.snakes = snakes;
+        console.log('- Loaded data from: Snakes sheet');
 
         // Populate ladders
         const ladders = await getLadders();
         global.ladders = ladders;
+        console.log('- Loaded data from: Ladders sheet');
 
-        console.log('Data populated successfully.');
+        // Populate Event Password
+        const eventPassword = await getEventPassword();
+        global.eventPassword = eventPassword;
+        console.log('- Loaded data from: Event Password sheet\n -- Event Password is: ', global.eventPassword);
+
+        console.log('------All Data Populated Successfully------');
     } catch (error) {
-        console.error('Error populating data from Google Sheets:', error);
+        console.error('ERROR: populating data from Google Sheets:', error);
     }
 }
 
