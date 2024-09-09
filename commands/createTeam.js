@@ -200,7 +200,8 @@ module.exports = {
         if (teams[teamName]) {
             teams[teamName].canRoll = true;
         }
-    }
+    },
+    loadTeamsFromSheet
 };
 
 // Load teams from Google Sheets on startup

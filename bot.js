@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 const axios = require('axios');
 const googleSheets = require('./src/utils/googleSheets');
-const createTeam = require('./commands/createTeam');
+const { loadTeamsFromSheet } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
 
@@ -74,7 +74,7 @@ async function setHeadersIfNotExist(sheetName, headers) {
 async function populateData() {
     try {
         // Load teams from Google Sheets
-        await createTeam.loadTeamsFromSheet();
+        await loadTeamsFromSheet();
 
         // Populate snakes
         const snakes = await getSnakes();
