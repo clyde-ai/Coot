@@ -144,10 +144,11 @@ module.exports = {
 
         try {
             // Read the existing teams from the Google Sheet
-            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
-            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
+            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, 0]; // Include initial currentTile value
+            const currentTile = teams[teamName] ? teams[teamName].currentTile : 0;
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile]; // Include currentTile value
 
             if (teamIndex !== 0) {
                 // Update existing team
