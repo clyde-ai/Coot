@@ -118,7 +118,11 @@ app.get('/callback', async (req, res) => {
             }
         });
 
-        const { access_token } = response.data;
+        const { access_token, refresh_token, expires_in } = response.data;
+        process.env.ACCESS_TOKEN = access_token;
+        process.env.REFRESH_TOKEN = refresh_token;
+        process.env.TOKEN_EXPIRY = Date.now() + expires_in * 1000;
+
         const userInfo = await axios.get('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: `Bearer ${access_token}`
@@ -131,6 +135,34 @@ app.get('/callback', async (req, res) => {
         res.status(500).send('An error occurred during the OAuth2 flow.');
     }
 });
+
+async function refreshToken() {
+    try {
+        const response = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: 'refresh_token',
+            refresh_token: process.env.REFRESH_TOKEN
+        }), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+
+        const { access_token, refresh_token, expires_in } = response.data;
+        process.env.ACCESS_TOKEN = access_token;
+        process.env.REFRESH_TOKEN = refresh_token;
+        process.env.TOKEN_EXPIRY = Date.now() + expires_in * 1000;
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+    }
+}
+
+async function ensureValidToken() {
+    if (Date.now() >= process.env.TOKEN_EXPIRY) {
+        await refreshToken();
+    }
+}
 
 app.listen(port, () => {
     console.log(`OAuth2 app listening at http://localhost:${port}`);
