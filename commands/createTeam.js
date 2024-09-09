@@ -27,6 +27,10 @@ async function loadTeamsFromSheet() {
     }
 }
 
+function isUserOnAnyTeam(userId) {
+    return Object.values(teams).some(team => team.members.includes(userId));
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('create-team')
@@ -79,6 +83,21 @@ module.exports = {
                 command: 'create-team',
                 title: ':x: Team Size Exceeded :x:',
                 description: 'A team can have a maximum of 10 members.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
+        // Check if any member is already on a team
+        const memberAlreadyOnTeam = memberIds.some(id => isUserOnAnyTeam(id));
+        if (memberAlreadyOnTeam) {
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Member Already on a Team :x:',
+                description: 'One or more members are already on a team. Each member can only be on one team at a time.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
