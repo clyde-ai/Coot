@@ -4,6 +4,7 @@ const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
 const path = require('path');
+const tiles = require('../src/tiles');
 
 module.exports = {
     data: new SlashCommandBuilder()
