@@ -6,7 +6,8 @@ const express = require('express');
 const axios = require('axios');
 const googleSheets = require('./src/utils/googleSheets');
 const createTeam = require('./commands/createTeam');
-const { getSnakes, getLadders } = require('./commands/snakeAndLadderCommands'); // Adjust the path as needed
+const { getSnakes } = require('./commands/createSnake');
+const { getLadders } = require('./commands/createLadder');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
