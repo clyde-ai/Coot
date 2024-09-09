@@ -41,6 +41,7 @@ To add Coot to your Discord server, follow these steps:
     ADMIN_ROLE_ID=admin-role-id
     GOOGLE_SHEET_ID=google-sheet-id
     GOOGLE_CREDENTIALS_PATH=path-to-google-credentials
+    GOOGLE_CREDENTIALS=your-google-service-account-credentials
 5. Run the bot:
     ```bash
     npm start
@@ -49,25 +50,25 @@ To add Coot to your Discord server, follow these steps:
 ## Commands
 
 ### /clear-ladders
-**Description:** Clears all ladders from the current game.
+**Description:** Clears all ladders from the current game. This command can only be used by administrators.
 
 **Parameters:** None
 
 **Usage:**
 ```plaintext
 User: /clear-ladders
-Bot: All ladders have been cleared from the game.
+Bot: All ladders have been removed from the board!
 ```
 
 ### /clear-snakes
-**Description:** Clears all snakes from the current game.
+**Description:** Clears all snakes from the current game. This command can only be used by administrators.
 
 **Parameters:** None
 
 **Usage**
 ```plaintext
 User: /clear-snakes
-Bot: All snakes have been cleared from the game.
+Bot: All snakes have been cleared from the board!
 ```
 
 ### /create-admin-team
@@ -134,7 +135,7 @@ Bot: Snake created: from tile 20 to tile 5.
 
 **Parameters:** 
 * `teamname` (string): The name of the team. This parameter is required.
-* `members` (string): The members to add to the team. Mention the members in the format <@user_id>. This parameter is required.
+* `members` (string): The members to add to the team. Mention the members in the format <@user_id>. This parameter is required. 1-10 members can be assigned to a team.
 
 **Detailed Functionality:**
 * Permission Check: The command checks if the user has administrator permissions. If not, it replies with a permission error message.
@@ -177,7 +178,7 @@ Bot: Team Warriors created with members: User1, User2. Role <@&role_id> has been
 **Usage**
 ```plaintext
 User: /reroll teamname:Warriors
-Bot: Reroll for <@&role_id>: rolled 4. Moves to tile 10. No description available.
+Bot: Reroll for <@&role_id>: rolled 4. Moves to tile 10. Obtain 1x Abyssal whip.
 ```
 
 ### /roll
@@ -194,7 +195,7 @@ Bot: Reroll for <@&role_id>: rolled 4. Moves to tile 10. No description availabl
 **Usage**
 ```plaintext
 User: /roll
-Bot: <@user_id> rolled 4. Team Warriors moves to tile 10. No description available.
+Bot: <@user_id> rolled 4. Team Warriors moves to tile 10. Obtain 1x Abyssal whip.
 ```
 
 ### /submit
@@ -208,7 +209,6 @@ Bot: <@user_id> rolled 4. Team Warriors moves to tile 10. No description availab
 * Parameter Extraction: The command extracts the tile and proof parameters from the command.
 * Validation: It validates the provided tile number to ensure it is a valid integer.
 * Team Check: It checks if the user is part of any team. If not, it replies with an error message.
-* Tile Check: It checks if the team is currently on the specified tile. If not, it replies with an error message.
 * Proof Submission: It stores the proof URL in the team’s data and allows the team to roll again.
 * Google Sheets Integration: It writes the submission data to a Google Sheet.
 * Response: It replies with a confirmation message indicating the successful submission of proof and allows the team to roll again.
