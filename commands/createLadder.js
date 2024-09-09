@@ -63,10 +63,32 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        // Store the ladder in memory
-        ladders.push({ bottom: bottomTile, top: topTile });
-
         try {
+            // Read existing ladders from the Google Sheet
+            const existingLadders = await googleSheets.readSheet('Ladders!A:B');
+            const ladderExists = existingLadders.some(row => 
+                parseInt(row[0], 10) === bottomTile || 
+                parseInt(row[1], 10) === topTile || 
+                parseInt(row[0], 10) === topTile || 
+                parseInt(row[1], 10) === bottomTile
+            );
+
+            if (ladderExists) {
+                const { embed } = await createEmbed({
+                    command: 'create-ladder',
+                    title: ':x: Ladder Exists :x:',
+                    description: 'A ladder with the same bottom or top tile numbers already exists.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
+
+            // Store the ladder in memory
+            ladders.push({ bottom: bottomTile, top: topTile });
+
             // Append the ladder to the Google Sheet
             const ladderData = [bottomTile, topTile, interaction.user.displayName, new Date().toISOString()];
             await googleSheets.writeToSheet('Ladders', ladderData);

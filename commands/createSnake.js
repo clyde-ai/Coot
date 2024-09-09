@@ -63,10 +63,32 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        // Store the snake in memory
-        snakes.push({ head: headTile, tail: tailTile });
-
         try {
+            // Read existing snakes from the Google Sheet
+            const existingSnakes = await googleSheets.readSheet('Snakes!A:B');
+            const snakeExists = existingSnakes.some(row => 
+                parseInt(row[0], 10) === headTile || 
+                parseInt(row[1], 10) === tailTile || 
+                parseInt(row[0], 10) === tailTile || 
+                parseInt(row[1], 10) === headTile
+            );
+
+            if (snakeExists) {
+                const { embed } = await createEmbed({
+                    command: 'create-snake',
+                    title: ':x: Snake Exists :x:',
+                    description: 'A snake with the same head or tail tile numbers already exists.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
+
+            // Store the snake in memory
+            snakes.push({ head: headTile, tail: tailTile });
+
             // Append the snake to the Google Sheet
             const snakeData = [headTile, tailTile, interaction.user.displayName, new Date().toISOString()];
             await googleSheets.writeToSheet('Snakes', snakeData);
