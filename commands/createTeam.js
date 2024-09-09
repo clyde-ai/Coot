@@ -2,19 +2,22 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
 const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
+const path = require('path');
+const tiles = require('../src/tiles');
+
 const teams = {};
 
 async function loadTeamsFromSheet() {
     try {
-        const rows = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+        const rows = await googleSheets.readSheet('Teams!A:F');
         rows.slice(1).forEach(row => {
-            const [teamName, members, dateCreated, roleId, currentTile] = row;
+            const [teamName, members, dateCreated, roleId, currentTile, previousTile] = row;
             const memberIds = members.split(', ').map(member => member.split(':')[1]);
             teams[teamName] = {
                 members: memberIds,
                 roleId: roleId,
-                currentTile: parseInt(currentTile, 10) || 0, // Parse currentTile
-                previousTile: 0,
+                currentTile: parseInt(currentTile, 10) || 0,
+                previousTile: parseInt(previousTile, 10) || 0,
                 canRoll: false,
                 proofs: {}
             };
@@ -22,6 +25,10 @@ async function loadTeamsFromSheet() {
     } catch (error) {
         console.error('Error loading teams from Google Sheets:', error);
     }
+}
+
+function isUserOnAnyTeam(userId) {
+    return Object.values(teams).some(team => team.members.includes(userId));
 }
 
 module.exports = {
@@ -76,6 +83,21 @@ module.exports = {
                 command: 'create-team',
                 title: ':x: Team Size Exceeded :x:',
                 description: 'A team can have a maximum of 10 members.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
+        // Check if any member is already on a team
+        const memberAlreadyOnTeam = memberIds.some(id => isUserOnAnyTeam(id));
+        if (memberAlreadyOnTeam) {
+            const { embed } = await createEmbed({
+                command: 'create-team',
+                title: ':x: Member Already on a Team :x:',
+                description: 'One or more members are already on a team. Each member can only be on one team at a time.',
                 color: '#FF0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -140,17 +162,19 @@ module.exports = {
             }
         }
 
+        let existingTeams;
         try {
             // Read the existing teams from the Google Sheet
-            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            existingTeams = await googleSheets.readSheet('Teams!A:F');
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
             const currentTile = teams[teamName] ? teams[teamName].currentTile : 0;
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile]; // Include currentTile value
+            const previousTile = teams[teamName] ? teams[teamName].previousTile : 0;
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile, previousTile];
 
             if (teamIndex !== 0) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:E${teamIndex + 1}`, teamData);
+                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:F${teamIndex + 1}`, teamData);
             } else {
                 // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);

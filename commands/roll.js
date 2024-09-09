@@ -31,8 +31,9 @@ module.exports = {
         const teamRoleMention = `<@&${team.roleId}>`;
 
         // Fetch the current tile from the Teams sheet
+        let existingTeams;
         try {
-            const existingTeams = await googleSheets.readSheet('Teams!A:E');
+            existingTeams = await googleSheets.readSheet('Teams!A:F');
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
                 team.currentTile = parseInt(teamRow[4], 10);
@@ -127,11 +128,12 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            // Update the Teams sheet with the new tile position
+            // Update the Teams sheet with the new tile position and previous tile
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
 
             if (teamIndex !== 0) {
                 await googleSheets.updateSheet('Teams', `E${teamIndex + 1}`, [newTile]); // Update currentTile in the fifth column
+                await googleSheets.updateSheet('Teams', `F${teamIndex + 1}`, [previousTile]); // Update previousTile in the sixth column
             }
 
             let description = `${userMention} rolled **${roll}**. ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;

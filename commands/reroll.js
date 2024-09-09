@@ -4,6 +4,7 @@ const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
 const path = require('path');
+const tiles = require('../src/tiles');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -50,11 +51,13 @@ module.exports = {
         }
 
         // Fetch the current tile from the Teams sheet
+        let existingTeams;
         try {
-            const existingTeams = await googleSheets.readSheet('Teams!A:E'); // Updated to include currentTile
+            existingTeams = await googleSheets.readSheet('Teams!A:F');
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
-                team.currentTile = parseInt(teamRow[4], 10); // Assuming the currentTile is in the fifth column
+                team.currentTile = parseInt(teamRow[4], 10);
+                team.previousTile = parseInt(teamRow[5], 10);
             } else {
                 throw new Error('Team not found in Google Sheets');
             }
@@ -134,11 +137,12 @@ module.exports = {
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
 
-            // Update the Teams sheet with the new tile position
+            // Update the Teams sheet with the new tile position and previous tile
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1; // Skip header row
 
             if (teamIndex !== 0) {
                 await googleSheets.updateSheet('Teams', `E${teamIndex + 1}`, [newTile]); // Update currentTile in the fifth column
+                await googleSheets.updateSheet('Teams', `F${teamIndex + 1}`, [previousTile]); // Update previousTile in the sixth column
             }
 
             let description = `Reroll for ${teamRoleMention}: rolled **${roll}**. Moves to tile **${newTile}**.\n **${tileDescription}**`;
@@ -170,7 +174,7 @@ module.exports = {
             const { embed } = await createEmbed({
                 command: 'reroll',
                 title: ':x: Google Sheets Error :x:',
-                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde.',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
