@@ -104,8 +104,10 @@ module.exports = {
             const text = detections.length ? detections[0].description : '';
 
             const eventPassword = getEventPassword();
+            const tile = tiles.find(t => t.tileNumber === tileNumber);
+            const dropMessage = tile ? tile.dropMessage : '';
 
-            if (!text.includes(eventPassword)) {
+            if (!text.includes(eventPassword) && (dropMessage && !text.includes(dropMessage))) {
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
@@ -113,7 +115,6 @@ module.exports = {
                     // Accept the image but flag for manual review
                     team.proofs[tileNumber] = proofAttachment.url;
 
-                    const tile = tiles.find(t => t.tileNumber === tileNumber);
                     const imagesNeeded = tile ? tile.imagesNeeded : 1;
                     const imagesSubmitted = team.proofs[tileNumber].length;
 
@@ -146,7 +147,7 @@ module.exports = {
                     const { embed } = await createEmbed({
                         command: 'submit',
                         title: ':x: Invalid Proof :x:',
-                        description: 'The submitted image does not contain the event password.\n Please upload a clear and valid image.\n Make sure your event password is visible!\n i.e. bright green text placed in an open area, **not** on top of any objects, overlays, etc.',
+                        description: 'The submitted image does not contain the event password and/or drop message.\n Please upload a clear and valid image.\n Make sure your event password or drop message is visible!\n i.e. bright green text placed in an open area, **not** on top of any objects, overlays, etc.',
                         color: '#FF0000',
                         channelId: interaction.channelId,
                         messageId: interaction.id,
@@ -163,7 +164,6 @@ module.exports = {
                 }
                 team.proofs[tileNumber].push(proofAttachment.url);
 
-                const tile = tiles.find(t => t.tileNumber === tileNumber);
                 const imagesNeeded = tile ? tile.imagesNeeded : 1;
                 const imagesSubmitted = team.proofs[tileNumber].length;
 
