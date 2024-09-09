@@ -3,6 +3,7 @@ const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
 const googleSheets = require('../src/utils/googleSheets');
 const moment = require('moment-timezone');
+const path = require('path');
 
 let eventStartTime = null;
 let eventEndTime = null;
@@ -142,12 +143,16 @@ async function broadcastEventStart(client) {
         const embed = {
             title: ':tada: EVENT STARTED! :tada:',
             description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
-            color: '#00FF00'
+            color: '#00FF00',
+            image: {
+                url: 'attachment://eventLogo.png'
+            }
         };
 
         const channel = client.channels.cache.get(broadcastChannelId);
         if (channel) {
-            await channel.send({ embeds: [embed] });
+            const attachment = path.join(__dirname, '../src/images/other/eventLogo.png');
+            await channel.send({ embeds: [embed], files: [attachment] });
         }
     } catch (error) {
         console.error(`ERROR broadcasting event start: ${error.message}`);
@@ -155,7 +160,7 @@ async function broadcastEventStart(client) {
 }
 
 // Function to schedule the event start broadcast
-export function scheduleEventStartBroadcast(client) {
+function scheduleEventStartBroadcast(client) {
     const startTime = moment(eventStartTime);
     const now = moment();
 

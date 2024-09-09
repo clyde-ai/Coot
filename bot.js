@@ -51,7 +51,7 @@ client.once('ready', async () => {
         await setHeadersIfNotExist('Ladders', laddersHeaders);
         await setHeadersIfNotExist('EventPassword', eventPasswordHeaders);
 
-        console.log('Headers set successfully.');
+        console.log('------Headers set successfully------');
 
         // Populate data from Google Sheets
         await populateData();

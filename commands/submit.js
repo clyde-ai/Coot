@@ -8,6 +8,7 @@ const { getEventPassword } = require('./setEventPassword');
 const tiles = require('../src/tiles');
 const path = require('path');
 const { createEmbed } = require('../src/utils/embeds');
+const { getEventTime, isEventActive } = require('./set-event-time');
 
 let client;
 
@@ -38,6 +39,20 @@ module.exports = {
                 .setDescription('Proof of tile completion (image)')
                 .setRequired(true)),
     async execute(interaction) {
+        // Check if the event is active
+        const { eventStartTime, eventEndTime } = await getEventTime();
+        if (!isEventActive()) {
+            const { embed } = await createEmbed({
+                command: 'roll',
+                title: ':x: Event Not Active :x:',
+                description: '**The event has not started yet or has already ended. Please wait for the event to start.**',
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
         await interaction.deferReply();
 
         const proofAttachment = interaction.options.getAttachment('proof');
