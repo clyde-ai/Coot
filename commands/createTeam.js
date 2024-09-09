@@ -101,16 +101,14 @@ module.exports = {
                 return interaction.reply({ embeds: [embed], ephemeral: true });
             }
 
-            // Remove members who are no longer in the team
+            // Remove the role from all existing members
             const existingMembers = teams[teamName].members;
-            existingMembers.forEach(id => {
-                if (!memberIds.includes(id)) {
-                    const member = interaction.guild.members.cache.get(id);
-                    if (member) {
-                        member.roles.remove(role);
-                    }
+            for (const id of existingMembers) {
+                const member = interaction.guild.members.cache.get(id);
+                if (member) {
+                    await member.roles.remove(role).catch(console.error);
                 }
-            });
+            }
 
             // Update team members
             teams[teamName].members = memberIds;
@@ -133,14 +131,14 @@ module.exports = {
         }
 
         // Assign the new role to the members and get their display names and IDs
-        const memberDisplayNames = memberIds.map(id => {
+        const memberDisplayNames = [];
+        for (const id of memberIds) {
             const member = interaction.guild.members.cache.get(id);
             if (member) {
-                member.roles.add(role);
-                return `${member.displayName}:${id}`;
+                await member.roles.add(role).catch(console.error);
+                memberDisplayNames.push(`${member.displayName}:${id}`);
             }
-            return null;
-        }).filter(Boolean);
+        }
 
         try {
             // Read the existing teams from the Google Sheet
