@@ -33,10 +33,10 @@ module.exports = {
         // Fetch the current tile from the Teams sheet
         let existingTeams;
         try {
-            existingTeams = await googleSheets.readSheet('Teams!A:F'); // Updated to include previousTile
+            existingTeams = await googleSheets.readSheet('Teams!A:F');
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
-                team.currentTile = parseInt(teamRow[4], 10); // Assuming the currentTile is in the fifth column
+                team.currentTile = parseInt(teamRow[4], 10);
             } else {
                 throw new Error('Team not found in Google Sheets');
             }

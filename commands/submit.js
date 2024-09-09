@@ -134,7 +134,7 @@ module.exports = {
                     const { embed } = await createEmbed({
                         command: 'submit',
                         title: ':warning: Manual Review Needed :warning:',
-                        description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
+                        description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n This is due to being unable to find the event password and/or drop phrase in your submission.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
                         color: '#FFA500',
                         channelId: interaction.channelId,
                         messageId: interaction.id,
