@@ -5,9 +5,11 @@ const { createEmbed } = require('../src/utils/embeds');
 const path = require('path');
 const tiles = require('../src/tiles');
 
+const teams = {};
+
 async function loadTeamsFromSheet() {
     try {
-        const rows = await googleSheets.readSheet('Teams!A:F'); // Updated to include previousTile
+        const rows = await googleSheets.readSheet('Teams!A:F');
         rows.slice(1).forEach(row => {
             const [teamName, members, dateCreated, roleId, currentTile, previousTile] = row;
             const memberIds = members.split(', ').map(member => member.split(':')[1]);
