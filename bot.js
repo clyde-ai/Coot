@@ -40,12 +40,14 @@ client.once('ready', async () => {
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
         const laddersHeaders = ['Bottom Tile', 'Top Tile', 'Created By', 'Timestamp'];
+        const eventPasswordHeaders = ['Password'];
 
         await setHeadersIfNotExist('Teams', teamHeaders);
         await setHeadersIfNotExist('Rolls', rollHeaders);
         await setHeadersIfNotExist('Submissions', submissionHeaders);
         await setHeadersIfNotExist('Snakes', snakesHeaders);
         await setHeadersIfNotExist('Ladders', laddersHeaders);
+        await setHeadersIfNotExist('Event Password', eventPasswordHeaders);
 
         console.log('Headers set successfully.');
 
