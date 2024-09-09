@@ -47,7 +47,7 @@ client.once('ready', async () => {
         await setHeadersIfNotExist('Submissions', submissionHeaders);
         await setHeadersIfNotExist('Snakes', snakesHeaders);
         await setHeadersIfNotExist('Ladders', laddersHeaders);
-        await setHeadersIfNotExist('Event Password', eventPasswordHeaders);
+        await setHeadersIfNotExist('EventPassword', eventPasswordHeaders);
 
         console.log('Headers set successfully.');
 
