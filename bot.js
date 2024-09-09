@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const axios = require('axios');
+const moment = require('moment');
+const { getEventTime, isEventActive, scheduleEventStartBroadcast } = require('./commands/set-event-time');
 const googleSheets = require('./src/utils/googleSheets');
 const { loadTeamsFromSheet } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
@@ -40,7 +42,7 @@ client.once('ready', async () => {
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
         const laddersHeaders = ['Bottom Tile', 'Top Tile', 'Created By', 'Timestamp'];
-        const eventPasswordHeaders = ['Password'];
+        const eventPasswordHeaders = ['Password', 'Start Time', 'End Time', 'Broadcast Channel ID'];
 
         await setHeadersIfNotExist('Teams', teamHeaders);
         await setHeadersIfNotExist('Rolls', rollHeaders);
@@ -53,6 +55,12 @@ client.once('ready', async () => {
 
         // Populate data from Google Sheets
         await populateData();
+
+        // Schedule the event start broadcast if the event start time is in the future
+        const eventTime = await getEventTime();
+        if (eventTime.eventStartTime && moment().isBefore(eventTime.eventStartTime)) {
+            scheduleEventStartBroadcast(client, eventTime.eventStartTime, eventTime.broadcastChannelId);
+        }
 
         // Set an interval to ensure the token is valid
         setInterval(ensureValidToken, 15 * 60 * 1000); // Check every 15 minutes
@@ -96,6 +104,15 @@ async function populateData() {
         const eventPassword = await getEventPassword();
         global.eventPassword = eventPassword;
         console.log('- Loaded data from: Event Password sheet\n -- Event Password is: ', global.eventPassword);
+
+        const eventTime = await getEventTime();
+        global.eventStartTime = eventTime.eventStartTime;
+        global.eventEndTime = eventTime.eventEndTime;
+        global.broadcastChannelId = eventTime.broadcastChannelId;
+        console.log('- Loaded additional data from: Event Password sheet:');
+        console.log('- Loaded Event Start Time: ', global.eventStartTime);
+        console.log('- Loaded Event End Time: ', global.eventEndTime);
+        console.log('- Loaded Broadcast Channel ID: ', global.broadcastChannelId);
 
         console.log('------All Data Populated Successfully------');
     } catch (error) {

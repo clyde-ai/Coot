@@ -1,0 +1,166 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { PermissionsBitField } = require('discord.js');
+const { createEmbed } = require('../src/utils/embeds');
+const googleSheets = require('../src/utils/googleSheets');
+const moment = require('moment-timezone');
+
+let eventStartTime = null;
+let eventEndTime = null;
+let broadcastChannelId = null;
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('set-event-time')
+        .setDescription('Set the event start and end times')
+        .addStringOption(option => 
+            option.setName('starttime')
+                .setDescription('The event start time (YYYY-MM-DD HH:mm) in your local time zone')
+                .setRequired(true))
+        .addStringOption(option => 
+            option.setName('endtime')
+                .setDescription('The event end time (YYYY-MM-DD HH:mm) in your local time zone')
+                .setRequired(true))
+        .addStringOption(option => 
+            option.setName('timezone')
+                .setDescription('The time zone of the provided times (e.g., America/New_York)')
+                .setRequired(true))
+        .addChannelOption(option => 
+            option.setName('channel')
+                .setDescription('The channel to broadcast the event start in (e.g., #channel-name)')
+                .setRequired(true)),
+    async execute(interaction) {
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
+        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+
+        if (!hasAdminRole && !hasAdminPermission) {
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':x: Access Denied :x:',
+                description: 'You do not have permission to use this command.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
+        const startTime = interaction.options.getString('starttime');
+        const endTime = interaction.options.getString('endtime');
+        const timeZone = interaction.options.getString('timezone');
+        const channel = interaction.options.getChannel('channel');
+
+        // Validate the date format
+        if (!moment(startTime, 'YYYY-MM-DD HH:mm', true).isValid() || !moment(endTime, 'YYYY-MM-DD HH:mm', true).isValid()) {
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':x: Invalid Date Format :x:',
+                description: 'Please provide the date and time in the format YYYY-MM-DD HH:mm.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
+        // Convert to Zulu time (UTC)
+        eventStartTime = moment.tz(startTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
+        eventEndTime = moment.tz(endTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
+        broadcastChannelId = channel.id;
+
+        try {
+            // Read the existing password from the EventPassword sheet
+            const rows = await googleSheets.readSheet('EventPassword!A2:A2');
+            const existingPassword = rows.length > 0 ? rows[0][0] : '';
+
+            // Write the new start and end times and broadcast channel ID to the sheet without overwriting the password
+            await googleSheets.updateSheet('EventPassword', 'B2:D2', [eventStartTime, eventEndTime, broadcastChannelId]);
+
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':clock1: Event Time Set :clock1:',
+                description: '**Event start and end times have been set successfully!**\n Broadcast of event start is scheduled.',
+                color: '#00FF00',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+
+            // Schedule the event start broadcast
+            scheduleEventStartBroadcast(interaction.client);
+        } catch (error) {
+            console.error(`Error updating Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+    },
+    async getEventTime() {
+        try {
+            const rows = await googleSheets.readSheet('EventPassword!B2:D2');
+            if (rows.length > 0) {
+                eventStartTime = rows[0][0];
+                eventEndTime = rows[0][1];
+                broadcastChannelId = rows[0][2];
+            } else {
+                eventStartTime = null;
+                eventEndTime = null;
+                broadcastChannelId = null;
+            }
+        } catch (error) {
+            console.error(`Error reading Google Sheets: ${error.message}`);
+            eventStartTime = null;
+            eventEndTime = null;
+            broadcastChannelId = null;
+        }
+        return { eventStartTime, eventEndTime, broadcastChannelId };
+    },
+    isEventActive() {
+        const now = moment().toISOString();
+        return eventStartTime && eventEndTime && now >= eventStartTime && now <= eventEndTime;
+    },
+    scheduleEventStartBroadcast
+};
+
+// Function to broadcast the event start
+async function broadcastEventStart(client) {
+    try {
+        const rows = await googleSheets.readSheet('EventPassword!A2:D2');
+        const eventPassword = rows[0][0];
+        const broadcastChannelId = rows[0][2];
+
+        const embed = {
+            title: ':tada: EVENT STARTED! :tada:',
+            description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
+            color: '#00FF00'
+        };
+
+        const channel = client.channels.cache.get(broadcastChannelId);
+        if (channel) {
+            await channel.send({ embeds: [embed] });
+        }
+    } catch (error) {
+        console.error(`ERROR broadcasting event start: ${error.message}`);
+    }
+}
+
+// Function to schedule the event start broadcast
+export function scheduleEventStartBroadcast(client) {
+    const startTime = moment(eventStartTime);
+    const now = moment();
+
+    const delay = startTime.diff(now);
+    if (delay > 0) {
+        setTimeout(() => broadcastEventStart(client), delay);
+    }
+}
