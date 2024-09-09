@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
+const googleSheets = require('../src/utils/googleSheets');
 let eventPassword = '';
 
 module.exports = {
@@ -32,18 +33,49 @@ module.exports = {
         const password = interaction.options.getString('password');
         eventPassword = password;
 
-        const { embed } = await createEmbed({
-            command: 'set-event-password',
-            title: ':lock: Event Password Set :lock:',
-            description: '**Event password has been set successfully!**',
-            color: '#00FF00',
-            channelId: interaction.channelId,
-            messageId: interaction.id,
-            client: interaction.client
-        });
-        await interaction.reply({ embeds: [embed] });
+        try {
+            // Clear existing entries in the EventPassword sheet
+            await googleSheets.clearSheet('EventPassword!A2:A');
+
+            // Write the new password to the sheet
+            await googleSheets.writeToSheet('EventPassword', [[password]]);
+
+            const { embed } = await createEmbed({
+                command: 'set-event-password',
+                title: ':lock: Event Password Set :lock:',
+                description: '**Event password has been set successfully!**',
+                color: '#00FF00',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error(`Error updating Google Sheets: ${error.message}`);
+            const { embed } = await createEmbed({
+                command: 'set-event-password',
+                title: ':x: Google Sheets Error :x:',
+                description: ':rage: There was an error updating the Google Sheet. Please ping Clyde or an admin.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
     },
-    getEventPassword() {
+    async getEventPassword() {
+        try {
+            const rows = await googleSheets.readSheet('EventPassword!A2:A');
+            if (rows.length > 0) {
+                eventPassword = rows[0][0];
+            } else {
+                eventPassword = '';
+            }
+        } catch (error) {
+            console.error(`ERROR reading Google Sheets: ${error.message}`);
+            eventPassword = '';
+        }
         return eventPassword;
     }
 };

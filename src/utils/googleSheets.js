@@ -34,7 +34,7 @@ async function writeToSheet(sheetName, data) {
         });
         console.log(`Data written to sheet ${sheetName}`);
     } catch (error) {
-        console.error(`Error writing to sheet ${sheetName}:`, error);
+        console.error(`ERROR writing to sheet ${sheetName}:`, error);
         throw new Error('Failed to write to Google Sheets. Please try again later.');
     }
 }
@@ -51,7 +51,7 @@ async function updateSheet(sheetName, range, data) {
         });
         console.log(`Sheet ${sheetName} updated at range ${range}`);
     } catch (error) {
-        console.error(`Error updating sheet ${sheetName}:`, error);
+        console.error(`ERROR updating sheet ${sheetName}:`, error);
         throw new Error('Failed to update Google Sheets. Please try again later.');
     }
 }
@@ -65,7 +65,7 @@ async function readSheet(range) {
         console.log(`Data read from sheet at range ${range}`);
         return res.data.values;
     } catch (error) {
-        console.error(`Error reading from sheet at range ${range}:`, error);
+        console.error(`ERROR reading from sheet at range ${range}:`, error);
         throw new Error('Failed to read from Google Sheets. Please try again later.');
     }
 }
@@ -82,7 +82,7 @@ async function setHeaders(sheetName, headers) {
         });
         console.log(`Headers set in sheet ${sheetName}`);
     } catch (error) {
-        console.error(`Error setting headers in sheet ${sheetName}:`, error);
+        console.error(`ERROR setting headers in sheet ${sheetName}:`, error);
         throw new Error('Failed to set headers in Google Sheets. Please try again later.');
     }
 }
@@ -126,7 +126,7 @@ async function getSheetId(sheetName) {
         const sheet = res.data.sheets.find(sheet => sheet.properties.title === sheetName);
         return sheet.properties.sheetId;
     } catch (error) {
-        console.error(`Error getting sheet ID for ${sheetName}:`, error);
+        console.error(`ERROR getting sheet ID for ${sheetName}:`, error);
         throw new Error('Failed to get sheet ID. Please try again later.');
     }
 }
@@ -153,7 +153,7 @@ async function freezeHeaders(sheetName) {
         });
         console.log(`Headers frozen in sheet ${sheetName}`);
     } catch (error) {
-        console.error(`Error freezing headers in sheet ${sheetName}:`, error);
+        console.error(`ERROR freezing headers in sheet ${sheetName}:`, error);
         throw new Error('Failed to freeze headers in Google Sheets. Please try again later.');
     }
 }
@@ -166,7 +166,7 @@ async function clearSheet(range) {
         });
         console.log(`Sheet cleared at range ${range}`);
     } catch (error) {
-        console.error(`Error clearing sheet at range ${range}:`, error);
+        console.error(`ERROR clearing sheet at range ${range}:`, error);
         throw new Error('Failed to clear Google Sheets. Please try again later.');
     }
 }
