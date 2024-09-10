@@ -130,7 +130,7 @@ module.exports = {
             const { embed } = await createEmbed({
                 command: 'review',
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
-                description: `${userMentionResponse} Your submission has been **${action === 'approve' ? 'approved' : 'denied'}** by ${reviewerName}.\n ${action === 'approved' ? 'No further proof needed, Good Luck!' : 'You need to submit additional evidence or redo this tile!'}`,
+                description: `${userMentionResponse} Your submission has been **${action === 'approve' ? 'approved' : 'denied'}** by ${reviewerName}.\n ${action === 'approved' ? 'You need to submit additional evidence or redo this tile!' : 'No further proof needed, Good Luck!'}`,
                 color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
                 channelId: channelId,
                 messageId: messageId,
