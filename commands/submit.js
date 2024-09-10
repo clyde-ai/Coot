@@ -137,7 +137,10 @@ module.exports = {
 
                 if (attempts >= 0) { // Set to 1 if you want the invalid proof response, default route without this
                     // Accept the image but flag for manual review
-                    team.proofs[tileNumber].length++;
+                    if (!team.proofs[tileNumber]) {
+                        team.proofs[tileNumber] = [];
+                    }
+                    team.proofs[tileNumber].push(proofAttachment.url);
 
                     const imagesNeeded = tile ? tile.imagesNeeded : 1;
                     const imagesSubmitted = team.proofs[tileNumber].length;
