@@ -123,11 +123,12 @@ module.exports = {
             const tile = tiles.find(t => t.tileNumber === tileNumber);
             const dropMessage = tile ? tile.dropMessage : '';
 
-            if (!text.includes(eventPassword) && (dropMessage && !text.includes(dropMessage))) {
+            // event password or drop message not found
+            if (!text.includes(eventPassword) || !text.includes(dropMessage)) {
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
-                if (attempts >= 0) { // Set to 1 if you want the invalid proof response
+                if (attempts >= 0) { // Set to 1 if you want the invalid proof response, default route without this
                     // Accept the image but flag for manual review
                     team.proofs[tileNumber] = proofAttachment.url;
 

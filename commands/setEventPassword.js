@@ -69,13 +69,16 @@ module.exports = {
             const rows = await googleSheets.readSheet('EventPassword!A2:A');
             if (rows.length > 0) {
                 eventPassword = rows[0][0];
+                console.log('Event Password found, returning ', eventPassword);
             } else {
+                console.log('Event Password not found, returning empty string.');
                 eventPassword = '';
             }
         } catch (error) {
             console.error(`ERROR reading Google Sheets: ${error.message}`);
             eventPassword = '';
         }
+        console.log('Event Password found, returning ', eventPassword);
         return eventPassword;
     }
 };
