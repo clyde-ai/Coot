@@ -30,7 +30,7 @@ module.exports = {
                 command: 'review',
                 title: ':x: Access Denied :x:',
                 description: 'You do not have permission to use this command.',
-                color: '#FF0000',
+                color: 0xFF0000, // Red color
                 channelId: interaction.channelId,
                 messageId: interaction.id,
                 client: interaction.client
@@ -128,7 +128,7 @@ module.exports = {
             const replyEmbed = {
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
                 description: `${replyDescription}`,
-                color: action === 'approve' ? '#00FF00' : '#FF0000',
+                color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
             };
 
             // Send an initial reply to the interaction
@@ -138,8 +138,8 @@ module.exports = {
             const { embed } = await createEmbed({
                 command: 'review',
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
-                description: `Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
-                color: action === 'approve' ? '#00FF00' : '#FF0000',
+                description: `${userMentionResponse} Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
+                color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
                 channelId: channelId,
                 messageId: messageId,
                 client: interaction.client
