@@ -161,22 +161,22 @@ client.on('messageCreate', async message => {
         const roll = Math.floor(Math.random() * 6) + 1;
         switch (roll) {
             case 1:
-                message.reply(`:game_die: You rolled a ${roll}... That's terrible. :skull:`);
+                message.reply(`:game_die: You rolled a **${roll}**... That's terrible. :skull:`);
                 break;
             case 2:
-                message.reply(`:game_die: You rolled a ${roll}, not great but could be worse! :unamused:`);
+                message.reply(`:game_die: You rolled a **${roll}**, not great but could be worse! :unamused:`);
                 break;
             case 3:
-                message.reply(`:game_die: You rolled a ${roll}, average. :neutral_face:`);
+                message.reply(`:game_die: You rolled a **${roll}**, average. :neutral_face:`);
                 break;
             case 4:
-                message.reply(`:game_die: You rolled a ${roll}, not bad! :thinking:`);
+                message.reply(`:game_die: You rolled a **${roll}**, not bad! :thinking:`);
                 break;
             case 5:
-                message.reply(`:game_die: You rolled a ${roll}, now thats what I'm talking about! :saluting_face:`);
+                message.reply(`:game_die: You rolled a **${roll}**, now thats what I'm talking about! :saluting_face:`);
                 break;
             case 6:
-                message.reply(`:game_die: You rolled a ${roll}! What are you, an Ironman?! :rage:`);
+                message.reply(`:game_die: You rolled a **${roll}**! What are you, an *Ironman*?! :rage:`);
                 break;
         }
     } else if (message.content === '!snake') {
