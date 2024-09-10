@@ -171,6 +171,19 @@ client.on('messageCreate', async message => {
         });
 
         message.channel.send({ embeds: [embed], files: attachment ? [attachment] : [] });
+    } else if (message.content === '!board') {
+        const { embed, attachment } = await createEmbed({
+            command: 'board',
+            title: 'Snakes and Ladders Board',
+            description: 'Here is the current Snakes and Ladders board for the event.',
+            imageUrl: path.join(__dirname, 'src/images/other/eventBoard.png'),
+            color: '#00FF00',
+            channelId: message.channel.id,
+            messageId: message.id,
+            client: client
+        });
+
+        message.channel.send({ embeds: [embed], files: attachment ? [attachment] : [] });
     }
 });
 
