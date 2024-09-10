@@ -188,13 +188,6 @@ module.exports = {
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                 const memberName = interaction.member.displayName;
 
-                // Write to the Submissions sheet
-                const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
-                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
-                await googleSheets.writeToSheet('Submissions', submissionData);
-
-                await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name
-
                 if (imagesSubmitted >= imagesNeeded) {
                     team.canRoll = true;
                     const { embed } = await createEmbed({
@@ -206,6 +199,12 @@ module.exports = {
                         messageId: interaction.id,
                         client: interaction.client
                     });
+                    // Write to the Submissions sheet
+                    const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
+                    const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${embed.messageId}`];
+                    await googleSheets.writeToSheet('Submissions', submissionData);
+
+                    await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name
                     await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
                 } else {
                     const { embed } = await createEmbed({
@@ -217,6 +216,12 @@ module.exports = {
                         messageId: interaction.id,
                         client: interaction.client
                     });
+                    // Write to the Submissions sheet
+                    const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
+                    const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${embed.messageId}`];
+                    await googleSheets.writeToSheet('Submissions', submissionData);
+
+                    await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name
                     await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
                 }
             }
