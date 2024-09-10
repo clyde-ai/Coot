@@ -13,6 +13,10 @@ const { getLadders } = require('./commands/createLadder');
 const { getEventPassword } = require('./commands/setEventPassword');
 const { createEmbed } = require('./src/utils/embeds');
 
+process.on('unhandledRejection', error => {
+    console.error('Unhandled promise rejection:', error);
+});
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
 client.commands = new Collection();
