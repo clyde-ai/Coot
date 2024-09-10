@@ -73,7 +73,9 @@ async function broadcastEventStart(client) {
         console.log('Creating Broadcast Embed');
         const rows = await googleSheets.readSheet('EventPassword!A2:D2');
         const eventPassword = rows[0][0];
-        const broadcastChannelId = rows[0][2];
+        const broadcastChannelId = rows[0][3]; // 4th column (index 3)
+
+        console.log('Broadcast Channel ID:', broadcastChannelId);
 
         const embed = {
             title: ':tada: EVENT STARTED! :tada:',
@@ -86,6 +88,17 @@ async function broadcastEventStart(client) {
             await channel.send({ embeds: [embed] });
         } else {
             console.error('Broadcast channel not found.');
+            // Attempt to fetch the channel if it's not in the cache
+            try {
+                const fetchedChannel = await client.channels.fetch(broadcastChannelId);
+                if (fetchedChannel) {
+                    await fetchedChannel.send({ embeds: [embed] });
+                } else {
+                    console.error('Broadcast channel still not found after fetching.');
+                }
+            } catch (fetchError) {
+                console.error('Error fetching the broadcast channel:', fetchError);
+            }
         }
     } catch (error) {
         console.error('Error broadcasting event start:', error);
@@ -193,6 +206,8 @@ module.exports = {
 
             // Write the new start and end times and broadcast channel ID to the sheet without overwriting the password
             await googleSheets.updateSheet('EventPassword', 'B2:D2', [eventStartTime, eventEndTime, broadcastChannelId]);
+
+
 
             const { embed } = await createEmbed({
                 command: 'set-event-time',
