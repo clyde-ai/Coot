@@ -8,7 +8,7 @@ const { getEventPassword } = require('./setEventPassword');
 const tiles = require('../src/tiles');
 const path = require('path');
 const { createEmbed } = require('../src/utils/embeds');
-const { getEventTime, isEventActive } = require('./set-event-time');
+const { getEventTime, isEventActive } = require('./setEventTime');
 
 let client;
 

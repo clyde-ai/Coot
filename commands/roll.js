@@ -4,7 +4,7 @@ const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
 const path = require('path');
 const tiles = require('../src/tiles');
-const { getEventTime, isEventActive } = require('./set-event-time');
+const { getEventTime, isEventActive } = require('./setEventTime');
 
 module.exports = {
     data: new SlashCommandBuilder()
