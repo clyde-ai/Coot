@@ -124,16 +124,6 @@ module.exports = {
                 replyDescription = `${userMentionResponse} Your submission has been denied by ${reviewerName}.\n Your team will need additional proof or resubmission for this tile!`;
             }
 
-            // Create an embed for the reply
-            const replyEmbed = {
-                title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
-                description: `${replyDescription}`,
-                color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
-            };
-
-            // Send an initial reply to the interaction
-            await interaction.editReply({ embeds: [replyEmbed] });
-
             // Send an embed message in reply to the submission message
             const { embed } = await createEmbed({
                 command: 'review',
