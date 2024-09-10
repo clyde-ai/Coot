@@ -75,8 +75,8 @@ module.exports = {
             }
 
             // Fetch the message
-            console.log(`messageId: ${messageId}, message: ${message}, message.id: ${message.id}`);
             const message = await channel.messages.fetch(messageId);
+            console.log(`messageId: ${messageId}, message: ${message}, message.id: ${message.id}`);
             if (!message) {
                 console.log('found !message');
                 throw new Error('Message not found');
