@@ -4,11 +4,18 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const axios = require('axios');
+const moment = require('moment');
+const { getEventTime, isEventActive, scheduleEventStartBroadcast } = require('./commands/setEventTime');
 const googleSheets = require('./src/utils/googleSheets');
 const { loadTeamsFromSheet } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
 const { getEventPassword } = require('./commands/setEventPassword');
+const { createEmbed } = require('./src/utils/embeds');
+
+process.on('unhandledRejection', error => {
+    console.error('Unhandled promise rejection:', error);
+});
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -40,7 +47,7 @@ client.once('ready', async () => {
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
         const laddersHeaders = ['Bottom Tile', 'Top Tile', 'Created By', 'Timestamp'];
-        const eventPasswordHeaders = ['Password'];
+        const eventPasswordHeaders = ['Password', 'Start Time', 'End Time', 'Broadcast Channel ID'];
 
         await setHeadersIfNotExist('Teams', teamHeaders);
         await setHeadersIfNotExist('Rolls', rollHeaders);
@@ -49,10 +56,16 @@ client.once('ready', async () => {
         await setHeadersIfNotExist('Ladders', laddersHeaders);
         await setHeadersIfNotExist('EventPassword', eventPasswordHeaders);
 
-        console.log('Headers set successfully.');
+        console.log('------Headers set successfully------');
 
         // Populate data from Google Sheets
         await populateData();
+
+        // Schedule the event start broadcast if the event start time is in the future
+        const eventTime = await getEventTime();
+        if (eventTime.eventStartTime && moment().isBefore(eventTime.eventStartTime)) {
+            scheduleEventStartBroadcast(client, eventTime.eventStartTime, eventTime.broadcastChannelId);
+        }
 
         // Set an interval to ensure the token is valid
         setInterval(ensureValidToken, 15 * 60 * 1000); // Check every 15 minutes
@@ -97,6 +110,30 @@ async function populateData() {
         global.eventPassword = eventPassword;
         console.log('- Loaded data from: Event Password sheet\n -- Event Password is: ', global.eventPassword);
 
+        const eventTime = await getEventTime();
+        if (!eventTime.eventStartTime || !eventTime.eventEndTime) {
+            // Set default values if they are not set
+            const defaultStartTime = moment().add(2, 'minutes').toISOString(); // Default to 2 minutes from now
+            const defaultEndTime = moment().add(10, 'minutes').toISOString(); // Default to 10 minutes from now
+
+            global.eventStartTime = eventTime.eventStartTime || defaultStartTime;
+            global.eventEndTime = eventTime.eventEndTime || defaultEndTime;
+
+            // Update the Google Sheet with the default values
+            await googleSheets.updateSheet('EventPassword', 'B2:C2', [global.eventStartTime, global.eventEndTime]);
+
+            console.log('Event times were not set. Default values have been initialized.');
+        } else {
+            global.eventStartTime = eventTime.eventStartTime;
+            global.eventEndTime = eventTime.eventEndTime;
+        }
+
+        global.broadcastChannelId = eventTime.broadcastChannelId;
+        console.log('- Loaded additional data from: Event Password sheet:');
+        console.log('- Loaded Event Start Time: ', global.eventStartTime);
+        console.log('- Loaded Event End Time: ', global.eventEndTime);
+        console.log('- Loaded Broadcast Channel ID: ', global.broadcastChannelId);
+
         console.log('------All Data Populated Successfully------');
     } catch (error) {
         console.error('ERROR: populating data from Google Sheets:', error);
@@ -118,8 +155,8 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Respond to meme messages
-client.on('messageCreate', message => {
+// Respond to other messages
+client.on('messageCreate', async message => {
     if (message.content === '!roll') {
         const roll = Math.floor(Math.random() * 6) + 1;
         message.reply(`You rolled a ${roll}`);
@@ -129,6 +166,68 @@ client.on('messageCreate', message => {
     } else if (message.content === '!ladder') {
         const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
         message.reply({ files: [gifPath] });
+    } else if (message.content === '!event') {
+        if (!global.eventStartTime || !global.eventEndTime) {
+            return message.channel.send('Event times are not set yet.');
+        }
+
+        try {
+            const eventStartTimestamp = `<t:${Math.floor(moment(global.eventStartTime).unix())}:F>`;
+            const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
+
+            const imagePath = path.join(__dirname, 'src/images/other/eventLogo.png');
+
+            const { embed, attachment } = await createEmbed({
+                command: 'event',
+                title: 'Snakes and Ladders',
+                description: 'Snakes and Ladders is a classic board game where players navigate a game board with numbered squares. The objective is to reach the last square by moving according to the roll of a dice, while encountering snakes that send you back and ladders that move you forward.',
+                fields: [
+                    { name: 'Event Start Time', value: eventStartTimestamp, inline: true },
+                    { name: 'Event End Time', value: eventEndTimestamp, inline: true }
+                ],
+                imageUrl: imagePath,
+                color: '#00FF00',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
+            });
+
+            const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
+
+            message.channel.send(replyOptions);
+        }  catch (error) {
+        console.error('Error creating embed:', error);
+        message.channel.send('There was an error creating the event embed.');
+    }
+    } else if (message.content === '!board') {
+        try {
+
+            const imagePath = path.join(__dirname, 'src/images/other/eventBoard.png');
+
+            const { embed, attachment } = await createEmbed({
+                command: 'board',
+                title: 'Snakes and Ladders Board',
+                description: 'Here is the current Snakes and Ladders board for the event.',
+                imageUrl: imagePath,
+                color: '#00FF00',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
+            });
+
+            const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
+
+            message.channel.send(replyOptions);
+        }  catch (error) {
+        console.error('Error creating embed:', error);
+        message.channel.send('There was an error creating the event embed.');
+        }
     }
 });
 

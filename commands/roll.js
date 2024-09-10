@@ -4,12 +4,28 @@ const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
 const path = require('path');
 const tiles = require('../src/tiles');
+const { getEventTime, isEventActive } = require('./setEventTime');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('roll')
         .setDescription('Roll a 6-sided dice'),
     async execute(interaction) {
+        // Check if the event is active
+        const { eventStartTime, eventEndTime } = await getEventTime();
+        if (!isEventActive()) {
+            const { embed } = await createEmbed({
+                command: 'roll',
+                title: ':x: Event Not Active :x:',
+                description: '**The event has not started yet or has already ended. Please wait for the event to start.**',
+                color: '#ff0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         const teams = createTeam.getTeams();
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
 
