@@ -55,6 +55,9 @@ module.exports = {
             const channel = await interaction.client.channels.fetch(channelId);
             const message = await channel.messages.fetch(messageId);
 
+            // Extract the message ID from the fetched message
+            const submissionMessageId = message.id;
+
             // React to the message based on the action
             if (action === 'approve') {
                 await message.react('✅');
@@ -87,7 +90,7 @@ module.exports = {
                 description: `Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
                 color: action === 'approve' ? '#00FF00' : '#FF0000',
                 channelId: channelId,
-                messageId: messageId,
+                messageId: submissionMessageId,
                 client: interaction.client
             });
             await message.reply({ embeds: [embed] });
