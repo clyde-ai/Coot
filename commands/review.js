@@ -50,6 +50,20 @@ module.exports = {
         }
         const [guildId, channelId, messageId] = match.slice(1);
 
+        // Check bot permissions
+        const requiredPermissions = [
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.ReadMessageHistory,
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.AddReactions,
+            PermissionsBitField.Flags.ManageMessages // Optional but recommended
+        ];
+
+        const botPermissions = interaction.channel.permissionsFor(interaction.client.user);
+        if (!botPermissions.has(requiredPermissions)) {
+            return interaction.reply({ content: 'I do not have the necessary permissions to perform this action.', ephemeral: true });
+        }
+
         try {
             // Fetch the channel
             const channel = await interaction.client.channels.fetch(channelId);
