@@ -71,8 +71,8 @@ module.exports = {
                 throw new Error('Channel not found');
             }
 
-            // Fetch the message with partials enabled
-            const message = await channel.messages.fetch(messageId, { force: true });
+            // Fetch the message
+            const message = await channel.messages.fetch(messageId);
             if (!message) {
                 throw new Error('Message not found');
             }
@@ -103,6 +103,12 @@ module.exports = {
                 return interaction.reply({ content: 'There was an error updating the Google Sheet. Please try again later.', ephemeral: true });
             }
 
+            // Send an initial reply to the interaction
+            await interaction.reply({ content: `Submission has been ${action === 'approve' ? 'approved' : 'denied'} and updated in the Google Sheet.`, ephemeral: true });
+
+            // Fetch the reply message
+            const replyMessage = await interaction.fetchReply();
+
             // Send an embed message in reply to the submission message
             const userMention = `<@${submissionRow[1]}>`;
             const { embed } = await createEmbed({
@@ -114,9 +120,8 @@ module.exports = {
                 messageId: messageId,
                 client: interaction.client
             });
-            await message.reply({ embeds: [embed] });
+            await replyMessage.reply({ embeds: [embed] });
 
-            await interaction.reply({ content: `Submission has been ${action === 'approve' ? 'approved' : 'denied'} and updated in the Google Sheet.`, ephemeral: true });
         } catch (error) {
             console.error(`Error fetching or reacting to the message: ${error.message}`);
             return interaction.reply({ content: 'There was an error fetching or reacting to the message. It may have been deleted or the bot lacks permissions.', ephemeral: true });
