@@ -95,6 +95,7 @@ module.exports = {
                 return interaction.editReply({ content: 'There was an error updating the Google Sheet. Please try again later.' });
             }
             let member;
+            let memberDisplayName;
             submissions = await googleSheets.readSheet('Submissions!A:H');
             submissionRow = submissions.slice(1).find(row => row[7] === link);
             if (submissionRow) {
