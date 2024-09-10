@@ -53,17 +53,13 @@ module.exports = {
         try {
             // Fetch the channel
             const channel = await interaction.client.channels.fetch(channelId);
-            console.log(`channel: ${channel}, channelId: ${channelId}`);
             if (!channel) {
-                console.log('found !channel');
                 throw new Error('Channel not found');
             }
 
             // Fetch the message
             const message = await channel.messages.fetch(messageId);
-            console.log(`messageId: ${messageId}, message: ${message}, message.id: ${message.id}`);
             if (!message) {
-                console.log('found !message');
                 throw new Error('Message not found');
             }
 
@@ -130,11 +126,15 @@ module.exports = {
             // Send an initial reply to the interaction
             await interaction.editReply({ embeds: [replyEmbed] });
 
+            // Create conditional response
+            let additionalMessage = action === 'approve' ? 'No further proof needed, Good Luck!' : 'You need to submit additional evidence or redo this tile!';
+            let replyDescription = `${userMentionResponse} Your submission has been **${action === 'approve' ? 'approved' : 'denied'}** by ${reviewerName}.\n ${additionalMessage}`;
+
             // Send an embed message in reply to the submission message
             const { embed } = await createEmbed({
                 command: 'review',
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
-                description: `${userMentionResponse} Your submission has been **${action === 'approve' ? 'approved' : 'denied'}** by ${reviewerName}.\n ${action === 'approved' ? 'You need to submit additional evidence or redo this tile!' : 'No further proof needed, Good Luck!'}`,
+                description: replyDescription,
                 color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
                 channelId: channelId,
                 messageId: messageId,
