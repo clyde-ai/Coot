@@ -51,7 +51,10 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            const reply = await interaction.reply({ embeds: [embed], ephemeral: true, fetchReply: true });
+            const messageId = reply.id;
+            
+            return;
         }
         await interaction.deferReply();
 
@@ -70,7 +73,9 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.editReply({ embeds: [embed] });
+            const reply = await interaction.editReply({ embeds: [embed], fetchReply: true });
+            const messageId = reply.id;
+
             return;
         }
 
@@ -97,7 +102,9 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.editReply({ embeds: [embed] });
+            const reply = await interaction.editReply({ embeds: [embed], fetchReply: true });
+            const messageId = reply.id;
+
             return;
         }
 
@@ -130,22 +137,22 @@ module.exports = {
 
                 if (attempts >= 0) { // Set to 1 if you want the invalid proof response, default route without this
                     // Accept the image but flag for manual review
-                    team.proofs[tileNumber] = proofAttachment.url;
+                    if (!team.proofs[tileNumber]) {
+                        team.proofs[tileNumber] = [];
+                    }
+                    team.proofs[tileNumber].push(proofAttachment.url);
 
                     const imagesNeeded = tile ? tile.imagesNeeded : 1;
                     const imagesSubmitted = team.proofs[tileNumber].length;
 
                     if (imagesSubmitted >= imagesNeeded) {
+                        console.log(`${teamName} can now roll.`);
                         team.canRoll = true;
                     }
 
                     const userMention = `<@${interaction.user.id}>`;
                     const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                     const memberName = interaction.member.displayName;
-
-                    // Write to the Submissions sheet with a flag for manual review
-                    const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed'];
-                    await googleSheets.writeToSheet('Submissions', submissionData);
 
                     const { embed } = await createEmbed({
                         command: 'submit',
@@ -156,7 +163,13 @@ module.exports = {
                         messageId: interaction.id,
                         client: interaction.client
                     });
-                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
+                    const reply = await interaction.editReply({ embeds: [embed], files: [proofAttachment], fetchReply: true });
+                    const messageId = reply.id;
+                    
+                    // Write to the Submissions sheet
+                    const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
+                    const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), 'Manual Review Needed', `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId}`];
+                    await googleSheets.writeToSheet('Submissions', submissionData);
 
                     failedAttempts.delete(userId);
                 } else {
@@ -170,7 +183,8 @@ module.exports = {
                         messageId: interaction.id,
                         client: interaction.client
                     });
-                    await interaction.editReply({ embeds: [embed] });
+                    const reply = await interaction.editReply({ embeds: [embed], fetchReply: true });
+                    const messageId = reply.id;
                 }
             } else {
                 // Reset failed attempts on successful submission
@@ -188,40 +202,25 @@ module.exports = {
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                 const memberName = interaction.member.displayName;
 
+                const { embed } = await createEmbed({
+                    command: 'submit',
+                    title: ':white_check_mark: Proof Submitted :white_check_mark:',
+                    description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been successfully submitted.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
+                    color: '#00FF00',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                const reply = await interaction.editReply({ embeds: [embed], files: [proofAttachment], fetchReply: true });
+                const messageId = reply.id;
+
                 // Write to the Submissions sheet
                 const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
-                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString()];
+                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), '', `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId}`];
                 await googleSheets.writeToSheet('Submissions', submissionData);
-
-                await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name
-
-                if (imagesSubmitted >= imagesNeeded) {
-                    team.canRoll = true;
-                    const { embed } = await createEmbed({
-                        command: 'submit',
-                        title: ':white_check_mark: Proof Submitted :white_check_mark:',
-                        description: `Proof for tile **${tileNumber}** submitted successfully by ${userMention} from team ${teamRoleMention}.\n :tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!`,
-                        color: '#00FF00',
-                        channelId: interaction.channelId,
-                        messageId: interaction.id,
-                        client: interaction.client
-                    });
-                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
-                } else {
-                    const { embed } = await createEmbed({
-                        command: 'submit',
-                        title: ':ballot_box_with_check: Proof Submitted :ballot_box_with_check:',
-                        description: `Proof for tile ${tileNumber} submitted successfully by ${userMention} from team ${teamRoleMention}.\n **${imagesNeeded - imagesSubmitted}** more proof(s) needed.`,
-                        color: '#004cff',
-                        channelId: interaction.channelId,
-                        messageId: interaction.id,
-                        client: interaction.client
-                    });
-                    await interaction.editReply({ embeds: [embed], files: [proofAttachment] });
-                }
             }
         } catch (error) {
-            console.error(`Error processing the image: ${error.message}`);
+            console.error(`Error processing submission: ${error.message}`);
             const { embed } = await createEmbed({
                 command: 'submit',
                 title: ':x: Error :x:',

@@ -26,7 +26,7 @@ async function writeToSheet(sheetName, data) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            range: `${sheetName}!A:F`,
+            range: `${sheetName}!A:G`,
             valueInputOption: 'RAW',
             resource: {
                 values: [data],
@@ -53,6 +53,23 @@ async function updateSheet(sheetName, range, data) {
     } catch (error) {
         console.error(`ERROR updating sheet ${sheetName}:`, error);
         throw new Error('Failed to update Google Sheets. Please try again later.');
+    }
+}
+
+async function updateCell(range, value) {
+    try {
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range: range,
+            valueInputOption: 'RAW',
+            resource: {
+                values: [[value]],
+            },
+        });
+        console.log(`Cell ${range} updated with value ${value}`);
+    } catch (error) {
+        console.error(`ERROR updating cell ${range}:`, error);
+        throw new Error('Failed to update cell in Google Sheets. Please try again later.');
     }
 }
 
@@ -171,12 +188,29 @@ async function clearSheet(range) {
     }
 }
 
+async function readCell(range, variable) {
+    try {
+        const res = await sheets.spreadsheets.values.get({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range,
+        });
+        console.log(`Cell ${range} read with value ${res.data.values[0][0]}`);
+        variable = res.data.values[0][0];
+        return variable;
+    } catch (error) {
+        console.error(`ERROR reading cell ${range}:`, error);
+        throw new Error('Failed to read cell in Google Sheets. Please try again later.');
+    }
+}
+
 module.exports = {
     writeToSheet,
     updateSheet,
+    updateCell,
     readSheet,
     setHeaders,
     sortSheet,
     freezeHeaders,
-    clearSheet
+    clearSheet,
+    readCell
 };

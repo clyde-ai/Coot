@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -17,7 +17,19 @@ process.on('unhandledRejection', error => {
     console.error('Unhandled promise rejection:', error);
 });
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessageReactions // Ensure this intent is included
+    ],
+    partials: [
+        Partials.Message,
+        Partials.Channel,
+        Partials.Reaction
+    ]
+});
 
 client.commands = new Collection();
 
@@ -44,7 +56,7 @@ client.once('ready', async () => {
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created', 'Role ID', 'Current Tile', 'Previous Tile'];
         const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
-        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag'];
+        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag', 'Submission Link', 'Review Status', 'Reviewer Name'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
         const laddersHeaders = ['Bottom Tile', 'Top Tile', 'Created By', 'Timestamp'];
         const eventPasswordHeaders = ['Password', 'Start Time', 'End Time', 'Broadcast Channel ID'];

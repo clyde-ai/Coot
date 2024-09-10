@@ -148,7 +148,7 @@ module.exports = {
                 currentTile: 0, // Set initial tile to 0
                 previousTile: 0, // Set initial previous tile to 0
                 canRoll: false, // Set initial to false
-                proofs: {}
+                proofs: []
             };
         }
 
