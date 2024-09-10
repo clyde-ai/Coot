@@ -196,8 +196,8 @@ async function broadcastEventStart(client) {
 }
 
 function scheduleEventStartBroadcast(client) {
-    const startTime = moment(global.eventStartTime);
-    const now = moment();
+    const startTime = moment(global.eventStartTime).valueOf();
+    const now = moment().valueOf();
 
     const delay = now.diff(startTime, 'milliseconds'); // Calculate delay in milliseconds
     console.log('Delay until Broadcast start: ', delay, ' milliseconds');
