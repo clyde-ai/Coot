@@ -9,6 +9,89 @@ let eventStartTime = null;
 let eventEndTime = null;
 let broadcastChannelId = null;
 
+async function getEventTime() {
+    try {
+        const rows = await googleSheets.readSheet('EventPassword!B2:D2');
+        if (rows.length > 0) {
+            return {
+                eventStartTime: rows[0][0],
+                eventEndTime: rows[0][1],
+                broadcastChannelId: rows[0][2]
+            };
+        } else {
+            return {
+                eventStartTime: null,
+                eventEndTime: null,
+                broadcastChannelId: null
+            };
+        }
+    } catch (error) {
+        console.error(`Error reading Google Sheets: ${error.message}`);
+        return {
+            eventStartTime: null,
+            eventEndTime: null,
+            broadcastChannelId: null
+        };
+    }
+}
+
+function isEventActive() {
+    const now = moment.utc().toISOString(); // Ensure current time is in UTC
+    return global.eventStartTime && global.eventEndTime && now >= global.eventStartTime && now <= global.eventEndTime;
+}
+
+async function scheduleEventStartBroadcast(client) {
+    try {
+        // Get event times from Google Sheets
+        const eventTimes = await getEventTime();
+        if (!eventTimes.eventStartTime) {
+            console.error('No start time found in the Google Sheet.');
+            return;
+        }
+
+        const startTime = moment.utc(eventTimes.eventStartTime); // Use moment.utc for Zulu time
+        const now = moment.utc(); // Use moment.utc to get the current time in UTC
+
+        console.log('Start Time:', startTime.format());
+        console.log('Current Time:', now.format());
+
+        const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
+        console.log('Delay until Broadcast start: ', delay, ' milliseconds');
+        if (delay > 0) {
+            setTimeout(() => broadcastEventStart(client), delay);
+        } else {
+            console.log('Event start time is in the past. No broadcast scheduled.');
+        }
+    } catch (error) {
+        console.error('Error reading start time from Google Sheets:', error);
+    }
+}
+
+// Function to broadcast the event start
+async function broadcastEventStart(client) {
+    try {
+        console.log('Creating Broadcast Embed');
+        const rows = await googleSheets.readSheet('EventPassword!A2:D2');
+        const eventPassword = rows[0][0];
+        const broadcastChannelId = rows[0][2];
+
+        const embed = {
+            title: ':tada: EVENT STARTED! :tada:',
+            description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
+            color: '#00FF00',
+        };
+
+        const channel = client.channels.cache.get(broadcastChannelId);
+        if (channel) {
+            await channel.send({ embeds: [embed] });
+        } else {
+            console.error('Broadcast channel not found.');
+        }
+    } catch (error) {
+        console.error('Error broadcasting event start:', error);
+    }
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('set-event-time')
@@ -138,86 +221,7 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
-    async getEventTime() {
-        try {
-            const rows = await googleSheets.readSheet('EventPassword!B2:D2');
-            if (rows.length > 0) {
-                return {
-                    eventStartTime: rows[0][0],
-                    eventEndTime: rows[0][1],
-                    broadcastChannelId: rows[0][2]
-                };
-            } else {
-                return {
-                    eventStartTime: null,
-                    eventEndTime: null,
-                    broadcastChannelId: null
-                };
-            }
-        } catch (error) {
-            console.error(`Error reading Google Sheets: ${error.message}`);
-            return {
-                eventStartTime: null,
-                eventEndTime: null,
-                broadcastChannelId: null
-            };
-        }
-    },
-    isEventActive() {
-        const now = moment.utc().toISOString(); // Ensure current time is in UTC
-        return global.eventStartTime && global.eventEndTime && now >= global.eventStartTime && now <= global.eventEndTime;
-    }, 
+    getEventTime,
+    isEventActive,
     scheduleEventStartBroadcast
 };
-
-// Function to broadcast the event start
-async function broadcastEventStart(client) {
-    try {
-        console.log('Creating Broadcast Embed');
-        const rows = await googleSheets.readSheet('EventPassword!A2:D2');
-        const eventPassword = rows[0][0];
-        const broadcastChannelId = rows[0][2];
-
-        const embed = {
-            title: ':tada: EVENT STARTED! :tada:',
-            description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
-            color: '#00FF00',
-        };
-
-        const channel = client.channels.cache.get(broadcastChannelId);
-        if (channel) {
-            await channel.send({ embeds: [embed] });
-        } else {
-            console.error('Broadcast channel not found.');
-        }
-    } catch (error) {
-        console.error('Error broadcasting event start:', error);
-    }
-}
-
-async function scheduleEventStartBroadcast(client) {
-    try {
-        // Get event times from Google Sheets
-        const eventTimes = await getEventTime();
-        if (!eventTimes.eventStartTime) {
-            console.error('No start time found in the Google Sheet.');
-            return;
-        }
-
-        const startTime = moment.utc(eventTimes.eventStartTime); // Use moment.utc for Zulu time
-        const now = moment.utc(); // Use moment.utc to get the current time in UTC
-
-        console.log('Start Time:', startTime.format());
-        console.log('Current Time:', now.format());
-
-        const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
-        console.log('Delay until Broadcast start: ', delay, ' milliseconds');
-        if (delay > 0) {
-            setTimeout(() => broadcastEventStart(client), delay);
-        } else {
-            console.log('Event start time is in the past. No broadcast scheduled.');
-        }
-    } catch (error) {
-        console.error('Error reading start time from Google Sheets:', error);
-    }
-}
