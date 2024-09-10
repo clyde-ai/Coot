@@ -136,7 +136,6 @@ async function populateData() {
     }
 }
 
-
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
@@ -186,7 +185,11 @@ client.on('messageCreate', async message => {
             client: client
         });
 
-        message.channel.send({ embeds: [embed], files: attachment ? [attachment] : [] });
+        if (attachment) {
+            message.channel.send({ embeds: [embed], files: [attachment] });
+        } else {
+            message.channel.send({ embeds: [embed] });
+        }
     } else if (message.content === '!board') {
         const { embed, attachment } = await createEmbed({
             command: 'board',
@@ -199,7 +202,11 @@ client.on('messageCreate', async message => {
             client: client
         });
 
-        message.channel.send({ embeds: [embed], files: attachment ? [attachment] : [] });
+        if (attachment) {
+            message.channel.send({ embeds: [embed], files: [attachment] });
+        } else {
+            message.channel.send({ embeds: [embed] });
+        }
     }
 });
 
