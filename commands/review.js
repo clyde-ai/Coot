@@ -17,10 +17,8 @@ module.exports = {
             option.setName('action')
                 .setDescription('Approve or Deny the submission')
                 .setRequired(true)
-                .addChoices(
-                    { name: 'approve', value: 'approve' },
-                    { name: 'deny', value: 'deny' }
-                )),
+                .addChoice('Approve', 'approve')
+                .addChoice('Deny', 'deny')),
     async execute(interaction) {
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
@@ -50,17 +48,12 @@ module.exports = {
         }
         const [guildId, channelId, messageId] = match.slice(1);
 
-        console.log(`messageId is: ${messageId}`);
-
         try {
             // Fetch the message
             const channel = await interaction.client.channels.fetch(channelId);
-            console.log(`channel is ${channel}`);
             const message = await channel.messages.fetch(messageId);
-            console.log(`message is ${message}`);
 
-            // Extract the message ID from the fetched message
-            const submissionMessageId = message.id;
+            console.log(`Fetched message ID: ${message.id}`);
 
             // React to the message based on the action
             if (action === 'approve') {
@@ -94,7 +87,7 @@ module.exports = {
                 description: `Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
                 color: action === 'approve' ? '#00FF00' : '#FF0000',
                 channelId: channelId,
-                messageId: submissionMessageId,
+                messageId: messageId,
                 client: interaction.client
             });
             await message.reply({ embeds: [embed] });
