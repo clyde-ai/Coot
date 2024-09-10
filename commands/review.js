@@ -72,7 +72,7 @@ module.exports = {
             }
 
             // Fetch the message
-            const message = await channel.messages.fetch(messageId);
+            const message = await channel.messages.fetchReply(messageId);
             if (!message) {
                 throw new Error('Message not found');
             }
