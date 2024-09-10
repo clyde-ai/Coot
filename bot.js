@@ -190,7 +190,7 @@ client.on('messageCreate', async message => {
             replyOptions.files = [attachment];
         }
 
-        message.reply(replyOptions);
+        await message.reply(replyOptions);
     } else if (message.content === '!board') {
         const { embed, attachment } = await createEmbed({
             command: 'board',
@@ -208,7 +208,7 @@ client.on('messageCreate', async message => {
             replyOptions.files = [attachment];
         }
 
-        message.reply(replyOptions);
+        await message.reply(replyOptions);
     }
 });
 
