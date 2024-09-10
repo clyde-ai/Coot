@@ -185,11 +185,12 @@ client.on('messageCreate', async message => {
             client: client
         });
 
-        if (attachment) {
-            message.channel.send({ embeds: [embed], files: [attachment] });
-        } else {
-            message.channel.send({ embeds: [embed] });
-        }
+        const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
+
+            await interaction.reply(replyOptions);
     } else if (message.content === '!board') {
         const { embed, attachment } = await createEmbed({
             command: 'board',
@@ -202,11 +203,12 @@ client.on('messageCreate', async message => {
             client: client
         });
 
-        if (attachment) {
-            message.channel.send({ embeds: [embed], files: [attachment] });
-        } else {
-            message.channel.send({ embeds: [embed] });
-        }
+        const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
+
+            await interaction.reply(replyOptions);
     }
 });
 
