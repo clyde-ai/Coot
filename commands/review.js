@@ -72,7 +72,7 @@ module.exports = {
             }
 
             // Fetch the message with partials enabled
-            const message = await channel.messages.fetch(messageId);
+            const message = await channel.messages.fetch(messageId, { force: true });
             if (!message) {
                 throw new Error('Message not found');
             }
