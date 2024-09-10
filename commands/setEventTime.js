@@ -195,14 +195,15 @@ async function broadcastEventStart(client) {
     }
 }
 
-// Function to schedule the event start broadcast
 function scheduleEventStartBroadcast(client) {
     const startTime = moment(global.eventStartTime);
     const now = moment();
 
-    const delay = startTime.diff(now, 'minutes');
-    console.log('Delay until Broadcast start: ', delay);
+    const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
+    console.log('Delay until Broadcast start: ', delay, ' milliseconds');
     if (delay > 0) {
         setTimeout(() => broadcastEventStart(client), delay);
+    } else {
+        console.log('Event start time is in the past. No broadcast scheduled.');
     }
 }
