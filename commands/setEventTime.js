@@ -162,14 +162,15 @@ module.exports = {
     },
     isEventActive() {
         const now = moment().toISOString();
-        return eventStartTime && eventEndTime && now >= eventStartTime && now <= eventEndTime;
-    },
+        return global.eventStartTime && global.eventEndTime && now >= global.eventStartTime && now <= global.eventEndTime;
+    }, 
     scheduleEventStartBroadcast
 };
 
 // Function to broadcast the event start
 async function broadcastEventStart(client) {
     try {
+        console.log('Creating Broadcast Embed');
         const rows = await googleSheets.readSheet('EventPassword!A2:D2');
         const eventPassword = rows[0][0];
         const broadcastChannelId = rows[0][2];
@@ -186,6 +187,7 @@ async function broadcastEventStart(client) {
         const channel = client.channels.cache.get(broadcastChannelId);
         if (channel) {
             const attachment = path.join(__dirname, '../src/images/other/eventLogo.png');
+            console.log('Sending Broadcast Embed');
             await channel.send({ embeds: [embed], files: [attachment] });
         }
     } catch (error) {
@@ -195,10 +197,11 @@ async function broadcastEventStart(client) {
 
 // Function to schedule the event start broadcast
 function scheduleEventStartBroadcast(client) {
-    const startTime = moment(eventStartTime);
+    const startTime = moment(global.eventStartTime);
     const now = moment();
 
     const delay = startTime.diff(now);
+    console.log('Delay until Broadcast start: ', delay);
     if (delay > 0) {
         setTimeout(() => broadcastEventStart(client), delay);
     }
