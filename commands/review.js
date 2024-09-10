@@ -50,10 +50,14 @@ module.exports = {
         }
         const [guildId, channelId, messageId] = match.slice(1);
 
+        console.log(`messageId is: ${messageId}`);
+
         try {
             // Fetch the message
             const channel = await interaction.client.channels.fetch(channelId);
+            console.log(`channel is ${channel}`);
             const message = await channel.messages.fetch(messageId);
+            console.log(`message is ${message}`);
 
             // Extract the message ID from the fetched message
             const submissionMessageId = message.id;
