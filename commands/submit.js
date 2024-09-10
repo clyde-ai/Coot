@@ -144,7 +144,7 @@ module.exports = {
                     const memberName = interaction.member.displayName;
 
                     // Write to the Submissions sheet with a flag for manual review
-                    const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed'];
+                    const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed', `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
                     await googleSheets.writeToSheet('Submissions', submissionData);
 
                     const { embed } = await createEmbed({
@@ -190,7 +190,7 @@ module.exports = {
 
                 // Write to the Submissions sheet
                 const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
-                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString()];
+                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
                 await googleSheets.writeToSheet('Submissions', submissionData);
 
                 await googleSheets.sortSheet('Submissions', 'A', 'asc'); // Sort by Team Name

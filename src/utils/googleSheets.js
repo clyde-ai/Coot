@@ -26,7 +26,7 @@ async function writeToSheet(sheetName, data) {
     try {
         await sheets.spreadsheets.values.append({
             spreadsheetId: process.env.GOOGLE_SHEET_ID,
-            range: `${sheetName}!A:F`,
+            range: `${sheetName}!A:G`,
             valueInputOption: 'RAW',
             resource: {
                 values: [data],
