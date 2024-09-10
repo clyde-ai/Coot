@@ -60,7 +60,6 @@ async function createEmbed({
             console.error('Error resizing image:', error);
         }
     }
-    }
 
     if (thumbnailUrl) {
         embed.setThumbnail(thumbnailUrl);
