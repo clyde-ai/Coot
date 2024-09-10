@@ -159,13 +159,35 @@ client.on('interactionCreate', async interaction => {
 client.on('messageCreate', async message => {
     if (message.content === '!roll') {
         const roll = Math.floor(Math.random() * 6) + 1;
-        message.reply(`You rolled a ${roll}`);
+        switch (roll) {
+            case 1:
+                message.reply(`:game_die: You rolled a **${roll}**... That's terrible. :skull:`);
+                break;
+            case 2:
+                message.reply(`:game_die: You rolled a **${roll}**, not great but could be worse! :unamused:`);
+                break;
+            case 3:
+                message.reply(`:game_die: You rolled a **${roll}**, average. :neutral_face:`);
+                break;
+            case 4:
+                message.reply(`:game_die: You rolled a **${roll}**, not bad! :thinking:`);
+                break;
+            case 5:
+                message.reply(`:game_die: You rolled a **${roll}**, now thats what I'm talking about! :saluting_face:`);
+                break;
+            case 6:
+                message.reply(`:game_die: You rolled a **${roll}**! What are you, an *Ironman*?! :rage:`);
+                break;
+        }
     } else if (message.content === '!snake') {
         const gifPath = path.join(__dirname, 'src/images/memes/snake.gif');
         message.reply({ files: [gifPath] });
     } else if (message.content === '!ladder') {
         const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
         message.reply({ files: [gifPath] });
+    } else if (message.content === '!promo') {
+        const promoURL = 'https://youtube.com/shorts/d_3e2-UDduU?si=VBCkZs8TQ_krQecs';
+        message.reply(`:index_pointing_at_the_viewer: Sign Up for the event! :movie_camera:\n ${promoURL}`);
     } else if (message.content === '!event') {
         if (!global.eventStartTime || !global.eventEndTime) {
             return message.channel.send('Event times are not set yet.');
