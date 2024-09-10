@@ -47,7 +47,7 @@ async function createEmbed({
                 let resizedImageBuffer;
                 if (command === 'roll' || command === 'reroll') {
                     resizedImageBuffer = await resizeImage(imageUrl, 64, 64);
-                } else if (command === 'submit') {
+                } else if (command === 'submit' || command === 'event') {
                     resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
                 }
                 attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
@@ -59,8 +59,7 @@ async function createEmbed({
         } catch (error) {
             console.error('Error resizing image:', error);
         }
-    } else {
-        embed.setImage(`attachment://${path.basename(imageUrl)}`);
+    }
     }
 
     if (thumbnailUrl) {

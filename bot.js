@@ -188,7 +188,7 @@ client.on('messageCreate', async message => {
                     { name: 'Event Start Time', value: eventStartTimestamp, inline: true },
                     { name: 'Event End Time', value: eventEndTimestamp, inline: true }
                 ],
-                imageUrl: path.join(__dirname, 'src/images/other/eventLogo.png'),
+                imageUrl: imagePath,
                 color: '#00FF00',
                 channelId: message.channel.id,
                 messageId: message.id,
