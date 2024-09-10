@@ -67,8 +67,12 @@ module.exports = {
                 throw new Error('Message not found');
             }
 
-            // React to the message based on the action
+            // Check and remove ❌ reaction if it exists
             if (action === 'approve') {
+                const denyReaction = message.reactions.cache.get('❌');
+                if (denyReaction) {
+                    await denyReaction.users.remove(interaction.client.user.id);
+                }
                 await message.react('✅');
             } else if (action === 'deny') {
                 await message.react('❌');

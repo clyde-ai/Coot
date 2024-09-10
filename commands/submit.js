@@ -143,6 +143,7 @@ module.exports = {
                     const imagesSubmitted = team.proofs[tileNumber].length;
 
                     if (imagesSubmitted >= imagesNeeded) {
+                        console.log(`${teamName} can now roll.`);
                         team.canRoll = true;
                     }
 
