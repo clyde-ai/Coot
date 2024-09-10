@@ -49,6 +49,7 @@ module.exports = {
             return interaction.reply({ content: 'Invalid link format. Please provide a valid message link.', ephemeral: true });
         }
         const [guildId, channelId, messageId] = match.slice(1);
+        console.log(`messageId from line51: ${messageId}`)
 
         // Check bot permissions
         const requiredPermissions = [
