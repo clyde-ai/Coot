@@ -164,7 +164,7 @@ module.exports = {
                     
                     // Write to the Submissions sheet
                     const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
-                    const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
+                    const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId}`];
                     await googleSheets.writeToSheet('Submissions', submissionData);
 
                     failedAttempts.delete(userId);
@@ -212,7 +212,7 @@ module.exports = {
 
                 // Write to the Submissions sheet
                 const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
-                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
+                const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${messageId}`];
                 await googleSheets.writeToSheet('Submissions', submissionData);
             }
         } catch (error) {
