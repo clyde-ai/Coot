@@ -44,7 +44,7 @@ client.once('ready', async () => {
     try {
         const teamHeaders = ['Team Name', 'Members', 'Date Created', 'Role ID', 'Current Tile', 'Previous Tile'];
         const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
-        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag', 'Submission Link'];
+        const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag', 'Submission Link', 'Review Status', 'Reviewer Name'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
         const laddersHeaders = ['Bottom Tile', 'Top Tile', 'Created By', 'Timestamp'];
         const eventPasswordHeaders = ['Password', 'Start Time', 'End Time', 'Broadcast Channel ID'];
