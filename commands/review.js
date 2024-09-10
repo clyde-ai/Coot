@@ -65,27 +65,32 @@ module.exports = {
         }
 
         try {
+            console.log('inside try on line 68');
             // Fetch the channel
             const channel = await interaction.client.channels.fetch(channelId);
+            console.log(`channel: ${channel}, channelId: ${channelId}`);
             if (!channel) {
+                console.log('found !channel');
                 throw new Error('Channel not found');
             }
 
             // Fetch the message
-            const message = await channel.messages.fetchReply(messageId);
+            console.log(`messageId: ${messageId}, message: ${message}, message.id: ${message.id}`);
+            const message = await channel.messages.fetch(messageId);
             if (!message) {
+                console.log('found !message');
                 throw new Error('Message not found');
             }
 
             console.log(`Fetched message ID: ${message.id}`);
-
+            console.log('before react action');
             // React to the message based on the action
             if (action === 'approve') {
                 await message.react('✅');
             } else if (action === 'deny') {
                 await message.react('❌');
             }
-
+            console.log('after react action');
             // Update the Google Sheets
             let submissions;
             try {
@@ -108,7 +113,7 @@ module.exports = {
 
             // Fetch the reply message
             const replyMessage = await interaction.fetchReply();
-
+            console.log(`replyMessage: ${replyMessage}`);
             // Send an embed message in reply to the submission message
             const userMention = `<@${submissionRow[1]}>`;
             const { embed } = await createEmbed({
