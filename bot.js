@@ -11,6 +11,7 @@ const { loadTeamsFromSheet } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
 const { getEventPassword } = require('./commands/setEventPassword');
+const { createEmbed } = require('./src/utils/embeds');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -136,7 +137,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 // Respond to meme messages
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
     if (message.content === '!roll') {
         const roll = Math.floor(Math.random() * 6) + 1;
         message.reply(`You rolled a ${roll}`);
@@ -146,6 +147,30 @@ client.on('messageCreate', message => {
     } else if (message.content === '!ladder') {
         const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
         message.reply({ files: [gifPath] });
+    } else if (message.content === '!event') {
+        if (!global.eventStartTime || !global.eventEndTime) {
+            return message.channel.send('Event times are not set yet.');
+        }
+
+        const eventStartTimestamp = `<t:${Math.floor(moment(global.eventStartTime).unix())}:F>`;
+        const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
+
+        const { embed, attachment } = await createEmbed({
+            command: 'event',
+            title: 'Snakes and Ladders',
+            description: 'Snakes and Ladders is a classic board game where players navigate a game board with numbered squares. The objective is to reach the last square by moving according to the roll of a dice, while encountering snakes that send you back and ladders that move you forward.',
+            fields: [
+                { name: 'Event Start Time', value: eventStartTimestamp, inline: true },
+                { name: 'Event End Time', value: eventEndTimestamp, inline: true }
+            ],
+            imageUrl: path.join(__dirname, 'src/images/other/eventLogo.png'),
+            color: '#00FF00',
+            channelId: message.channel.id,
+            messageId: message.id,
+            client: client
+        });
+
+        message.channel.send({ embeds: [embed], files: attachment ? [attachment] : [] });
     }
 });
 
