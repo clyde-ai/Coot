@@ -15,8 +15,10 @@ module.exports = {
             option.setName('status')
                 .setDescription('Review status: approve or deny')
                 .setRequired(true)
-                .addChoice('approve', 'approve')
-                .addChoice('deny', 'deny')),
+                .addChoices(
+                    { name: 'approve', value: 'approve' },
+                    { name: 'deny', value: 'deny' }
+                )),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
