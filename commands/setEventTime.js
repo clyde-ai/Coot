@@ -73,14 +73,14 @@ async function broadcastEventStart(client) {
         console.log('Creating Broadcast Embed');
         const rows = await googleSheets.readSheet('EventPassword!A2:D2');
         const eventPassword = rows[0][0];
-        const broadcastChannelId = rows[0][3]; // 4th column (index 3)
+        const broadcastChannelId = rows[0][3];
 
         console.log('Broadcast Channel ID:', broadcastChannelId);
 
         const embed = {
             title: ':tada: EVENT STARTED! :tada:',
-            description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
-            color: parseInt('00FF00', 16), // Convert hex color string to integer
+            description: `The event has started!\n Use the password: **${eventPassword}** to submit your entries.`,
+            color: parseInt('00FF00', 16),
         };
 
         const channel = client.channels.cache.get(broadcastChannelId);
@@ -216,12 +216,12 @@ module.exports = {
             const startTime = moment.utc(eventTimes.eventStartTime); // Use moment.utc for Zulu time
             const now = moment.utc(); // Use moment.utc to get the current time in UTC
 
-            const delay = startTime.diff(now, 'minutes');
+            const delay = startTime.diff(now, 'milliseconds');
 
             const { embed } = await createEmbed({
                 command: 'set-event-time',
                 title: ':clock1: Event Time Set :clock1:',
-                description: `**Event start and end times have been set successfully!**\n Broadcast of event start is scheduled in ${delay} minutes.`,
+                description: `**Event start and end times have been set successfully!**\n Broadcast of event start is scheduled in ${delay}ms.`,
                 color: '#00FF00',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
