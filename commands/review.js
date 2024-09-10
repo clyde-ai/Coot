@@ -17,8 +17,10 @@ module.exports = {
             option.setName('action')
                 .setDescription('Approve or Deny the submission')
                 .setRequired(true)
-                .addChoice('Approve', 'approve')
-                .addChoice('Deny', 'deny')),
+                .addChoices(
+                    { name: 'Approve', value: 'approve' },
+                    { name: 'Deny', value: 'deny' }
+                )),
     async execute(interaction) {
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
