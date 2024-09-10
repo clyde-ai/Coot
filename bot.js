@@ -185,7 +185,7 @@ client.on('messageCreate', async message => {
     } else if (message.content === '!ladder') {
         const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
         message.reply({ files: [gifPath] });
-    } else if (message.content === !promo) {
+    } else if (message.content === '!promo') {
         const promoURL = 'https://youtube.com/shorts/d_3e2-UDduU?si=VBCkZs8TQ_krQecs';
         message.reply(':index_pointing_at_the_viewer: Sign Up for the event! :movie_camera:\n', promoURL);
     } else if (message.content === '!event') {
