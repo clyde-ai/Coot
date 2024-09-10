@@ -80,7 +80,7 @@ async function broadcastEventStart(client) {
         const embed = {
             title: ':tada: EVENT STARTED! :tada:',
             description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
-            color: '#00FF00',
+            color: parseInt('00FF00', 16), // Convert hex color string to integer
         };
 
         const channel = client.channels.cache.get(broadcastChannelId);
@@ -207,12 +207,21 @@ module.exports = {
             // Write the new start and end times and broadcast channel ID to the sheet without overwriting the password
             await googleSheets.updateSheet('EventPassword', 'B2:D2', [eventStartTime, eventEndTime, broadcastChannelId]);
 
+            const eventTimes = await getEventTime();
+            if (!eventTimes.eventStartTime) {
+                console.error('No start time found in the Google Sheet.');
+            return;
+            }
 
+            const startTime = moment.utc(eventTimes.eventStartTime); // Use moment.utc for Zulu time
+            const now = moment.utc(); // Use moment.utc to get the current time in UTC
+
+            const delay = startTime.diff(now, 'minutes');
 
             const { embed } = await createEmbed({
                 command: 'set-event-time',
                 title: ':clock1: Event Time Set :clock1:',
-                description: '**Event start and end times have been set successfully!**\n Broadcast of event start is scheduled.',
+                description: `**Event start and end times have been set successfully!**\n Broadcast of event start is scheduled in ${delay} minutes.`,
                 color: '#00FF00',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
