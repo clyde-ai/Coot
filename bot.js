@@ -109,8 +109,8 @@ async function populateData() {
         const eventTime = await getEventTime();
         if (!eventTime.eventStartTime || !eventTime.eventEndTime) {
             // Set default values if they are not set
-            const defaultStartTime = moment().add(1, 'days').toISOString(); // Default to 1 day from now
-            const defaultEndTime = moment().add(2, 'days').toISOString(); // Default to 2 days from now
+            const defaultStartTime = moment().add(2, 'minutes').toISOString(); // Default to 2 minutes from now
+            const defaultEndTime = moment().add(10, 'minutes').toISOString(); // Default to 10 minutes from now
 
             global.eventStartTime = eventTime.eventStartTime || defaultStartTime;
             global.eventEndTime = eventTime.eventEndTime || defaultEndTime;
@@ -186,11 +186,11 @@ client.on('messageCreate', async message => {
         });
 
         const replyOptions = { embeds: [embed] };
-            if (attachment) {
-                replyOptions.files = [attachment];
-            }
+        if (attachment) {
+            replyOptions.files = [attachment];
+        }
 
-            await interaction.reply(replyOptions);
+        message.channel.send(replyOptions);
     } else if (message.content === '!board') {
         const { embed, attachment } = await createEmbed({
             command: 'board',
@@ -204,11 +204,11 @@ client.on('messageCreate', async message => {
         });
 
         const replyOptions = { embeds: [embed] };
-            if (attachment) {
-                replyOptions.files = [attachment];
-            }
+        if (attachment) {
+            replyOptions.files = [attachment];
+        }
 
-            await interaction.reply(replyOptions);
+        message.channel.send(replyOptions);
     }
 });
 
