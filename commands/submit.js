@@ -190,6 +190,8 @@ module.exports = {
                 const memberName = interaction.member.displayName;
 
                 // Write to the Submissions sheet
+                console.log(`interaction.id: ${interaction.id}`);
+                console.log(`full link: https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.message.id}`);
                 const submissionStatus = `${imagesSubmitted}/${imagesNeeded}`;
                 const submissionData = [teamName, memberName, tileNumber, submissionStatus, proofAttachment.url, new Date().toISOString(), `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.message.id}`];
                 await googleSheets.writeToSheet('Submissions', submissionData);
