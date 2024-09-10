@@ -52,7 +52,8 @@ async function createEmbed({
                 } else if (command === 'event') {
                     resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
                 }
-                attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                attachment = new AttachmentBuilder(resizedImageBuffer);
+                attachment.setName(`${path.basename(imageUrl)}`);
                 console.log('Attachment:', attachment);
                 embed.setImage(`attachment://${path.basename(imageUrl)}`);
             } else {
