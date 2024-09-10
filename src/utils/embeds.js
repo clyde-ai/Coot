@@ -42,6 +42,7 @@ async function createEmbed({
     let attachment;
     if (imageUrl) {
         try {
+            console.log('Image URL:', imageUrl);
             if (fs.existsSync(imageUrl)) {
                 let resizedImageBuffer;
                 if (command === 'roll' || command === 'reroll') {
@@ -50,6 +51,7 @@ async function createEmbed({
                     resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
                 }
                 attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                console.log('Attachment:', attachment);
                 embed.setImage(`attachment://${path.basename(imageUrl)}`);
             } else {
                 console.warn(`Image file not found: ${imageUrl}`);

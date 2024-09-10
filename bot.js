@@ -175,6 +175,11 @@ client.on('messageCreate', async message => {
             const eventStartTimestamp = `<t:${Math.floor(moment(global.eventStartTime).unix())}:F>`;
             const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
 
+            const imagePath = path.join(__dirname, 'src/images/other/eventLogo.png');
+            console.log('Image Path:', imagePath);
+            console.log('File Exists:', fs.existsSync(imagePath));
+
+
             const { embed, attachment } = await createEmbed({
                 command: 'event',
                 title: 'Snakes and Ladders',
