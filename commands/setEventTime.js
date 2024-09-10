@@ -195,18 +195,29 @@ async function broadcastEventStart(client) {
     }
 }
 
-function scheduleEventStartBroadcast(client) {
-    const startTime = moment.utc(global.eventStartTime); // Use moment.utc for Zulu time
-    const now = moment.utc(); // Use moment.utc to get the current time in UTC
+async function scheduleEventStartBroadcast(client) {
+    try {
+        // Get event times from Google Sheets
+        const eventTimes = await getEventTime();
+        if (!eventTimes.eventStartTime) {
+            console.error('No start time found in the Google Sheet.');
+            return;
+        }
 
-    console.log('Start Time:', startTime.format());
-    console.log('Current Time:', now.format());
+        const startTime = moment.utc(eventTimes.eventStartTime); // Use moment.utc for Zulu time
+        const now = moment.utc(); // Use moment.utc to get the current time in UTC
 
-    const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
-    console.log('Delay until Broadcast start: ', delay, ' milliseconds');
-    if (delay > 0) {
-        setTimeout(() => broadcastEventStart(client), delay);
-    } else {
-        console.log('Event start time is in the past. No broadcast scheduled.');
+        console.log('Start Time:', startTime.format());
+        console.log('Current Time:', now.format());
+
+        const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
+        console.log('Delay until Broadcast start: ', delay, ' milliseconds');
+        if (delay > 0) {
+            setTimeout(() => broadcastEventStart(client), delay);
+        } else {
+            console.log('Event start time is in the past. No broadcast scheduled.');
+        }
+    } catch (error) {
+        console.error('Error reading start time from Google Sheets:', error);
     }
 }
