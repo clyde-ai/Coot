@@ -69,6 +69,35 @@ module.exports = {
         // Convert to Zulu time (UTC)
         eventStartTime = moment.tz(startTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
         eventEndTime = moment.tz(endTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
+
+        // Check if the start time is in the future
+        if (moment(eventStartTime).isBefore(moment.utc())) {
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':x: Invalid Start Time :x:',
+                description: 'The event start time must be in the future.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
+        // Check if the end time is after the start time
+        if (moment(eventEndTime).isBefore(moment(eventStartTime))) {
+            const { embed } = await createEmbed({
+                command: 'set-event-time',
+                title: ':x: Invalid End Time :x:',
+                description: 'The event end time must be after the start time.',
+                color: '#FF0000',
+                channelId: interaction.channelId,
+                messageId: interaction.id,
+                client: interaction.client
+            });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         broadcastChannelId = channel.id;
 
         try {
