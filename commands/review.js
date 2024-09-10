@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { PermissionsBitField } = require('discord.js');
+const { PermissionsBitField, userMention } = require('discord.js');
 const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
 
@@ -49,16 +49,6 @@ module.exports = {
             return interaction.reply({ content: 'Invalid link format. Please provide a valid message link.', ephemeral: true });
         }
         const [guildId, channelId, messageId] = match.slice(1);
-        console.log(`messageId from line51: ${messageId}`)
-
-        // Check bot permissions
-        const requiredPermissions = [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.ReadMessageHistory,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.AddReactions,
-            PermissionsBitField.Flags.ManageMessages // Optional but recommended
-        ];
 
         const botPermissions = interaction.channel.permissionsFor(interaction.client.user);
         if (!botPermissions.has(requiredPermissions)) {
@@ -66,7 +56,6 @@ module.exports = {
         }
 
         try {
-            console.log('inside try on line 68');
             // Fetch the channel
             const channel = await interaction.client.channels.fetch(channelId);
             console.log(`channel: ${channel}, channelId: ${channelId}`);
@@ -83,20 +72,22 @@ module.exports = {
                 throw new Error('Message not found');
             }
 
-            console.log(`Fetched message ID: ${message.id}`);
-            console.log('before react action');
             // React to the message based on the action
             if (action === 'approve') {
                 await message.react('✅');
             } else if (action === 'deny') {
                 await message.react('❌');
             }
-            console.log('after react action');
+
+            // Defer the reply to the interaction
+            await interaction.deferReply({ ephemeral: true });
+
             // Update the Google Sheets
             let submissions;
+            let submissionRow;
             try {
                 submissions = await googleSheets.readSheet('Submissions!A:H');
-                const submissionRow = submissions.slice(1).find(row => row[7] === link);
+                submissionRow = submissions.slice(1).find(row => row[7] === link);
                 if (submissionRow) {
                     const rowIndex = submissions.indexOf(submissionRow) + 1;
                     await googleSheets.updateCell(`Submissions!I${rowIndex}`, action === 'approve' ? 'Approved' : 'Denied');
@@ -106,15 +97,44 @@ module.exports = {
                 }
             } catch (error) {
                 console.error(`Error updating Google Sheets: ${error.message}`);
-                return interaction.reply({ content: 'There was an error updating the Google Sheet. Please try again later.', ephemeral: true });
+                return interaction.editReply({ content: 'There was an error updating the Google Sheet. Please try again later.' });
+            }
+            let member;
+            submissions = await googleSheets.readSheet('Submissions!A:H');
+            submissionRow = submissions.slice(1).find(row => row[7] === link);
+            if (submissionRow) {
+                const rowIndex = submissions.indexOf(submissionRow) + 1;
+                await googleSheets.readCell(`Submissions!B${rowIndex}`, memberDisplayName);
+                member = guild.members.cache.find(member => member.displayName === memberDisplayName);
+            } else {
+                console.error(`Error getting member from Google Sheets: ${error.message}`);
+                member = ''
+            }
+            let userMentionResponse;
+            if (member === '') {
+                userMentionResponse = '';
+            } else {
+                userMentionResponse = userMention(member.id);
             }
 
-            // Send an initial reply to the interaction
-            await interaction.reply({ content: `Submission has been ${action === 'approve' ? 'approved' : 'denied'} and updated in the Google Sheet.`, ephemeral: true });
+            // Create conditional response
+            let replyDescription;
+            if (action === 'approve') {
+                replyDescription = `${userMentionResponse} Your submission has been approved by ${reviewerName}.`;
+            } else {
+                replyDescription = `${userMentionResponse} Your submission has been denied by ${reviewerName}.\n Your team will need additional proof or resubmission for this tile!`;
+            }
 
-            // Fetch the reply message
-            const replyMessage = await interaction.fetchReply();
-            console.log(`replyMessage: ${replyMessage}`);
+            // Create an embed for the reply
+            const replyEmbed = {
+                title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
+                description: `${replyDescription}`,
+                color: action === 'approve' ? '#00FF00' : '#FF0000',
+            };
+
+            // Send an initial reply to the interaction
+            await interaction.editReply({ embeds: [replyEmbed] });
+
             // Send an embed message in reply to the submission message
             const userMention = `<@${submissionRow[1]}>`;
             const { embed } = await createEmbed({
@@ -126,11 +146,11 @@ module.exports = {
                 messageId: messageId,
                 client: interaction.client
             });
-            await replyMessage.reply({ embeds: [embed] });
+            await message.reply({ embeds: [embed] });
 
         } catch (error) {
             console.error(`Error fetching or reacting to the message: ${error.message}`);
-            return interaction.reply({ content: 'There was an error fetching or reacting to the message. It may have been deleted or the bot lacks permissions.', ephemeral: true });
+            return interaction.editReply({ content: 'There was an error fetching or reacting to the message. It may have been deleted or the bot lacks permissions.' });
         }
     },
 };

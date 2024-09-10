@@ -188,6 +188,21 @@ async function clearSheet(range) {
     }
 }
 
+async function readCell(range, variable) {
+    try {
+        const res = await sheets.spreadsheets.values.get({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range,
+        });
+        console.log(`Cell ${range} read with value ${res.data.values[0][0]}`);
+        variable = res.data.values[0][0];
+        return variable;
+    } catch (error) {
+        console.error(`ERROR reading cell ${range}:`, error);
+        throw new Error('Failed to read cell in Google Sheets. Please try again later.');
+    }
+}
+
 module.exports = {
     writeToSheet,
     updateSheet,
@@ -196,5 +211,6 @@ module.exports = {
     setHeaders,
     sortSheet,
     freezeHeaders,
-    clearSheet
+    clearSheet,
+    readCell
 };
