@@ -52,8 +52,8 @@ async function createEmbed({
                 } else if (command === 'event') {
                     resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
                 }
-                // attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-                // console.log('Attachment:', attachment);
+                attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                console.log('Attachment:', attachment);
                 embed.setImage(`attachment://${path.basename(imageUrl)}`);
             } else {
                 console.warn(`Image file not found: ${imageUrl}`);
@@ -76,7 +76,7 @@ async function createEmbed({
     }
 
     return { embed, attachment };
-}
+};
 
 async function resizeImage(filePath, width, height) {
     try {
@@ -89,7 +89,7 @@ async function resizeImage(filePath, width, height) {
         console.error('Error resizing image:', error);
         throw error;
     }
-}
+};
 
 module.exports = {
     createEmbed
