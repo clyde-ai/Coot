@@ -54,7 +54,7 @@ async function createEmbed({
                 }
                 // attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
                 // console.log('Attachment:', attachment);
-                embed.setImage(`${path.basename(imageUrl)}`);
+                embed.setImage(`attachment://${path.basename(imageUrl)}`);
             } else {
                 console.warn(`Image file not found: ${imageUrl}`);
             }
