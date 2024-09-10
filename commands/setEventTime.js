@@ -196,10 +196,10 @@ async function broadcastEventStart(client) {
 }
 
 function scheduleEventStartBroadcast(client) {
-    const startTime = moment(global.eventStartTime).valueOf();
-    const now = moment().valueOf();
+    const startTime = moment.utc(global.eventStartTime); // Use moment.utc for Zulu time
+    const now = moment.utc(); // Use moment.utc to get the current time in UTC
 
-    const delay = now.diff(startTime, 'milliseconds'); // Calculate delay in milliseconds
+    const delay = startTime.diff(now, 'milliseconds'); // Calculate delay in milliseconds
     console.log('Delay until Broadcast start: ', delay, ' milliseconds');
     if (delay > 0) {
         setTimeout(() => broadcastEventStart(client), delay);
