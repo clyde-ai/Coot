@@ -139,21 +139,26 @@ module.exports = {
         try {
             const rows = await googleSheets.readSheet('EventPassword!B2:D2');
             if (rows.length > 0) {
-                eventStartTime = rows[0][0];
-                eventEndTime = rows[0][1];
-                broadcastChannelId = rows[0][2];
+                return {
+                    eventStartTime: rows[0][0],
+                    eventEndTime: rows[0][1],
+                    broadcastChannelId: rows[0][2]
+                };
             } else {
-                eventStartTime = null;
-                eventEndTime = null;
-                broadcastChannelId = null;
+                return {
+                    eventStartTime: null,
+                    eventEndTime: null,
+                    broadcastChannelId: null
+                };
             }
         } catch (error) {
             console.error(`Error reading Google Sheets: ${error.message}`);
-            eventStartTime = null;
-            eventEndTime = null;
-            broadcastChannelId = null;
+            return {
+                eventStartTime: null,
+                eventEndTime: null,
+                broadcastChannelId: null
+            };
         }
-        return { eventStartTime, eventEndTime, broadcastChannelId };
     },
     isEventActive() {
         const now = moment().toISOString();

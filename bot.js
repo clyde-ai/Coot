@@ -107,8 +107,23 @@ async function populateData() {
         console.log('- Loaded data from: Event Password sheet\n -- Event Password is: ', global.eventPassword);
 
         const eventTime = await getEventTime();
-        global.eventStartTime = eventTime.eventStartTime;
-        global.eventEndTime = eventTime.eventEndTime;
+        if (!eventTime.eventStartTime || !eventTime.eventEndTime) {
+            // Set default values if they are not set
+            const defaultStartTime = moment().add(1, 'days').toISOString(); // Default to 1 day from now
+            const defaultEndTime = moment().add(2, 'days').toISOString(); // Default to 2 days from now
+
+            global.eventStartTime = eventTime.eventStartTime || defaultStartTime;
+            global.eventEndTime = eventTime.eventEndTime || defaultEndTime;
+
+            // Update the Google Sheet with the default values
+            await googleSheets.updateSheet('EventPassword', 'B2:C2', [global.eventStartTime, global.eventEndTime]);
+
+            console.log('Event times were not set. Default values have been initialized.');
+        } else {
+            global.eventStartTime = eventTime.eventStartTime;
+            global.eventEndTime = eventTime.eventEndTime;
+        }
+
         global.broadcastChannelId = eventTime.broadcastChannelId;
         console.log('- Loaded additional data from: Event Password sheet:');
         console.log('- Loaded Event Start Time: ', global.eventStartTime);
@@ -120,6 +135,7 @@ async function populateData() {
         console.error('ERROR: populating data from Google Sheets:', error);
     }
 }
+
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
