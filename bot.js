@@ -167,48 +167,58 @@ client.on('messageCreate', async message => {
             return message.channel.send('Event times are not set yet.');
         }
 
-        const eventStartTimestamp = `<t:${Math.floor(moment(global.eventStartTime).unix())}:F>`;
-        const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
+        try {
+            const eventStartTimestamp = `<t:${Math.floor(moment(global.eventStartTime).unix())}:F>`;
+            const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
 
-        const { embed, attachment } = await createEmbed({
-            command: 'event',
-            title: 'Snakes and Ladders',
-            description: 'Snakes and Ladders is a classic board game where players navigate a game board with numbered squares. The objective is to reach the last square by moving according to the roll of a dice, while encountering snakes that send you back and ladders that move you forward.',
-            fields: [
-                { name: 'Event Start Time', value: eventStartTimestamp, inline: true },
-                { name: 'Event End Time', value: eventEndTimestamp, inline: true }
-            ],
-            imageUrl: path.join(__dirname, 'src/images/other/eventLogo.png'),
-            color: '#00FF00',
-            channelId: message.channel.id,
-            messageId: message.id,
-            client: client
-        });
+            const { embed, attachment } = await createEmbed({
+                command: 'event',
+                title: 'Snakes and Ladders',
+                description: 'Snakes and Ladders is a classic board game where players navigate a game board with numbered squares. The objective is to reach the last square by moving according to the roll of a dice, while encountering snakes that send you back and ladders that move you forward.',
+                fields: [
+                    { name: 'Event Start Time', value: eventStartTimestamp, inline: true },
+                    { name: 'Event End Time', value: eventEndTimestamp, inline: true }
+                ],
+                imageUrl: path.join(__dirname, 'src/images/other/eventLogo.png'),
+                color: '#00FF00',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
+            });
 
-        const replyOptions = { embeds: [embed] };
-        if (attachment) {
-            replyOptions.files = [attachment];
-        }
+            const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
 
-        message.channel.send(replyOptions);
+            message.channel.send(replyOptions);
+        }  catch (error) {
+        console.error('Error creating embed:', error);
+        message.channel.send('There was an error creating the event embed.');
+    }
     } else if (message.content === '!board') {
-        const { embed, attachment } = await createEmbed({
-            command: 'board',
-            title: 'Snakes and Ladders Board',
-            description: 'Here is the current Snakes and Ladders board for the event.',
-            imageUrl: path.join(__dirname, 'src/images/other/eventBoard.png'),
-            color: '#00FF00',
-            channelId: message.channel.id,
-            messageId: message.id,
-            client: client
-        });
+        try {
+            const { embed, attachment } = await createEmbed({
+                command: 'board',
+                title: 'Snakes and Ladders Board',
+                description: 'Here is the current Snakes and Ladders board for the event.',
+                imageUrl: path.join(__dirname, 'src/images/other/eventBoard.png'),
+                color: '#00FF00',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
+            });
 
-        const replyOptions = { embeds: [embed] };
-        if (attachment) {
-            replyOptions.files = [attachment];
+            const replyOptions = { embeds: [embed] };
+            if (attachment) {
+                replyOptions.files = [attachment];
+            }
+
+            message.channel.send(replyOptions);
+        }  catch (error) {
+        console.error('Error creating embed:', error);
+        message.channel.send('There was an error creating the event embed.');
         }
-
-        message.channel.send(replyOptions);
     }
 });
 
