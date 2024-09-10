@@ -51,12 +51,10 @@ async function createEmbed({
                     resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
                 } else if (command === 'event') {
                     resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
-                } else if (command === 'board') {
-                    resizedImageBuffer = await resizeImage(imageUrl, 1080, 1080);
                 }
-                attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-                console.log('Attachment:', attachment);
-                embed.setImage(`attachment://${path.basename(imageUrl)}`);
+                // attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                // console.log('Attachment:', attachment);
+                embed.setImage(imageUrl);
             } else {
                 console.warn(`Image file not found: ${imageUrl}`);
             }
