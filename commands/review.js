@@ -94,20 +94,23 @@ module.exports = {
                 console.error(`Error updating Google Sheets: ${error.message}`);
                 return interaction.editReply({ content: 'There was an error updating the Google Sheet. Please try again later.' });
             }
-            let member;
+
+            // Read the member display name from Google Sheets
             let memberDisplayName;
-            submissions = await googleSheets.readSheet('Submissions!A:H');
-            submissionRow = submissions.slice(1).find(row => row[7] === link);
-            if (submissionRow) {
+            try {
                 const rowIndex = submissions.indexOf(submissionRow) + 1;
-                await googleSheets.readCell(`Submissions!B${rowIndex}`, memberDisplayName);
-                member = guild.members.cache.find(member => member.displayName === memberDisplayName);
-            } else {
-                console.error(`Error getting member from Google Sheets: ${error.message}`);
-                member = ''
+                memberDisplayName = await googleSheets.readCell(`Submissions!B${rowIndex}`);
+            } catch (error) {
+                console.error(`Error reading member display name from Google Sheets: ${error.message}`);
+                return interaction.editReply({ content: 'There was an error reading the member display name from Google Sheets. Please try again later.' });
             }
+
+            // Fetch the guild and find the member
+            const guild = interaction.guild;
+            const member = guild.members.cache.find(member => member.displayName === memberDisplayName);
+
             let userMentionResponse;
-            if (member === '') {
+            if (!member) {
                 userMentionResponse = '';
             } else {
                 userMentionResponse = userMention(member.id);
@@ -132,7 +135,6 @@ module.exports = {
             await interaction.editReply({ embeds: [replyEmbed] });
 
             // Send an embed message in reply to the submission message
-            const userMention = `<@${submissionRow[1]}>`;
             const { embed } = await createEmbed({
                 command: 'review',
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
