@@ -70,6 +70,9 @@ module.exports = {
         eventStartTime = moment.tz(startTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
         eventEndTime = moment.tz(endTime, 'YYYY-MM-DD HH:mm', timeZone).utc().toISOString();
 
+        console.log('Event Start Time (UTC):', eventStartTime);
+        console.log('Event End Time (UTC):', eventEndTime);
+
         // Check if the start time is in the future
         if (moment(eventStartTime).isBefore(moment.utc())) {
             const { embed } = await createEmbed({
@@ -161,7 +164,7 @@ module.exports = {
         }
     },
     isEventActive() {
-        const now = moment().toISOString();
+        const now = moment.utc().toISOString(); // Ensure current time is in UTC
         return global.eventStartTime && global.eventEndTime && now >= global.eventStartTime && now <= global.eventEndTime;
     }, 
     scheduleEventStartBroadcast
@@ -179,19 +182,16 @@ async function broadcastEventStart(client) {
             title: ':tada: EVENT STARTED! :tada:',
             description: `The event has started! Use the password **${eventPassword}** to submit your entries.`,
             color: '#00FF00',
-            image: {
-                url: 'attachment://eventLogo.png'
-            }
         };
 
         const channel = client.channels.cache.get(broadcastChannelId);
         if (channel) {
-            const attachment = path.join(__dirname, '../src/images/other/eventLogo.png');
-            console.log('Sending Broadcast Embed');
-            await channel.send({ embeds: [embed], files: [attachment] });
+            await channel.send({ embeds: [embed] });
+        } else {
+            console.error('Broadcast channel not found.');
         }
     } catch (error) {
-        console.error(`ERROR broadcasting event start: ${error.message}`);
+        console.error('Error broadcasting event start:', error);
     }
 }
 
@@ -210,4 +210,3 @@ function scheduleEventStartBroadcast(client) {
         console.log('Event start time is in the past. No broadcast scheduled.');
     }
 }
-
