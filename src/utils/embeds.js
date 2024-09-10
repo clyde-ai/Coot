@@ -44,18 +44,21 @@ async function createEmbed({
         try {
             console.log('Image URL:', imageUrl);
             if (fs.existsSync(imageUrl)) {
-                let resizedImageBuffer;
                 if (command === 'roll' || command === 'reroll') {
-                    resizedImageBuffer = await resizeImage(imageUrl, 64, 64);
-                } else if (command === 'submit') {
-                    resizedImageBuffer = await resizeImage(imageUrl, 128, 128);
-                } else if (command === 'event') {
-                    resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
+                    const resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
+                    console.log('Resized Image Buffer:', resizedImageBuffer);
+                    attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                    console.log('Attachment:', attachment);
+                    embed.setImage(`attachment://${path.basename(imageUrl)}`);
+                } else if (command === 'submit' || command === 'event') {
+                    const resizedImageBuffer = await resizeImage(imageUrl, 512, 512);
+                    console.log('Resized Image Buffer:', resizedImageBuffer);
+                    attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
+                    console.log('Attachment:', attachment);
+                    embed.setImage(`attachment://${path.basename(imageUrl)}`);
+                } else {
+                    embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 }
-                attachment = new AttachmentBuilder(resizedImageBuffer);
-                attachment.setName(`${path.basename(imageUrl)}`);
-                console.log('Attachment:', attachment);
-                embed.setImage(`attachment://${path.basename(imageUrl)}`);
             } else {
                 console.warn(`Image file not found: ${imageUrl}`);
             }
@@ -77,20 +80,22 @@ async function createEmbed({
     }
 
     return { embed, attachment };
-};
+}
 
 async function resizeImage(filePath, width, height) {
     try {
         const buffer = fs.readFileSync(filePath);
+        console.log('Original Image Buffer:', buffer);
         const resizedBuffer = await sharp(buffer)
             .resize(width, height)
             .toBuffer();
+        console.log('Resized Image Buffer:', resizedBuffer);
         return resizedBuffer;
     } catch (error) {
         console.error('Error resizing image:', error);
         throw error;
     }
-};
+}
 
 module.exports = {
     createEmbed
