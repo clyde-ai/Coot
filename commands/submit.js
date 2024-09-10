@@ -144,6 +144,8 @@ module.exports = {
                     const memberName = interaction.member.displayName;
 
                     // Write to the Submissions sheet with a flag for manual review
+                    console.log(`interaction.id: ${interaction.id}`);
+                    console.log(`full link: https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`);
                     const submissionData = [teamName, memberName, tileNumber, '1/1', proofAttachment.url, new Date().toISOString(), 'Manual Review Needed', `https://discord.com/channels/${interaction.guildId}/${interaction.channelId}/${interaction.id}`];
                     await googleSheets.writeToSheet('Submissions', submissionData);
 
