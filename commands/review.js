@@ -1,19 +1,21 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const googleSheets = require('../src/utils/googleSheets');
 const { createEmbed } = require('../src/utils/embeds');
+
+const adminRoleId = process.env.ADMIN_ROLE_ID;
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('review')
         .setDescription('Review a submission')
         .addStringOption(option => 
-            option.setName('submission_link')
+            option.setName('link')
                 .setDescription('Link to the submission message')
                 .setRequired(true))
         .addStringOption(option => 
-            option.setName('status')
-                .setDescription('Review status: approve or deny')
+            option.setName('action')
+                .setDescription('Approve or Deny the submission')
                 .setRequired(true)
                 .addChoices(
                     { name: 'approve', value: 'approve' },
@@ -37,53 +39,59 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        const submissionLink = interaction.options.getString('submission_link');
-        const status = interaction.options.getString('status');
+        const link = interaction.options.getString('link');
+        const action = interaction.options.getString('action');
         const reviewerName = interaction.member.displayName;
 
-        // Extract message ID from the submission link
-        const linkParts = submissionLink.split('/');
-        const messageId = linkParts[linkParts.length - 1];
-        const channelId = linkParts[linkParts.length - 2];
+        // Extract message ID from the link
+        const regex = /\/(\d+)\/(\d+)\/(\d+)$/;
+        const match = link.match(regex);
+        if (!match) {
+            return interaction.reply({ content: 'Invalid link format. Please provide a valid message link.', ephemeral: true });
+        }
+        const [guildId, channelId, messageId] = match.slice(1);
 
         // Fetch the message
         const channel = await interaction.client.channels.fetch(channelId);
         const message = await channel.messages.fetch(messageId);
 
-        // React to the message
-        if (status === 'approve') {
+        // React to the message based on the action
+        if (action === 'approve') {
             await message.react('✅');
-        } else if (status === 'deny') {
+        } else if (action === 'deny') {
             await message.react('❌');
         }
 
-        // Update Google Sheets
+        // Update the Google Sheets
+        let submissions;
         try {
-            const submissions = await googleSheets.readSheet('Submissions!A:H');
-            const submissionRow = submissions.slice(1).find(row => row[7] === submissionLink);
+            submissions = await googleSheets.readSheet('Submissions!A:H');
+            const submissionRow = submissions.slice(1).find(row => row[7] === link);
             if (submissionRow) {
                 const rowIndex = submissions.indexOf(submissionRow) + 1;
-                await googleSheets.updateSheet(`Submissions!I${rowIndex}`, status === 'approve' ? 'Approved' : 'Denied');
-                await googleSheets.updateSheet(`Submissions!J${rowIndex}`, reviewerName);
+                await googleSheets.updateCell(`Submissions!I${rowIndex}`, action === 'approve' ? 'Approved' : 'Denied');
+                await googleSheets.updateCell(`Submissions!J${rowIndex}`, reviewerName);
             } else {
                 throw new Error('Submission not found in Google Sheets');
             }
         } catch (error) {
             console.error(`Error updating Google Sheets: ${error.message}`);
-            return interaction.reply({ content: 'There was an error updating the Google Sheet. Please ping Clyde.', ephemeral: true });
+            return interaction.reply({ content: 'There was an error updating the Google Sheet. Please try ping Clyde.', ephemeral: true });
         }
 
-        // Send an embed message with the review details
-        const submitterId = submissionRow[1]; // Assuming the submitter's ID is in the second column
-        const embed = new MessageEmbed()
-            .setTitle(':scales: Submission Review :scales:')
-            .setDescription(`Your submission has been reviewed by ${reviewerName}.`)
-            .addField('Status', status === 'approve' ? 'Approved ✅' : 'Denied ❌')
-            .setColor(status === 'approve' ? '#00FF00' : '#FF0000')
-            .setTimestamp();
+        // Send an embed message in reply to the submission message
+        const userMention = `<@${submissionRow[1]}>`;
+        const { embed } = await createEmbed({
+            command: 'review',
+            title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
+            description: `Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
+            color: action === 'approve' ? '#00FF00' : '#FF0000',
+            channelId: channelId,
+            messageId: messageId,
+            client: interaction.client
+        });
+        await message.reply({ embeds: [embed] });
 
-        await message.reply({ content: `<@${submitterId}>`, embeds: [embed] });
-
-        return interaction.reply({ content: 'Review submitted successfully.', ephemeral: true });
+        await interaction.reply({ content: `Submission has been ${action === 'approve' ? 'approved' : 'denied'} and updated in the Google Sheet.`, ephemeral: true });
     },
 };
