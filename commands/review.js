@@ -116,19 +116,21 @@ module.exports = {
                 userMentionResponse = userMention(member.id);
             }
 
-            // Create conditional response
-            let replyDescription;
-            if (action === 'approve') {
-                replyDescription = `${userMentionResponse} Your submission has been approved by ${reviewerName}.`;
-            } else {
-                replyDescription = `${userMentionResponse} Your submission has been denied by ${reviewerName}.\n Your team will need additional proof or resubmission for this tile!`;
-            }
+            // Create an embed for the reply
+            const replyEmbed = {
+                title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
+                description: `You have ${action === 'approve' ? 'approved' : 'denied'} this submission successfully.`,
+                color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
+            };
+
+            // Send an initial reply to the interaction
+            await interaction.editReply({ embeds: [replyEmbed] });
 
             // Send an embed message in reply to the submission message
             const { embed } = await createEmbed({
                 command: 'review',
                 title: action === 'approve' ? ':white_check_mark: Submission Approved :white_check_mark:' : ':x: Submission Denied :x:',
-                description: `${userMentionResponse} Your submission has been ${action === 'approve' ? 'approved' : 'denied'} by ${reviewerName}.`,
+                description: `${userMentionResponse} Your submission has been **${action === 'approve' ? 'approved' : 'denied'}** by ${reviewerName}.\n ${action === 'approved' ? 'No further proof needed, Good Luck!' : 'You need to submit additional evidence or redo this tile!'}`,
                 color: action === 'approve' ? 0x00FF00 : 0xFF0000, // Green or Red color
                 channelId: channelId,
                 messageId: messageId,
