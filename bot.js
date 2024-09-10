@@ -151,7 +151,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Respond to meme messages
+// Respond to other messages
 client.on('messageCreate', async message => {
     if (message.content === '!roll') {
         const roll = Math.floor(Math.random() * 6) + 1;
@@ -190,7 +190,7 @@ client.on('messageCreate', async message => {
             replyOptions.files = [attachment];
         }
 
-        await message.reply(replyOptions);
+        message.channel.send(replyOptions);
     } else if (message.content === '!board') {
         const { embed, attachment } = await createEmbed({
             command: 'board',
@@ -208,7 +208,7 @@ client.on('messageCreate', async message => {
             replyOptions.files = [attachment];
         }
 
-        await message.reply(replyOptions);
+        message.channel.send(replyOptions);
     }
 });
 
