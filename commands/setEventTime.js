@@ -200,7 +200,7 @@ function scheduleEventStartBroadcast(client) {
     const startTime = moment(global.eventStartTime);
     const now = moment();
 
-    const delay = startTime.diff(now);
+    const delay = startTime.diff(now, 'minutes');
     console.log('Delay until Broadcast start: ', delay);
     if (delay > 0) {
         setTimeout(() => broadcastEventStart(client), delay);
