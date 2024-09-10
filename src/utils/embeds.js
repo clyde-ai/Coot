@@ -59,6 +59,8 @@ async function createEmbed({
         } catch (error) {
             console.error('Error resizing image:', error);
         }
+    } else {
+        embed.setImage(`attachment://${path.basename(imageUrl)}`);
     }
 
     if (thumbnailUrl) {
