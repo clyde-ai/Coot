@@ -56,6 +56,23 @@ async function updateSheet(sheetName, range, data) {
     }
 }
 
+async function updateCell(range, value) {
+    try {
+        await sheets.spreadsheets.values.update({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            range: range,
+            valueInputOption: 'RAW',
+            resource: {
+                values: [[value]],
+            },
+        });
+        console.log(`Cell ${range} updated with value ${value}`);
+    } catch (error) {
+        console.error(`ERROR updating cell ${range}:`, error);
+        throw new Error('Failed to update cell in Google Sheets. Please try again later.');
+    }
+}
+
 async function readSheet(range) {
     try {
         const res = await sheets.spreadsheets.values.get({
@@ -174,6 +191,7 @@ async function clearSheet(range) {
 module.exports = {
     writeToSheet,
     updateSheet,
+    updateCell,
     readSheet,
     setHeaders,
     sortSheet,
