@@ -51,9 +51,17 @@ module.exports = {
         const [guildId, channelId, messageId] = match.slice(1);
 
         try {
-            // Fetch the message
+            // Fetch the channel
             const channel = await interaction.client.channels.fetch(channelId);
+            if (!channel) {
+                throw new Error('Channel not found');
+            }
+
+            // Fetch the message
             const message = await channel.messages.fetch(messageId);
+            if (!message) {
+                throw new Error('Message not found');
+            }
 
             console.log(`Fetched message ID: ${message.id}`);
 
@@ -97,7 +105,7 @@ module.exports = {
             await interaction.reply({ content: `Submission has been ${action === 'approve' ? 'approved' : 'denied'} and updated in the Google Sheet.`, ephemeral: true });
         } catch (error) {
             console.error(`Error fetching or reacting to the message: ${error.message}`);
-            return interaction.reply({ content: 'There was an error fetching or reacting to the message. It may have been deleted.', ephemeral: true });
+            return interaction.reply({ content: 'There was an error fetching or reacting to the message. It may have been deleted or the bot lacks permissions.', ephemeral: true });
         }
     },
 };
