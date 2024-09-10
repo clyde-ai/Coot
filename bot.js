@@ -176,9 +176,6 @@ client.on('messageCreate', async message => {
             const eventEndTimestamp = `<t:${Math.floor(moment(global.eventEndTime).unix())}:F>`;
 
             const imagePath = path.join(__dirname, 'src/images/other/eventLogo.png');
-            console.log('Image Path:', imagePath);
-            console.log('File Exists:', fs.existsSync(imagePath));
-
 
             const { embed, attachment } = await createEmbed({
                 command: 'event',
@@ -207,11 +204,14 @@ client.on('messageCreate', async message => {
     }
     } else if (message.content === '!board') {
         try {
+
+            const imagePath = path.join(__dirname, 'src/images/other/eventBoard.png');
+
             const { embed, attachment } = await createEmbed({
                 command: 'board',
                 title: 'Snakes and Ladders Board',
                 description: 'Here is the current Snakes and Ladders board for the event.',
-                imageUrl: path.join(__dirname, 'src/images/other/eventBoard.png'),
+                imageUrl: imagePath,
                 color: '#00FF00',
                 channelId: message.channel.id,
                 messageId: message.id,
