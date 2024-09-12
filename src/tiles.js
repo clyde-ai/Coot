@@ -4,67 +4,67 @@ const tiles = [
         description: 'Something dragon from a dragon',
         image: 'src/images/1.png',
         imagesNeeded: 1,
-        dropMessage: 'Dragon *'
+        dropMessage: 'Dragon'
     },
     {
         tileNumber: 2,
-        description: 'Something bloody from Morytania',
+        description: 'Any Demonic gorilla unique',
         image: 'src/images/2.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 3,
-        description: "Scurrius' spine",
+        description: "Scurrius' spine", // Snake #1 tail
         image: 'src/images/3.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'spine'
     },
     {
         tileNumber: 4,
-        description: '6 jads kill',
+        description: 'Abyssal whip',
         image: 'src/images/4.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 5,
-        description: 'Any Demonic gorilla unique',
+        description: 'Ladder 1 Bottom',
         image: 'src/images/5.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 6,
-        description: 'Abyssal whip',
+        description: 'Vial of Blood',
         image: 'src/images/6.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Vial of blood'
     },
     {
         tileNumber: 7,
         description: 'Any DKs ring',
         image: 'src/images/7.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'ring'
     },
     {
         tileNumber: 8,
         description: 'Any champion scroll',
         image: 'src/images/8.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'champion scroll'
     },
     {
         tileNumber: 9,
         description: 'Brimstone key',
         image: 'src/images/9.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Brimstone key'
     },
     {
         tileNumber: 10,
-        description: 'Fire cape',
+        description: 'Ladder 2 Bottom',
         image: 'src/images/10.png',
         imagesNeeded: 1,
         dropMessage: ''
@@ -85,105 +85,105 @@ const tiles = [
     },
     {
         tileNumber: 13,
-        description: 'Any revs unique',
+        description: 'Snake 1 Head',
         image: 'src/images/13.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 14,
-        description: 'Ancient icon',
+        description: '5x Fire Cape',
         image: 'src/images/14.png',
-        imagesNeeded: 1,
-        dropMessage: ''
+        imagesNeeded: 5,
+        dropMessage: 'Fire cape'
     },
     {
         tileNumber: 15,
         description: "Awakener's orb",
         image: 'src/images/15.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'orb'
     },
     {
         tileNumber: 16,
         description: 'Vorkath head',
         image: 'src/images/16.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'head'
     },
     {
         tileNumber: 17,
         description: 'Any elder chaos robe piece',
         image: 'src/images/17.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Elder chaos'
     },
     {
         tileNumber: 18,
-        description: 'Any unique from Callisto',
+        description: '2x Dizana\'s quiver',
         image: 'src/images/18.png',
-        imagesNeeded: 1,
-        dropMessage: ''
+        imagesNeeded: 2,
+        dropMessage: 'quiver'
     },
     {
         tileNumber: 19,
-        description: 'Any unique from Venenatis',
+        description: 'Any Moon armour',
         image: 'src/images/19.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'moon'
     },
     {
         tileNumber: 20,
-        description: 'Any unique from Vet\'ion',
+        description: 'Any Grotesque Guardians Unique',
         image: 'src/images/20.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 21,
-        description: "Dizana's quiver",
+        description: 'Ancient icon', // Snake tail #2
         image: 'src/images/21.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 22,
-        description: 'Any Garg unique',
+        description: 'Any Cerberus Unique',
         image: 'src/images/22.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 23,
-        description: 'Any Cerberus unique',
+        description: 'Kraken tentacle or Trident',
         image: 'src/images/23.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 24,
-        description: 'Kraken tentacle or Trident',
+        description: 'Unsired',
         image: 'src/images/24.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Unsired'
     },
     {
         tileNumber: 25,
-        description: 'Unsired',
+        description: 'Occult necklace',
         image: 'src/images/25.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Occult necklace'
     },
     {
         tileNumber: 26,
-        description: 'Any Moon armour',
+        description: 'Dark bow',
         image: 'src/images/26.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Dark bow'
     },
     {
         tileNumber: 27,
-        description: 'Dark bow',
+        description: 'Snake 2 Head',
         image: 'src/images/27.png',
         imagesNeeded: 1,
         dropMessage: ''
@@ -197,224 +197,343 @@ const tiles = [
     },
     {
         tileNumber: 29,
-        description: 'Any Tormented demon unique',
+        description: 'Any unique from Vet\'ion',
         image: 'src/images/29.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 30,
-        description: 'Any Armadyl unique',
+        description: 'Ladder 3 Bottom',
         image: 'src/images/30.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 31,
-        description: 'Any Bandos unique',
+        description: 'Any unique from Venenatis',
         image: 'src/images/31.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 32,
-        description: 'Saradomin sword',
+        description: 'Any unique from Callisto',
         image: 'src/images/32.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 33,
-        description: 'Zamorakian spear',
+        description: 'Any Odium shard',
         image: 'src/images/33.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Odium'
     },
     {
         tileNumber: 34,
-        description: 'Any Vardorvis unique',
+        description: 'Any Malediction shard',
         image: 'src/images/34.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Malediction'
     },
     {
         tileNumber: 35,
-        description: 'Any Duke unique',
+        description: 'Snake 3 Head',
         image: 'src/images/35.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 36,
-        description: 'Any Leviathan unique',
+        description: 'Any Vardorvis unique',
         image: 'src/images/36.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 37,
-        description: 'Any Whisperer unique',
+        description: 'Any Duke unique',
         image: 'src/images/37.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 38,
-        description: 'Awakened boss kill',
+        description: 'Challenge 3',
         image: 'src/images/38.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 39,
-        description: 'ToA 425 completion',
+        description: 'Any Leviathan unique',
         image: 'src/images/39.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 40,
-        description: 'Any Odium shard',
+        description: 'Ladder 4 Bottom',
         image: 'src/images/40.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 41,
-        description: 'Any Malediction shard',
+        description: 'Any Whisperer unique',
         image: 'src/images/41.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 42,
-        description: 'Any scroll from CoX',
+        description: 'Any Armadyl unique',
         image: 'src/images/42.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Armadyl'
     },
     {
         tileNumber: 43,
-        description: 'Hard Mode ToB completion',
+        description: 'Any Bandos Unique',
         image: 'src/images/43.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Bandos'
     },
     {
         tileNumber: 44,
-        description: 'ToA 425 completion',
+        description: 'Saradomin sword',
         image: 'src/images/44.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Saradomin sword'
     },
     {
         tileNumber: 45,
-        description: 'Any CG seed',
+        description: 'Zamorakian spear',
         image: 'src/images/45.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Zamorakian spear'
     },
     {
         tileNumber: 46,
-        description: 'Venator shard',
+        description: 'Any CG seed',
         image: 'src/images/46.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'seed'
     },
     {
         tileNumber: 47,
-        description: 'Kq head',
+        description: 'TOA 500 Any Size',
         image: 'src/images/47.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 48,
-        description: 'Pet chaos elemental',
+        description: 'Any Colosseum unique',
         image: 'src/images/48.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 49,
-        description: 'Sarachnis cudgel',
+        description: 'Any Tormented Demon Unique',
         image: 'src/images/49.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 50,
-        description: 'Any Godsword shard',
+        description: 'Venator Shard',
         image: 'src/images/50.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Venator'
     },
     {
         tileNumber: 51,
-        description: 'Inferno cape',
+        description: 'KQ Head',
         image: 'src/images/51.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'head'
     },
     {
         tileNumber: 52,
-        description: 'ToA 500 completion',
+        description: 'Any Corporeal Beast unique',
         image: 'src/images/52.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 53,
-        description: 'Any Colosseum unique',
+        description: 'Steam Battlestaff',
         image: 'src/images/53.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Steam battlestaff'
     },
     {
         tileNumber: 54,
-        description: 'Any ToB unique',
+        description: '2x Zenyte Shards',
         image: 'src/images/54.png',
-        imagesNeeded: 1,
-        dropMessage: ''
+        imagesNeeded: 2,
+        dropMessage: 'Zenyte'
     },
     {
         tileNumber: 55,
-        description: 'Fang or lightbearer',
+        description: 'Any CoX Scroll',
         image: 'src/images/55.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'scroll'
     },
     {
         tileNumber: 56,
-        description: 'Any CoX unique',
+        description: 'Pet Chaos Elemental',
         image: 'src/images/56.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'Pet chaos elemental'
     },
     {
         tileNumber: 57,
-        description: 'Any Nex unique',
+        description: '2x Barrows Weapons',
         image: 'src/images/57.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 58,
-        description: 'Any Masori piece or Elidinis\' ward',
+        description: 'Sarachnis cudgel',
         image: 'src/images/58.png',
         imagesNeeded: 1,
-        dropMessage: ''
+        dropMessage: 'cudgel'
     },
     {
         tileNumber: 59,
-        description: 'Any Nightmare unique',
+        description: 'Snake 4',
         image: 'src/images/59.png',
         imagesNeeded: 1,
         dropMessage: ''
     },
     {
         tileNumber: 60,
-        description: 'Any unique from Callisto',
+        description: 'Any Sunfire Piece',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'Sunfire'
+    },
+    {
+        tileNumber: 61,
+        description: '3x Noxious Halberd Pieces',
+        image: 'src/images/60.png',
+        imagesNeeded: 3,
+        dropMessage: 'Noxious'
+    },
+    {
+        tileNumber: 62,
+        description: 'Ladder 5',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: ''
+    },
+    {
+        tileNumber: 63,
+        description: 'Any Godsword Shard',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'shard'
+    },
+    {
+        tileNumber: 64,
+        description: 'Onyx or Serpentine Visage',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: ''
+    },
+    {
+        tileNumber: 65,
+        description: 'Armadyl Crossbow or Saradomin Hilt',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: ''
+    },
+    {
+        tileNumber: 66,
+        description: 'Any ToA Unique',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'found something special'
+    },
+    {
+        tileNumber: 67,
+        description: 'Any ToB Unique',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'found something special'
+    },
+    {
+        tileNumber: 68,
+        description: 'Any CoX Unique',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'found something special'
+    },
+    {
+        tileNumber: 69,
+        description: 'Infernal Cape',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'Infernal cape'
+    },
+    {
+        tileNumber: 70,
+        description: 'Snake 5',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: ''
+    },
+    {
+        tileNumber: 71,
+        description: 'Any Nex Unique',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: ''
+    },
+    {
+        tileNumber: 72,
+        description: 'Fang or Lightbearer',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'found something special'
+    },
+    {
+        tileNumber: 73,
+        description: 'Dex or Arcane Prayer Scroll',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'prayer scroll'
+    },
+    {
+        tileNumber: 74,
+        description: 'Avernic Defender Hilt',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'Avernic'
+    },
+    {
+        tileNumber: 75,
+        description: 'Any Dust or Kit from ToB/CoX',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'found something special'
+    },
+    {
+        tileNumber: 76,
+        description: 'Any Masori Piece',
+        image: 'src/images/60.png',
+        imagesNeeded: 1,
+        dropMessage: 'Masori'
+    },
+    {
+        tileNumber: 77,
+        description: 'Any Nightmare Unique',
         image: 'src/images/60.png',
         imagesNeeded: 1,
         dropMessage: ''
