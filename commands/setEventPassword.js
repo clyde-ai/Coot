@@ -38,7 +38,7 @@ module.exports = {
             await googleSheets.clearSheet('EventPassword!A2:A');
 
             // Write the new password to the sheet
-            await googleSheets.writeToSheet('EventPassword', [password]);
+            await googleSheets.updateSheet('EventPassword', 'A2:A', [password]);
 
             const { embed } = await createEmbed({
                 command: 'set-event-password',
