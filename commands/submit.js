@@ -137,7 +137,6 @@ module.exports = {
             console.log(`PW: ${eventPassword}, DropMsg: ${dropMessage}, Tile: ${tile.tileNumber}`);
 
             for (const row of rows) {
-                console.log(`Row: ${row}`);
                 if (row.includes(eventPassword)) {
                     console.log(`Detected Event Password: ${row} === ${eventPassword}`);
                     eventPasswordFound = true;
