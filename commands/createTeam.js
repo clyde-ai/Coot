@@ -91,21 +91,6 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        // Check if any member is already on a team
-        const memberAlreadyOnTeam = memberIds.some(id => isUserOnAnyTeam(id));
-        if (memberAlreadyOnTeam) {
-            const { embed } = await createEmbed({
-                command: 'create-team',
-                title: ':x: Member Already on a Team :x:',
-                description: 'One or more members are already on a team. Each member can only be on one team at a time.',
-                color: '#FF0000',
-                channelId: interaction.channelId,
-                messageId: interaction.id,
-                client: interaction.client
-            });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
-        }
-
         let role;
         if (teams[teamName]) {
             // Edit existing team
@@ -135,6 +120,21 @@ module.exports = {
             // Update team members
             teams[teamName].members = memberIds;
         } else {
+            // Check if any member is already on an existing team
+            const memberAlreadyOnTeam = memberIds.some(id => isUserOnAnyTeam(id));
+            if (memberAlreadyOnTeam) {
+                const { embed } = await createEmbed({
+                    command: 'create-team',
+                    title: ':x: Member Already on a Team :x:',
+                    description: 'One or more members are already on a team. Each member can only be on one team at a time.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
+            
             // Create a new team
             role = await interaction.guild.roles.create({
                 name: `Team ${teamName}`,
