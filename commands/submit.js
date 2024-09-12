@@ -134,7 +134,10 @@ module.exports = {
             let eventPasswordFound = false;
             let dropMessageFound = false;
 
+            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessage}, Tile: ${tile}`);
+
             for (const word of words) {
+                console.log(`Word: ${word}`);
                 if (word.includes(eventPassword)) {
                     console.log(`Detected Event Password: ${word} === ${eventPassword}`);
                     eventPasswordFound = true;
