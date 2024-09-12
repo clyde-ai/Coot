@@ -86,6 +86,12 @@ module.exports = {
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.currentTile + roll;
 
+        // Check if roll is the last tile, if exceeds then set to last tile.
+        const lastTile = Math.max(...tiles.map(t => t.tileNumber));
+        if (newTile >= lastTile) {
+            newTile = lastTile;
+        }
+
         const userMention = `<@${interaction.user.id}>`;
 
         // Fetch ladders and snakes from Google Sheets
@@ -140,6 +146,7 @@ module.exports = {
         try {
             // Write to the Rolls sheet
             const rollData = [teamName, memberName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
+            console.log(`rollData: ${rollData}`);
             await googleSheets.writeToSheet('Rolls', rollData);
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
@@ -157,6 +164,8 @@ module.exports = {
                 description = `${userMention} rolled **${roll}** and landed on a ladder! :ladder: After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
                 description = `${userMention} rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+            } else if (newTile === lastTile) {
+                description = `${userMention} rolled the last roll! ${teamRoleMention} moves to the final tile **${newTile}**.\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
@@ -174,7 +183,7 @@ module.exports = {
             if (attachment) {
                 replyOptions.files = [attachment];
             }
-
+            console.log('Received interaction Before Embed Response:', interaction.id);
             await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
@@ -187,6 +196,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
+            console.log('Received interaction before Google Sheet Failure:', interaction.id);
             await interaction.reply({ embeds: [embed] });
         }
     },

@@ -126,12 +126,40 @@ module.exports = {
             const detections = result.textAnnotations;
             const text = detections.length ? detections[0].description : '';
 
-            const eventPassword = getEventPassword();
+            const eventPassword = await getEventPassword();
             const tile = tiles.find(t => t.tileNumber === tileNumber);
             const dropMessage = tile ? tile.dropMessage : '';
 
+            const rows = text.split('\n');
+            let eventPasswordFound = false;
+            let dropMessageFound = false;
+
+            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessage}, Tile: ${tile.tileNumber}`);
+
+            for (const row of rows) {
+                if (row.includes(eventPassword)) {
+                    console.log(`Detected Event Password: ${row} === ${eventPassword}`);
+                    eventPasswordFound = true;
+                }
+                if (dropMessage !== '' && row.includes(dropMessage)) {
+                    console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
+                    dropMessageFound = true;
+                }
+            }
+
+            const lastTile = Math.max(...tiles.map(t => t.tileNumber));
+            let isLastTile;
+
+            if (tileNumber === lastTile) {
+                isLastTile = true;
+            } else {
+                isLastTile = false;
+            }
+
             // event password or drop message not found
-            if (!text.includes(eventPassword) || !text.includes(dropMessage)) {
+            if (!eventPasswordFound || (!dropMessageFound && dropMessage !== '')) {
+                console.log(`Google Vision API - Did not detect BOTH password and drop message. eventPasswordFound: ${eventPasswordFound}, dropMessageFound: ${dropMessageFound}`);
+                //console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
@@ -154,11 +182,26 @@ module.exports = {
                     const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                     const memberName = interaction.member.displayName;
 
+                    let title;
+                    let color;
+                    let description;
+                    if (isLastTile) {
+                        console.log(`${teamName} submitted for the last tile, can no longer roll.`);
+                        team.canRoll = false;
+                        title = ':tada: Final Tile Proof Submitted For Manual Review:tada:';
+                        description = `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n This is due to being unable to find the event password and/or drop phrase in your submission.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n :handshake: Thanks for playing Snakes and Ladders! :handshake:\n *Please wait for an event admin to review your submission*' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`;
+                        color = '#8000ff';
+                    } else {
+                        title = ':warning: Manual Review Needed :warning:';
+                        description = `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n This is due to being unable to find the event password and/or drop phrase in your submission.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`;
+                        color = '#FFA500';
+                    }
+
                     const { embed } = await createEmbed({
                         command: 'submit',
-                        title: ':warning: Manual Review Needed :warning:',
-                        description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been flagged for manual review.\n This is due to being unable to find the event password and/or drop phrase in your submission.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
-                        color: '#FFA500',
+                        title: `${title}`,
+                        description: `${description}`,
+                        color: `${color}`,
                         channelId: interaction.channelId,
                         messageId: interaction.id,
                         client: interaction.client
@@ -187,6 +230,7 @@ module.exports = {
                     const messageId = reply.id;
                 }
             } else {
+                console.log(`Google Vision Found EventPassword and DropMessage!`);
                 // Reset failed attempts on successful submission
                 failedAttempts.delete(interaction.user.id);
 
@@ -202,11 +246,26 @@ module.exports = {
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                 const memberName = interaction.member.displayName;
 
+                let title;
+                let color;
+                let description;
+                if (isLastTile) {
+                    console.log(`${teamName} submitted for the last tile, can no longer roll.`);
+                    team.canRoll = false;
+                    title = ':tada: Final Tile Proof Submitted :tada:';
+                    description = `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been successfully submitted.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n :handshake: Thanks for playing Snakes and Ladders! :handshake:' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`;
+                    color = '#8000ff';
+                } else {
+                    title = ':white_check_mark: Proof Submitted :white_check_mark:';
+                    description = `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been successfully submitted.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`;
+                    color = '#00FF00';
+                }
+
                 const { embed } = await createEmbed({
                     command: 'submit',
-                    title: ':white_check_mark: Proof Submitted :white_check_mark:',
-                    description: `Proof for tile ${tileNumber} submitted by ${userMention} from team ${teamRoleMention} has been successfully submitted.\n ${imagesSubmitted >= imagesNeeded ? ':tada: **All required proofs have been submitted!** :tada:\n Any member of the team can now use the */roll* command!' : `\n${imagesNeeded - imagesSubmitted} more proof(s) needed.`}`,
-                    color: '#00FF00',
+                    title: `${title}`,
+                    description: `${description}`,
+                    color: `${color}`,
                     channelId: interaction.channelId,
                     messageId: interaction.id,
                     client: interaction.client

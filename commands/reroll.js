@@ -78,6 +78,12 @@ module.exports = {
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.previousTile + roll;
 
+        // Check if roll is the last tile, if exceeds then set to last tile.
+        const lastTile = Math.max(...tiles.map(t => t.tileNumber));
+        if (newTile >= lastTile) {
+            newTile = lastTile;
+        }
+
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
 
         // Fetch ladders and snakes from Google Sheets
@@ -145,11 +151,13 @@ module.exports = {
                 await googleSheets.updateSheet('Teams', `F${teamIndex + 1}`, [previousTile]); // Update previousTile in the sixth column
             }
 
-            let description = `Reroll for ${teamRoleMention}: rolled **${roll}**. Moves to tile **${newTile}**.\n **${tileDescription}**`;
+            let description = `${userMention} rolled **${roll}**. ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             if (landedOnLadder) {
-                description = `Reroll for ${teamRoleMention}: rolled **${roll}** and landed on a ladder! :ladder: After climbing up, moves to tile **${newTile}**.\n **${tileDescription}**`;
+                description = `${userMention} rolled **${roll}** and landed on a ladder! :ladder: After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
-                description = `Reroll for ${teamRoleMention}: rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, moves to tile **${newTile}**.\n **${tileDescription}**`;
+                description = `${userMention} rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+            } else if (newTile === lastTile) {
+                description = `${userMention} rolled the last roll! ${teamRoleMention} moves to the final tile **${newTile}**.\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
