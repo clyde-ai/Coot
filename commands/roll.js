@@ -187,6 +187,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
+            console.log('Received interaction:', interaction.id);
             await interaction.reply({ embeds: [embed] });
         }
     },
