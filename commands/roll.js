@@ -140,6 +140,7 @@ module.exports = {
         try {
             // Write to the Rolls sheet
             const rollData = [teamName, memberName, 'Roll', roll, previousTile, newTile, new Date().toISOString()];
+            console.log(`rollData: ${rollData}`);
             await googleSheets.writeToSheet('Rolls', rollData);
 
             await googleSheets.sortSheet('Rolls', 'A', 'asc'); // Sort by Team Name
@@ -174,7 +175,7 @@ module.exports = {
             if (attachment) {
                 replyOptions.files = [attachment];
             }
-
+            console.log('Received interaction Before Embed Response:', interaction.id);
             await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
@@ -187,7 +188,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            console.log('Received interaction:', interaction.id);
+            console.log('Received interaction before Google Sheet Failure:', interaction.id);
             await interaction.reply({ embeds: [embed] });
         }
     },
