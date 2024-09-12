@@ -131,7 +131,8 @@ module.exports = {
             const dropMessage = tile ? tile.dropMessage : '';
 
             // event password or drop message not found
-            if (!text.includes(eventPassword) || !text.includes(dropMessage)) {
+            if (!text.includes(eventPassword) || (!text.includes(dropMessage) && dropMessage !== '')) {
+                console.log(`Google Vision API - Did not detect BOTH password and drop message.\n Password?: ${text.includes(eventPassword)}\n DropMessage?: ${text.includes(dropMessage)}`);
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
@@ -187,6 +188,7 @@ module.exports = {
                     const messageId = reply.id;
                 }
             } else {
+                console.log(`Google Vision Found EventPassword and DropMessage!`);
                 // Reset failed attempts on successful submission
                 failedAttempts.delete(interaction.user.id);
 
