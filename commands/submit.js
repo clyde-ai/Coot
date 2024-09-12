@@ -126,7 +126,7 @@ module.exports = {
             const detections = result.textAnnotations;
             const text = detections.length ? detections[0].description : '';
 
-            const eventPassword = getEventPassword();
+            const eventPassword = await getEventPassword();
             const tile = tiles.find(t => t.tileNumber === tileNumber);
             const dropMessage = tile ? tile.dropMessage : '';
 
@@ -136,17 +136,19 @@ module.exports = {
 
             for (const word of words) {
                 if (word.includes(eventPassword)) {
+                    console.log(`Detected Event Password: ${word} === ${eventPassword}`);
                     eventPasswordFound = true;
                 }
                 if (dropMessage !== '' && word.includes(dropMessage)) {
+                    console.log(`Detected Drop Message: ${word} === ${dropMessage}`);
                     dropMessageFound = true;
                 }
             }
 
             // event password or drop message not found
             if (!eventPasswordFound || (!dropMessageFound && dropMessage !== '')) {
-                console.log(`Google Vision API - Did not detect BOTH password and drop message.\n Password?: ${text.includes(eventPassword)}\n DropMessage?: ${text.includes(dropMessage)}`);
-                console.log(`Google Vision Text Detections: ${text}`);
+                console.log(`Google Vision API - Did not detect BOTH password and drop message. eventPasswordFound: ${eventPasswordFound}, dropMessageFound: ${dropMessageFound}`);
+                //console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
