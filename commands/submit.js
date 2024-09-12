@@ -130,8 +130,21 @@ module.exports = {
             const tile = tiles.find(t => t.tileNumber === tileNumber);
             const dropMessage = tile ? tile.dropMessage : '';
 
+            const words = text.split(/\s+/);
+            let eventPasswordFound = false;
+            let dropMessageFound = false;
+
+            for (const word of words) {
+                if (word.includes(eventPassword)) {
+                    eventPasswordFound = true;
+                }
+                if (dropMessage !== '' && word.includes(dropMessage)) {
+                    dropMessageFound = true;
+                }
+            }
+
             // event password or drop message not found
-            if (!text.includes(eventPassword) || (!text.includes(dropMessage) && dropMessage !== '')) {
+            if (!eventPasswordFound || (!dropMessageFound && dropMessage !== '')) {
                 console.log(`Google Vision API - Did not detect BOTH password and drop message.\n Password?: ${text.includes(eventPassword)}\n DropMessage?: ${text.includes(dropMessage)}`);
                 console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
