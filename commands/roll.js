@@ -86,6 +86,12 @@ module.exports = {
         const roll = Math.floor(Math.random() * 6) + 1;
         let newTile = team.currentTile + roll;
 
+        // Check if roll is the last tile, if exceeds then set to last tile.
+        const lastTile = Math.max(...tiles.map(t => t.tileNumber));
+        if (newTile >= lastTile) {
+            newTile = lastTile;
+        }
+
         const userMention = `<@${interaction.user.id}>`;
 
         // Fetch ladders and snakes from Google Sheets
@@ -158,6 +164,8 @@ module.exports = {
                 description = `${userMention} rolled **${roll}** and landed on a ladder! :ladder: After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
                 description = `${userMention} rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+            } else if (newTile === lastTile) {
+                description = `${userMention} rolled the last roll! ${teamRoleMention} moves to the final tile **${newTile}**.\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
