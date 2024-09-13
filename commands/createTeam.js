@@ -31,6 +31,11 @@ function isUserOnAnyTeam(userId) {
     return Object.values(teams).some(team => team.members.includes(userId));
 }
 
+async function getTeams() {
+    await loadTeamsFromSheet();
+    return teams;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('create-team')
@@ -207,9 +212,7 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
-    getTeams() {
-        return teams;
-    },
+    getTeams,
     updateTeamTile(teamName, newTile) {
         if (teams[teamName]) {
             teams[teamName].previousTile = teams[teamName].currentTile;
