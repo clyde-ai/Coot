@@ -6,8 +6,7 @@ const { createEmbed } = require('../src/utils/embeds');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear-ladders')
-        .setDescription('Remove all ladders from the board')
-        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+        .setDescription('Remove all ladders from the board'),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
