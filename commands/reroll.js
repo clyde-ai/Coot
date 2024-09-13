@@ -52,7 +52,7 @@ module.exports = {
         // Fetch the current tile from the Teams sheet
         let existingTeams;
         try {
-            existingTeams = await googleSheets.readSheet('Teams!A:F');
+            existingTeams = await googleSheets.readSheet('Teams!A:G');
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
                 team.currentTile = parseInt(teamRow[4], 10);

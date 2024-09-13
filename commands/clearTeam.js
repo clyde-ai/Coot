@@ -49,7 +49,7 @@ module.exports = {
 
             // Clear the Google Sheet
             try {
-                await googleSheets.clearSheet('Teams!A:F');
+                await googleSheets.clearSheet('Teams!A:G');
                 const { embed } = await createEmbed({
                     command: 'clear-team',
                     title: ':white_check_mark: All Teams Deleted :white_check_mark:',
@@ -121,7 +121,7 @@ module.exports = {
             // Update the Google Sheet
             let existingTeams;
             try {
-                existingTeams = await googleSheets.readSheet('Teams!A:F');
+                existingTeams = await googleSheets.readSheet('Teams!A:G');
                 const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
                 if (teamIndex !== 0) {

@@ -100,6 +100,11 @@ Requires Discord Server Administrator or self defined Admin Role from environmen
 **Description:** Clears all snakes from the current game and Snakes Sheet.
 **Parameters:** None
 
+#### /clear-team
+**Description:** Clears all snakes from the current game and Snakes Sheet.
+**Parameters:** 
+`teamName` (string) *required*: The name of the team or 'ALL' to clear all teams.
+
 #### /create-admin-team
 **Description:** Creates an admin team with specified members, assigning the designated Admin role to each member.
 **Parameters:**
