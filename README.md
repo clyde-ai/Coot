@@ -68,17 +68,19 @@ To add Coot to your Discord server, follow these steps:
         - Mention Everyone
         - Add Reactions
         - Use Slash Commands
+    Generated URL example:
+    https://discord.com/oauth2/authorize?client_id={your-client-id}&permissions=2416168000&response_type=code&redirect_uri={your-base-url}%2Fcallback&integration_type=0&scope=identify+bot+messages.read
     ```
 6. Create your .env file:
     ```
-    DISCORD_TOKEN=discord-token-of-your-bot
-    CLIENT_ID=client-id-of-your-bot
-    GUILD_ID=discord-server-id
-    ADMIN_ROLE_ID=admin-role-id
-    GOOGLE_SHEET_ID=google-sheet-id
-    GOOGLE_CREDENTIALS_PATH=path-to-google-credentials
-    GOOGLE_CREDENTIALS=your-google-service-account-credentials
-    BASE_URL=your-discord-bot-hosted-base-url
+    DISCORD_TOKEN=discord-token-of-your-bot    - Token of your bot application.
+    CLIENT_ID=client-id-of-your-bot    - Client Id from your bot application.
+    GUILD_ID=discord-server-id    - ID of the server your bot will be using.
+    ADMIN_ROLE_ID=admin-role-id    - ID of any role for using admin commands
+    GOOGLE_SHEET_ID=google-sheet-id    - Sheet ID from URL of your Google Sheet.
+    GOOGLE_CREDENTIALS_PATH=path-to-google-credentials    - Path to your credentials for local run.
+    GOOGLE_CREDENTIALS=your-google-service-account-credentials   - JSON credentials
+    BASE_URL=your-discord-bot-hosted-base-url   - ex: http://localhost:3000
 6. Run the bot:
     ```bash
     npm start
