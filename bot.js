@@ -185,18 +185,18 @@ client.on('messageCreate', async message => {
                 message.reply(`:game_die: You rolled a **${roll}**, not bad! :thinking:`);
                 break;
             case 5:
-                message.reply(`:game_die: You rolled a **${roll}**, now thats what I'm talking about! :saluting_face:`);
+                message.reply(`:game_die: You rolled a **${roll}**, now that's what I'm talking about! :saluting_face:`);
                 break;
             case 6:
                 message.reply(`:game_die: You rolled a **${roll}**! What are you, an *Ironman*?! :rage:`);
                 break;
         }
     } else if (message.content === '!snake') {
-        const gifPath = path.join(__dirname, 'src/images/memes/snake.gif');
-        message.reply({ files: [gifPath] });
+        const gifUrl = await fetchRandomGif('snake');
+        message.reply({ content: gifUrl });
     } else if (message.content === '!ladder') {
-        const gifPath = path.join(__dirname, 'src/images/memes/ladder.gif');
-        message.reply({ files: [gifPath] });
+        const gifUrl = await fetchRandomGif('ladder fail');
+        message.reply({ content: gifUrl });
     } else if (message.content === '!promo') {
         const promoURL = 'https://youtube.com/shorts/d_3e2-UDduU?si=VBCkZs8TQ_krQecs';
         message.reply(`:index_pointing_at_the_viewer: Sign Up for the event! :movie_camera:\n ${promoURL}`);
@@ -232,13 +232,12 @@ client.on('messageCreate', async message => {
             }
 
             message.channel.send(replyOptions);
-        }  catch (error) {
-        console.error('Error creating embed:', error);
-        message.channel.send('There was an error creating the event embed.');
-    }
+        } catch (error) {
+            console.error('Error creating embed:', error);
+            message.channel.send('There was an error creating the event embed.');
+        }
     } else if (message.content === '!board') {
         try {
-
             const imagePath = path.join(__dirname, 'src/images/other/eventBoard.png');
 
             const { embed, attachment } = await createEmbed({
@@ -258,12 +257,24 @@ client.on('messageCreate', async message => {
             }
 
             message.channel.send(replyOptions);
-        }  catch (error) {
-        console.error('Error creating embed:', error);
-        message.channel.send('There was an error creating the event embed.');
+        } catch (error) {
+            console.error('Error creating embed:', error);
+            message.channel.send('There was an error creating the event embed.');
         }
     }
 });
+
+async function fetchRandomGif(tag) {
+    const apiKey = process.env.GIPHY_API_KEY;
+    const url = `https://api.giphy.com/v1/gifs/random?api_key=${apiKey}&tag=${tag}&rating=G`;
+    try {
+        const response = await axios.get(url);
+        return response.data.data.images.original.url;
+    } catch (error) {
+        console.error('Error fetching GIF:', error);
+        return 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif'; // Fallback GIF
+    }
+}
 
 // OAuth2 setup
 const app = express();
