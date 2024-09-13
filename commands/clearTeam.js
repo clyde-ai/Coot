@@ -2,6 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
+const { getTeams, loadTeamsFromSheet } = require('./createTeam');
+
+let teams = {};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,6 +33,10 @@ module.exports = {
         }
 
         const teamName = interaction.options.getString('teamname');
+
+        // Load teams from Google Sheets
+        await loadTeamsFromSheet();
+        teams = await getTeams();
 
         if (teamName.toUpperCase() === 'ALL') {
             // Delete all teams
