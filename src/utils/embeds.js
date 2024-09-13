@@ -46,21 +46,15 @@ async function createEmbed({
             if (fs.existsSync(imageUrl)) {
                 if (command === 'roll' || command === 'reroll') {
                     const resizedImageBuffer = await resizeImage(imageUrl, 256, 256);
-                    console.log('Resized Image Buffer:', resizedImageBuffer);
                     attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-                    console.log('Attachment:', attachment);
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 } else if (command === 'submit' || command === 'event') {
                     const resizedImageBuffer = await resizeImage(imageUrl, 1024, 1024);
-                    console.log('Resized Image Buffer:', resizedImageBuffer);
                     attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-                    console.log('Attachment:', attachment);
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 } else if (command === 'board') {
                     const resizedImageBuffer = await resizeImage(imageUrl, 2800, 3850);
-                    console.log('Resized Image Buffer:', resizedImageBuffer);
                     attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
-                    console.log('Attachment:', attachment);
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 } else {
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
@@ -91,11 +85,9 @@ async function createEmbed({
 async function resizeImage(filePath, width, height) {
     try {
         const buffer = fs.readFileSync(filePath);
-        console.log('Original Image Buffer:', buffer);
         const resizedBuffer = await sharp(buffer)
             .resize(width, height)
             .toBuffer();
-        console.log('Resized Image Buffer:', resizedBuffer);
         return resizedBuffer;
     } catch (error) {
         console.error('Error resizing image:', error);
