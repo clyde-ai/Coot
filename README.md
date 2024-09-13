@@ -164,6 +164,30 @@ Requires a user to be on a team.
 **Parameters:** 
 `proof` (attachment) *required*: Proof of tile completion (image).
 
+### Fun/Meme Commands
+These don't actually do anything, they're just for fun.
+
+#### !snake
+**Description:** Bot replies with a random snake gif.
+
+#### !ladder
+**Description:** Bot replies with a random ladder fail gif.
+
+#### !roll
+**Description:** Bot rolls a 6 sided dice, for fun.
+
+#### !promo
+**Description:** Bot replies with a link to the event promotional video.
+
+#### !event
+**Description:** Bot replies with a description of the current event.
+
+#### !board
+**Description:** Bot replies with a link to the event board.
+
+#### !wom
+**Description:** Bot replies with a link to the event Wise Old Man competition page.
+
 ## Contributing
 [Contributing](./CONTRIBUTING.md)
 
