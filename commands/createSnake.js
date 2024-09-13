@@ -10,18 +10,18 @@ module.exports = {
         .setDescription('Create a snake with a head and tail tile number')
         .addIntegerOption(option => 
             option.setName('head')
-                .setDescription('The head tile number of the snake')
+                .setDescription('The head tile number of the snake (e.g. 12)')
                 .setRequired(true))
         .addIntegerOption(option => 
             option.setName('tail')
-                .setDescription('The tail tile number of the snake')
+                .setDescription('The tail tile number of the snake (e.g. 3)')
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
 
-        if (!hasAdminRole || !hasAdminPermission) {
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'create-snake',
                 title: ':x: Access Denied :x:',

@@ -6,13 +6,13 @@ const { createEmbed } = require('../src/utils/embeds');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear-snakes')
-        .setDescription('Remove all snakes from the board'),
+        .setDescription('Removes all snakes from the board'),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
 
-        if (!hasAdminRole || !hasAdminPermission) {
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'clear-snakes',
                 title: ':x: Access Denied :x:',

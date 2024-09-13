@@ -10,14 +10,14 @@ module.exports = {
         .setDescription('Set the event password for submissions')
         .addStringOption(option => 
             option.setName('password')
-                .setDescription('The event password to set')
+                .setDescription('The event password to set (e.g. your_event_password)')
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
 
-        if (!hasAdminRole || !hasAdminPermission) {
+        if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'set-event-password',
                 title: ':x: Access Denied :x:',
