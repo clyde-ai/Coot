@@ -9,16 +9,16 @@ const teams = {};
 
 async function loadTeamsFromSheet() {
     try {
-        const rows = await googleSheets.readSheet('Teams!A:F');
+        const rows = await googleSheets.readSheet('Teams!A:G');
         rows.slice(1).forEach(row => {
-            const [teamName, members, dateCreated, roleId, currentTile, previousTile] = row;
+            const [teamName, members, dateCreated, roleId, currentTile, previousTile, canRoll] = row;
             const memberIds = members.split(', ').map(member => member.split(':')[1]);
             teams[teamName] = {
                 members: memberIds,
                 roleId: roleId,
                 currentTile: parseInt(currentTile, 10) || 0,
                 previousTile: parseInt(previousTile, 10) || 0,
-                canRoll: false,
+                canRoll: canRoll,
                 proofs: {}
             };
         });
@@ -171,16 +171,17 @@ module.exports = {
         let existingTeams;
         try {
             // Read the existing teams from the Google Sheet
-            existingTeams = await googleSheets.readSheet('Teams!A:F');
+            existingTeams = await googleSheets.readSheet('Teams!A:G');
             const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
 
             const currentTile = teams[teamName] ? teams[teamName].currentTile : 0;
             const previousTile = teams[teamName] ? teams[teamName].previousTile : 0;
-            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile, previousTile];
+            const canRoll = teams[teamName] ? teams[teamName].canRoll : false;
+            const teamData = [teamName, memberDisplayNames.join(', '), new Date().toISOString(), role.id, currentTile, previousTile, canRoll];
 
             if (teamIndex !== 0) {
                 // Update existing team
-                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:F${teamIndex + 1}`, teamData);
+                await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:G${teamIndex + 1}`, teamData);
             } else {
                 // Append new team
                 await googleSheets.writeToSheet('Teams', teamData);

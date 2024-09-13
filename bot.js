@@ -54,7 +54,7 @@ client.once('ready', async () => {
 
     // Initialize Google Sheets with headers if they are not already set
     try {
-        const teamHeaders = ['Team Name', 'Members', 'Date Created', 'Role ID', 'Current Tile', 'Previous Tile'];
+        const teamHeaders = ['Team Name', 'Members', 'Date Created', 'Role ID', 'Current Tile', 'Previous Tile', 'Can Roll'];
         const rollHeaders = ['Team Name', 'User Name', 'Action', 'Roll', 'Previous Tile', 'New Tile', 'Timestamp'];
         const submissionHeaders = ['Team Name', 'User Name', 'Tile Number', 'Submission Status', 'Proof URL', 'Timestamp', 'Manual Review Flag', 'Submission Link', 'Review Status', 'Reviewer Name'];
         const snakesHeaders = ['Head Tile', 'Tail Tile', 'Created By', 'Timestamp'];
