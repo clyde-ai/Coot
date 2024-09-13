@@ -2,6 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const googleSheets = require('../src/utils/googleSheets');
 const { PermissionsBitField } = require('discord.js');
 const { createEmbed } = require('../src/utils/embeds');
+const { getTeams, loadTeamsFromSheet } = require('./createTeam');
+
+let teams = {};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,6 +34,10 @@ module.exports = {
 
         const teamName = interaction.options.getString('teamname');
 
+        // Load teams from Google Sheets
+        await loadTeamsFromSheet();
+        teams = await getTeams();
+
         if (teamName.toUpperCase() === 'ALL') {
             // Delete all teams
             for (const team in teams) {
@@ -49,7 +56,7 @@ module.exports = {
 
             // Clear the Google Sheet
             try {
-                await googleSheets.clearSheet('Teams!A:G');
+                await googleSheets.clearSheet('Teams!A2:G');
                 const { embed } = await createEmbed({
                     command: 'clear-team',
                     title: ':white_check_mark: All Teams Deleted :white_check_mark:',
