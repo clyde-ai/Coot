@@ -50,7 +50,26 @@ To add Coot to your Discord server, follow these steps:
         - Share the sheet with the email of your Google Service Account.
         - Copy down your Google Sheet ID for later use. Found in the URL of the sheet. 
     - Hosting (optional) - Currently I use Heroku, use any host you like.</code></pre>
-5. Create your .env file:
+5. Discord Bot Permissions:
+    ```
+    OAuth2 Scopes:
+    - identify
+    - messages.read
+    - bot
+    Bot Permissions:
+      General
+        - Manage Roles
+        - View Channels
+      Text Permissions
+        - Send Messages
+        - Embed Links
+        - Attach Files
+        - Read Message History
+        - Mention Everyone
+        - Add Reactions
+        - Use Slash Commands
+    ```
+6. Create your .env file:
     ```
     DISCORD_TOKEN=discord-token-of-your-bot
     CLIENT_ID=client-id-of-your-bot
