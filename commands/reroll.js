@@ -84,6 +84,7 @@ module.exports = {
         }
 
         const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
+        const userMention = `<@${interaction.user.id}>`;
 
         // Fetch ladders and snakes from Google Sheets
         let ladders = [];
