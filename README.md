@@ -81,6 +81,7 @@ To add Coot to your Discord server, follow these steps:
     GOOGLE_CREDENTIALS_PATH=path-to-google-credentials    - Path to your credentials for local run.
     GOOGLE_CREDENTIALS=your-google-service-account-credentials   - JSON credentials
     BASE_URL=your-discord-bot-hosted-base-url   - ex: http://localhost:3000
+    GIPHY_API_KEY=your-giphy-api-key    - used for random gifs, feel free to remove from bot.js
 6. Run the bot:
     ```bash
     npm start
