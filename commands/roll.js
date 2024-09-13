@@ -183,7 +183,6 @@ module.exports = {
             if (attachment) {
                 replyOptions.files = [attachment];
             }
-            console.log('Received interaction Before Embed Response:', interaction.id);
             await interaction.reply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
@@ -196,7 +195,6 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            console.log('Received interaction before Google Sheet Failure:', interaction.id);
             await interaction.reply({ embeds: [embed] });
         }
     },

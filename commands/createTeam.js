@@ -48,7 +48,7 @@ module.exports = {
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
 
-        if (!hasAdminRole && !hasAdminPermission) {
+        if (!hasAdminRole || !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'create-team',
                 title: ':x: Access Denied :x:',
@@ -121,6 +121,7 @@ module.exports = {
             teams[teamName].members = memberIds;
         } else {
             // Check if any member is already on an existing team
+            await loadTeamsFromSheet();
             const memberAlreadyOnTeam = memberIds.some(id => isUserOnAnyTeam(id));
             if (memberAlreadyOnTeam) {
                 const { embed } = await createEmbed({

@@ -21,7 +21,7 @@ module.exports = {
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
 
-        if (!hasAdminRole && !hasAdminPermission) {
+        if (!hasAdminRole || !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'create-ladder',
                 title: ':x: Permission Denied :x:',
