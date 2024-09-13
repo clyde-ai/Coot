@@ -56,7 +56,7 @@ module.exports = {
 
             // Clear the Google Sheet
             try {
-                await googleSheets.clearSheet('Teams!A:G');
+                await googleSheets.clearSheet('Teams!A2:G');
                 const { embed } = await createEmbed({
                     command: 'clear-team',
                     title: ':white_check_mark: All Teams Deleted :white_check_mark:',
