@@ -203,6 +203,34 @@ async function readCell(range, variable) {
     }
 }
 
+async function deleteRow(sheetName, rowIndex) {
+    try {
+        const sheetId = await getSheetId(sheetName);
+        await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: process.env.GOOGLE_SHEET_ID,
+            resource: {
+                requests: [
+                    {
+                        deleteDimension: {
+                            range: {
+                                sheetId: sheetId,
+                                dimension: 'ROWS',
+                                startIndex: rowIndex - 1, // Google Sheets API is 0-indexed
+                                endIndex: rowIndex // Delete only one row
+                            }
+                        }
+                    }
+                ]
+            }
+        });
+        console.log(`Row ${rowIndex} deleted from sheet ${sheetName}`);
+    } catch (error) {
+        console.error(`ERROR deleting row ${rowIndex} from sheet ${sheetName}:`, error);
+        throw new Error('Failed to delete row in Google Sheets. Please try again later.');
+    }
+}
+
+
 module.exports = {
     writeToSheet,
     updateSheet,
@@ -212,5 +240,6 @@ module.exports = {
     sortSheet,
     freezeHeaders,
     clearSheet,
-    readCell
+    readCell,
+    deleteRow
 };
