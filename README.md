@@ -82,6 +82,8 @@ To add Coot to your Discord server, follow these steps:
     GOOGLE_CREDENTIALS=your-google-service-account-credentials   - JSON credentials
     BASE_URL=your-discord-bot-hosted-base-url   - ex: http://localhost:3000
     GIPHY_API_KEY=your-giphy-api-key    - used for random gifs, feel free to remove from bot.js
+    WOM_URL=wise-old-man-comp-url    - url to your event competition in wise old man
+    ```
 6. Run the bot:
     ```bash
     npm start
