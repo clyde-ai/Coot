@@ -81,6 +81,7 @@ To add Coot to your Discord server, follow these steps:
     GOOGLE_CREDENTIALS_PATH=path-to-google-credentials    - Path to your credentials for local run.
     GOOGLE_CREDENTIALS=your-google-service-account-credentials   - JSON credentials
     BASE_URL=your-discord-bot-hosted-base-url   - ex: http://localhost:3000
+    GIPHY_API_KEY=your-giphy-api-key    - used for random gifs, feel free to remove from bot.js
 6. Run the bot:
     ```bash
     npm start
@@ -162,6 +163,30 @@ Requires a user to be on a team.
 **Description:** Submits proof of tile completion, writes to the Submissions Sheet. This command allows a team member to submit an image as proof that their team has completed the task associated with their current tile. This command scrubs proofs for the event password and any drop message details.
 **Parameters:** 
 `proof` (attachment) *required*: Proof of tile completion (image).
+
+### Fun/Meme Commands
+These don't actually do anything, they're just for fun.
+
+#### !snake
+**Description:** Bot replies with a random snake gif.
+
+#### !ladder
+**Description:** Bot replies with a random ladder fail gif.
+
+#### !roll
+**Description:** Bot rolls a 6 sided dice, for fun.
+
+#### !promo
+**Description:** Bot replies with a link to the event promotional video.
+
+#### !event
+**Description:** Bot replies with a description of the current event.
+
+#### !board
+**Description:** Bot replies with a link to the event board.
+
+#### !wom
+**Description:** Bot replies with a link to the event Wise Old Man competition page.
 
 ## Contributing
 [Contributing](./CONTRIBUTING.md)

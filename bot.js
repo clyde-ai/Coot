@@ -261,6 +261,13 @@ client.on('messageCreate', async message => {
             console.error('Error creating embed:', error);
             message.channel.send('There was an error creating the event embed.');
         }
+    } else if (message.content === '!wom') {
+        const womUrl = process.env.WOM_URL;
+        if (womUrl) {
+            message.reply(`Check out the Wise Old Man Competition here: ${womUrl}`);
+        } else {
+            message.reply('Wise Old Man Competition TBD');
+        }
     }
 });
 
