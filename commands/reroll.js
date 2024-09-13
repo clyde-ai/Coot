@@ -13,8 +13,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('teamname')
                 .setDescription('The name of the team')
-                .setRequired(true))
-        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+                .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
