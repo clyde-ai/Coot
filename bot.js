@@ -262,16 +262,27 @@ client.on('messageCreate', async message => {
             // Sort teams by current tile number in descending order for display purposes only
             const sortedTeams = Object.entries(teams).sort(([, a], [, b]) => b.currentTile - a.currentTile);
     
-            // Prepare fields for the embed with trophy emojis for the top 3 teams
+            // Prepare fields for the embed with trophy emojis for the top 3 teams and on
             const fields = sortedTeams.map(([teamName, teamData], index) => {
-                let emoji = '';
-                if (index === 0) emoji = '🥇'; // 1st place
-                else if (index === 1) emoji = '🥈'; // 2nd place
-                else if (index === 2) emoji = '🥉'; // 3rd place
-
+                let rankLabel = '';
+                switch (index) {
+                    case 0:
+                        rankLabel = '🥇 1st';
+                        break;
+                    case 1:
+                        rankLabel = '🥈 2nd';
+                        break;
+                    case 2:
+                        rankLabel = '🥉 3rd';
+                        break;
+                    default:
+                        rankLabel = `${index + 1}th`;
+                        break;
+                }
+            
                 return {
-                    name: `${emoji} ${teamName}`,
-                    value: `Current Tile: ${teamData.currentTile}`,
+                    name: `${rankLabel} - ${teamName}`,
+                    value: `Tile: **${teamData.currentTile}**`,
                     inline: true
                 };
             });
