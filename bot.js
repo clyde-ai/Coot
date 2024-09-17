@@ -7,7 +7,7 @@ const axios = require('axios');
 const moment = require('moment');
 const { getEventTime, isEventActive, scheduleEventStartBroadcast } = require('./commands/setEventTime');
 const googleSheets = require('./src/utils/googleSheets');
-const { loadTeamsFromSheet } = require('./commands/createTeam');
+const { loadTeamsFromSheet, getTeams } = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
 const { getEventPassword } = require('./commands/setEventPassword');
@@ -278,6 +278,7 @@ client.on('messageCreate', async message => {
             console.error('Error fetching team data:', error);
             message.channel.send('There was an error fetching the team data. Please try again later.');
         }
+    }
 });
 
 async function fetchRandomGif(tag) {
