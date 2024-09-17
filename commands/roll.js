@@ -70,18 +70,19 @@ module.exports = {
         console.log(`existingTeams: ${existingTeams}`);
         const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
         console.log(`teamRow: ${teamRow}`);
-        let tile = tiles.find(t => t.tileNumber === team.currentTile);
-        let tileDescription = tile ? tile.description : 'No description available';
         if (teamRow) {
             team.currentTile = parseInt(teamRow[4], 10);
             team.canRoll = teamRow[6] === 'TRUE';
         }
         if (team.currentTile !== 0 && !team.canRoll) {
+            team.currentTile = parseInt(teamRow[4], 10);
+            let tile = tiles.find(t => t.tileNumber === team.currentTile);
+            let tileDescription = tile ? tile.description : 'No description available';
             console.log(`team.canRoll: ${team.canRoll}`);
             const { embed } = await createEmbed({
                 command: 'roll',
                 title: `:x: ${teamRole.name} Cannot Roll :x:`,
-                description: `**Your team has not submitted all required proof for tile: ${team.currentTile}**\n ${team.currentTile.description}`,
+                description: `**Your team has not submitted all required proof for tile: ${team.currentTile}**\n ${tileDescription}`,
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
@@ -144,8 +145,8 @@ module.exports = {
         createTeam.resetCanRoll(teamName);
 
         // Get tile description and image
-        tile = tiles.find(t => t.tileNumber === newTile);
-        tileDescription = tile ? tile.description : 'No description available';
+        let tile = tiles.find(t => t.tileNumber === newTile);
+        let tileDescription = tile ? tile.description : 'No description available';
         const tileImage = tile ? tile.image : null;
 
         const memberName = interaction.member.displayName;
