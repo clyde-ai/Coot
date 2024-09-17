@@ -28,8 +28,9 @@ module.exports = {
         console.log(`isEventActive?: ${isEventActive()}`);
 
         const teams = createTeam.getTeams();
+        console.log(`teams: ${JSON.stringify(teams)}`);
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
-        console.log(`teamEntry: ${teamEntry}`)
+        console.log(`teamEntry: ${teamEntry}`);
 
         if (!teamEntry) {
             const { embed } = await createEmbed({

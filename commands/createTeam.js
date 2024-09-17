@@ -33,6 +33,7 @@ function isUserOnAnyTeam(userId) {
 
 async function getTeams() {
     await loadTeamsFromSheet();
+    console.log(`Teams: ${JSON.stringify(teams)}`);
     return teams;
 }
 
