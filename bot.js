@@ -252,7 +252,32 @@ client.on('messageCreate', async message => {
         } else {
             message.reply('Wise Old Man Competition TBD');
         }
-    }
+    } else if (message.content === '!current') {
+        try {
+            // Ensure teams are loaded
+            await createTeam.loadTeamsFromSheet();
+            const teams = createTeam.getTeams();
+    
+            // Sort teams by current tile number in descending order for display purposes only
+            const sortedTeams = Object.entries(teams).sort(([, a], [, b]) => b.currentTile - a.currentTile);
+    
+            // Create an embed message
+            const embed = new Discord.MessageEmbed()
+                .setTitle('Current Team Tiles')
+                .setDescription('Here is the current tile for each team:')
+                .setColor('#8000ff');
+    
+            // Add each team and their current tile to the embed
+            sortedTeams.forEach(([teamName, teamData]) => {
+                embed.addField(teamName, `Current Tile: ${teamData.currentTile}`, true);
+            });
+    
+            // Send the embed message
+            message.channel.send({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error fetching team data:', error);
+            message.channel.send('There was an error fetching the team data. Please try again later.');
+        }
 });
 
 async function fetchRandomGif(tag) {

@@ -78,7 +78,7 @@ module.exports = {
             const { embed } = await createEmbed({
                 command: 'roll',
                 title: `:x: ${teamRole.name} Cannot Roll :x:`,
-                description: `**Your team has not submitted all required proof for tile: ${team.currentTile}**`,
+                description: `**Your team has not submitted all required proof for tile: ${team.currentTile}**\n ${team.currentTile.description}`,
                 color: '#ff0000',
                 channelId: interaction.channelId,
                 messageId: interaction.id,
