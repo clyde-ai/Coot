@@ -50,10 +50,14 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
+        console.log(`adminRoleId: ${adminRoleId}`);
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        console.log(`hasAdminRole: ${hasAdminRole}`);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+        console.log(`hasAdminPermission: ${hasAdminPermission}`);
 
         if (!hasAdminRole || !hasAdminPermission) {
+            console.log(`User does not have admin role or permissions`);
             const { embed } = await createEmbed({
                 command: 'create-team',
                 title: ':x: Access Denied :x:',
