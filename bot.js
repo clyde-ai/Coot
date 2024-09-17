@@ -8,6 +8,7 @@ const moment = require('moment');
 const { getEventTime, isEventActive, scheduleEventStartBroadcast } = require('./commands/setEventTime');
 const googleSheets = require('./src/utils/googleSheets');
 const { loadTeamsFromSheet } = require('./commands/createTeam');
+const createTeam = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
 const { getEventPassword } = require('./commands/setEventPassword');
@@ -238,35 +239,51 @@ client.on('messageCreate', async message => {
         }
     } else if (message.content === '!board') {
         try {
-            const imagePath = path.join(__dirname, 'src/images/other/eventBoard.png');
-
-            const { embed, attachment } = await createEmbed({
-                command: 'board',
-                title: 'Snakes and Ladders Board',
-                description: 'Here is the current Snakes and Ladders board for the event.',
-                imageUrl: imagePath,
-                color: '#00FF00',
-                channelId: message.channel.id,
-                messageId: message.id,
-                client: client
-            });
-
-            const replyOptions = { embeds: [embed] };
-            if (attachment) {
-                replyOptions.files = [attachment];
-            }
-
-            message.channel.send(replyOptions);
+            const imgurLink = 'https://imgur.com/a/0FpCe46';
+    
+            message.channel.send(`Here is the current Snakes and Ladders board for the event: ${imgurLink}`);
         } catch (error) {
-            console.error('Error creating embed:', error);
-            message.channel.send('There was an error creating the event embed.');
-        }
+            console.error('Error sending the board image:', error);
+            message.channel.send('There was an error sending the image. Please try again later.');
+    }
     } else if (message.content === '!wom') {
         const womUrl = process.env.WOM_URL;
         if (womUrl) {
             message.reply(`Check out the Wise Old Man Competition here: ${womUrl}`);
         } else {
             message.reply('Wise Old Man Competition TBD');
+        }
+    } else if (message.content === '!current') {
+        try {
+            // Ensure teams are loaded
+            await createTeam.loadTeamsFromSheet();
+            const teams = createTeam.getTeams();
+    
+            // Sort teams by current tile number in descending order for display purposes only
+            const sortedTeams = Object.entries(teams).sort(([, a], [, b]) => b.currentTile - a.currentTile);
+    
+            // Prepare fields for the embed
+            const fields = sortedTeams.map(([teamName, teamData]) => ({
+                name: teamName,
+                value: `Current Tile: ${teamData.currentTile}`,
+                inline: true
+            }));
+
+            const { embed } = await createEmbed({
+                command: 'current',
+                title: 'Current Team Tiles',
+                description: 'Here are the current tiles for each team:',
+                fields: fields,
+                color: '#8000ff',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
+            });
+            // Send the embed message
+            message.channel.send({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error fetching team data:', error);
+            message.channel.send('There was an error fetching the team data. Please try again later.');
         }
     }
 });

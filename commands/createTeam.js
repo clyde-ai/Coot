@@ -8,31 +8,35 @@ const tiles = require('../src/tiles');
 const teams = {};
 
 async function loadTeamsFromSheet() {
-    try {
-        const rows = await googleSheets.readSheet('Teams!A:G');
-        rows.slice(1).forEach(row => {
-            const [teamName, members, dateCreated, roleId, currentTile, previousTile, canRoll] = row;
-            const memberIds = members.split(', ').map(member => member.split(':')[1]);
-            teams[teamName] = {
-                members: memberIds,
-                roleId: roleId,
-                currentTile: parseInt(currentTile, 10) || 0,
-                previousTile: parseInt(previousTile, 10) || 0,
-                canRoll: canRoll,
-                proofs: {}
-            };
-        });
-    } catch (error) {
-        console.error('Error loading teams from Google Sheets:', error);
-    }
+    return new Promise(async (resolve, reject) => {
+        try {
+            const rows = await googleSheets.readSheet('Teams!A:G');
+            rows.slice(1).forEach(row => {
+                const [teamName, members, dateCreated, roleId, currentTile, previousTile, canRoll] = row;
+                const memberIds = members.split(', ').map(member => member.split(':')[1]);
+                teams[teamName] = {
+                    members: memberIds,
+                    roleId: roleId,
+                    currentTile: parseInt(currentTile, 10) || 0,
+                    previousTile: parseInt(previousTile, 10) || 0,
+                    canRoll: canRoll,
+                    proofs: {}
+                };
+            });
+            console.log('Data read from sheet at range Teams!A:G');
+            resolve();
+        } catch (error) {
+            console.error('Error loading teams from Google Sheets:', error);
+            reject(error);
+        }
+    });
 }
 
 function isUserOnAnyTeam(userId) {
     return Object.values(teams).some(team => team.members.includes(userId));
 }
 
-async function getTeams() {
-    await loadTeamsFromSheet();
+function getTeams() {
     return teams;
 }
 
@@ -50,10 +54,14 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
+        console.log(`adminRoleId: ${adminRoleId}`);
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        console.log(`hasAdminRole: ${hasAdminRole}`);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+        console.log(`hasAdminPermission: ${hasAdminPermission}`);
 
         if (!hasAdminRole && !hasAdminPermission) {
+            console.log(`User does not have admin role or permissions`);
             const { embed } = await createEmbed({
                 command: 'create-team',
                 title: ':x: Access Denied :x:',
@@ -213,24 +221,42 @@ module.exports = {
             await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     },
+    loadTeamsFromSheet,
+    isUserOnAnyTeam,
     getTeams,
-    updateTeamTile(teamName, newTile) {
+    async updateTeamTile(teamName, newTile) {
         if (teams[teamName]) {
             teams[teamName].previousTile = teams[teamName].currentTile;
             teams[teamName].currentTile = newTile;
         }
+        console.log(`Updating Teams Sheet for ${teamName}, previousTile: ${teams[teamName].previousTile}`);
+        console.log(`Updating Teams Sheet for ${teamName}, currentTile: ${teams[teamName].currentTile}`);
+        let existingTeams = await googleSheets.readSheet('Teams!A:G');
+        const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
+        await googleSheets.updateCell(`Teams!F${teamIndex + 1}`, teams[teamName].previousTile);
+        await googleSheets.updateCell(`Teams!E${teamIndex + 1}`, teams[teamName].currentTile);
+        console.log(`Updated Teams Sheet for ${teamName}\n previousTile: ${teams[teamName].previousTile}\n currentTile: ${teams[teamName].currentTile}`);
     },
-    resetCanRoll(teamName) {
+    async resetCanRoll(teamName) {
         if (teams[teamName]) {
             teams[teamName].canRoll = false;
         }
+        console.log(`Updating Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
+        let existingTeams = await googleSheets.readSheet('Teams!A:G');
+        const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
+        await googleSheets.updateCell(`Teams!G${teamIndex + 1}`, teams[teamName].canRoll);
+        console.log(`Updated Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
     },
-    allowRoll(teamName) {
+    async allowRoll(teamName) {
         if (teams[teamName]) {
             teams[teamName].canRoll = true;
         }
-    },
-    loadTeamsFromSheet
+        console.log(`Updating Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
+        let existingTeams = await googleSheets.readSheet('Teams!A:G');
+        const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
+        await googleSheets.updateCell(`Teams!G${teamIndex + 1}`, teams[teamName].canRoll);
+        console.log(`Updated Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
+    }
 };
 
 // Load teams from Google Sheets on startup
