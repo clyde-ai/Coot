@@ -8,23 +8,27 @@ const tiles = require('../src/tiles');
 const teams = {};
 
 async function loadTeamsFromSheet() {
-    try {
-        const rows = await googleSheets.readSheet('Teams!A:G');
-        rows.slice(1).forEach(row => {
-            const [teamName, members, dateCreated, roleId, currentTile, previousTile, canRoll] = row;
-            const memberIds = members.split(', ').map(member => member.split(':')[1]);
-            teams[teamName] = {
-                members: memberIds,
-                roleId: roleId,
-                currentTile: parseInt(currentTile, 10) || 0,
-                previousTile: parseInt(previousTile, 10) || 0,
-                canRoll: canRoll,
-                proofs: {}
-            };
-        });
-    } catch (error) {
-        console.error('Error loading teams from Google Sheets:', error);
-    }
+    return new Promise(async (resolve, reject) => {
+        try {
+            const rows = await googleSheets.readSheet('Teams!A:G');
+            rows.slice(1).forEach(row => {
+                const [teamName, members, dateCreated, roleId, currentTile, previousTile, canRoll] = row;
+                const memberIds = members.split(', ').map(member => member.split(':')[1]);
+                teams[teamName] = {
+                    members: memberIds,
+                    roleId: roleId,
+                    currentTile: parseInt(currentTile, 10) || 0,
+                    previousTile: parseInt(previousTile, 10) || 0,
+                    canRoll: canRoll,
+                    proofs: {}
+                };
+            });
+            resolve();
+        } catch (error) {
+            console.error('Error loading teams from Google Sheets:', error);
+            reject(error);
+        }
+    });
 }
 
 function isUserOnAnyTeam(userId) {
