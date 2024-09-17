@@ -70,6 +70,8 @@ module.exports = {
         console.log(`existingTeams: ${existingTeams}`);
         const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
         console.log(`teamRow: ${teamRow}`);
+        let tile = tiles.find(t => t.tileNumber === team.currentTile);
+        let tileDescription = tile ? tile.description : 'No description available';
         if (teamRow) {
             team.currentTile = parseInt(teamRow[4], 10);
             team.canRoll = teamRow[6] === 'TRUE';
@@ -142,8 +144,8 @@ module.exports = {
         createTeam.resetCanRoll(teamName);
 
         // Get tile description and image
-        const tile = tiles.find(t => t.tileNumber === newTile);
-        const tileDescription = tile ? tile.description : 'No description available';
+        tile = tiles.find(t => t.tileNumber === newTile);
+        tileDescription = tile ? tile.description : 'No description available';
         const tileImage = tile ? tile.image : null;
 
         const memberName = interaction.member.displayName;
