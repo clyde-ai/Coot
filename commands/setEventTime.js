@@ -35,8 +35,7 @@ async function getEventTime() {
     }
 }
 
-async function isEventActive() {
-    [global.eventStartTime, global.eventEndTime] = await getEventTime();
+function isEventActive() {
     const now = moment.utc().toISOString(); // Ensure current time is in UTC
     return global.eventStartTime && global.eventEndTime && now >= global.eventStartTime && now <= global.eventEndTime;
 }
