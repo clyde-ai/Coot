@@ -238,26 +238,13 @@ client.on('messageCreate', async message => {
         }
     } else if (message.content === '!board') {
         try {
-            const imageUrl = 'https://imgur.com/a/0FpCe46';
+            const imgurLink = 'https://imgur.com/a/0FpCe46';
     
-            const { embed } = await createEmbed({
-                command: 'board',
-                title: 'Snakes and Ladders Board',
-                description: 'Here is the current Snakes and Ladders board for the event.',
-                imageUrl: imageUrl,
-                color: '#00FF00',
-                channelId: message.channel.id,
-                messageId: message.id,
-                client: client
-            });
-    
-            message.channel.send({ embeds: [embed] });
-
-            message.channel.send(replyOptions);
+            message.channel.send(`Here is the current Snakes and Ladders board for the event: ${imgurLink}`);
         } catch (error) {
-            console.error('Error creating embed:', error);
-            message.channel.send('There was an error creating the event embed.');
-        }
+            console.error('Error sending the board image:', error);
+            message.channel.send('There was an error sending the image. Please try again later.');
+    }
     } else if (message.content === '!wom') {
         const womUrl = process.env.WOM_URL;
         if (womUrl) {
