@@ -78,6 +78,10 @@ module.exports = {
             team.canRoll = teamRow[6] === 'TRUE';
         }
         if (team.currentTile !== 0 && !team.canRoll) {
+            team.currentTile = parseInt(teamRow[4], 10);
+            let tile = tiles.find(t => t.tileNumber === team.currentTile);
+            let tileDescription = tile ? tile.description : 'No description available';
+            console.log(`team.canRoll: ${team.canRoll}`);
             const { embed } = await createEmbed({
                 command: 'roll',
                 title: `:x: ${teamRole.name} Cannot Roll :x:`,
