@@ -174,8 +174,9 @@ module.exports = {
                     const imagesSubmitted = team.proofs[tileNumber].length;
 
                     if (imagesSubmitted >= imagesNeeded) {
-                        console.log(`${teamName} can now roll.`);
+                        console.log(`Updating ${teamName} to be able to roll.`);
                         team.canRoll = true;
+                        await allowRoll(teamName);
                     }
 
                     const userMention = `<@${interaction.user.id}>`;
