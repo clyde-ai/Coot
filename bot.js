@@ -262,12 +262,30 @@ client.on('messageCreate', async message => {
             // Sort teams by current tile number in descending order for display purposes only
             const sortedTeams = Object.entries(teams).sort(([, a], [, b]) => b.currentTile - a.currentTile);
     
-            // Prepare fields for the embed
-            const fields = sortedTeams.map(([teamName, teamData]) => ({
-                name: teamName,
-                value: `Current Tile: ${teamData.currentTile}`,
-                inline: true
-            }));
+            // Prepare fields for the embed with trophy emojis for the top 3 teams and on
+            const fields = sortedTeams.map(([teamName, teamData], index) => {
+                let rankLabel = '';
+                switch (index) {
+                    case 0:
+                        rankLabel = '🥇 1st';
+                        break;
+                    case 1:
+                        rankLabel = '🥈 2nd';
+                        break;
+                    case 2:
+                        rankLabel = '🥉 3rd';
+                        break;
+                    default:
+                        rankLabel = `${index + 1}th`;
+                        break;
+                }
+            
+                return {
+                    name: `${rankLabel}: ${teamName}`,
+                    value: `Tile: **${teamData.currentTile}**`,
+                    inline: true
+                };
+            });
 
             const { embed } = await createEmbed({
                 command: 'current',
