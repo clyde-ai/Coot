@@ -49,8 +49,6 @@ module.exports = {
                 .setDescription('The members to add to the team (mention them)')
                 .setRequired(true)),
     async execute(interaction) {
-        let user = interaction.member;
-        await guild.members.fetch({user, force: true});
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         console.log(`adminRoleId: ${adminRoleId}`);
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
