@@ -11,6 +11,9 @@ module.exports = {
         .setName('roll')
         .setDescription('Roll a 6-sided dice'),
     async execute(interaction) {
+        // Defer the reply to give more time for processing
+        await interaction.deferReply();
+
         // Check if the event is active
         const { eventStartTime, eventEndTime } = await getEventTime();
         if (!isEventActive()) {
@@ -23,7 +26,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
         console.log(`isEventActive?: ${isEventActive()}`);
 
@@ -43,14 +46,14 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
 
         const [teamName, team] = teamEntry;
         const teamRole = interaction.guild.roles.cache.get(team.roleId);
         const teamRoleMention = `<@&${team.roleId}>`;
 
-        // Fetch the current tile from the Teams sheet
+        // Fetch the current tile and canRoll status from the Teams sheet
         let existingTeams;
         try {
             existingTeams = await googleSheets.readSheet('Teams!A:G');
@@ -65,7 +68,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
         console.log(`existingTeams: ${existingTeams}`);
         const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
@@ -75,10 +78,6 @@ module.exports = {
             team.canRoll = teamRow[6] === 'TRUE';
         }
         if (team.currentTile !== 0 && !team.canRoll) {
-            team.currentTile = parseInt(teamRow[4], 10);
-            let tile = tiles.find(t => t.tileNumber === team.currentTile);
-            let tileDescription = tile ? tile.description : 'No description available';
-            console.log(`team.canRoll: ${team.canRoll}`);
             const { embed } = await createEmbed({
                 command: 'roll',
                 title: `:x: ${teamRole.name} Cannot Roll :x:`,
@@ -88,7 +87,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
 
         const roll = Math.floor(Math.random() * 6) + 1;
@@ -122,7 +121,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed] });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
 
         // Check for ladders and snakes
@@ -191,7 +190,8 @@ module.exports = {
             if (attachment) {
                 replyOptions.files = [attachment];
             }
-            await interaction.reply(replyOptions);
+
+            interaction.editReply(replyOptions);
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
