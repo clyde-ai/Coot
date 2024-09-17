@@ -274,7 +274,7 @@ client.on('messageCreate', async message => {
                 title: 'Current Team Tiles',
                 description: 'Here are the current tiles for each team:',
                 fields: fields,
-                color: '##8000ff',
+                color: '#8000ff',
                 channelId: message.channel.id,
                 messageId: message.id,
                 client: client
