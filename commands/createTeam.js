@@ -242,7 +242,7 @@ module.exports = {
         console.log(`Updating Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
         let existingTeams = await googleSheets.readSheet('Teams!A:G');
         const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
-        await googleSheets.updateSheet('Teams', `A${teamIndex + 1}:G${teamIndex + 1}`, teamData);
+        await googleSheets.updateCell('Teams', `G${teamIndex}`, teams[teamName].canRoll);
         console.log(`Updated Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
     }
 };
