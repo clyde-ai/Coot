@@ -7,6 +7,7 @@ const axios = require('axios');
 const moment = require('moment');
 const { getEventTime, isEventActive, scheduleEventStartBroadcast } = require('./commands/setEventTime');
 const googleSheets = require('./src/utils/googleSheets');
+const { loadTeamsFromSheet } = require('./commands/createTeam');
 const createTeam = require('./commands/createTeam');
 const { getSnakes } = require('./commands/createSnake');
 const { getLadders } = require('./commands/createLadder');
