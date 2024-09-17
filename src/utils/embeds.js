@@ -53,7 +53,7 @@ async function createEmbed({
                     attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 } else if (command === 'board') {
-                    const resizedImageBuffer = await resizeImage(imageUrl, 2800, 3850);
+                    const resizedImageBuffer = await resizeImage(imageUrl, 2800, 5600);
                     attachment = new AttachmentBuilder(resizedImageBuffer, { name: path.basename(imageUrl) });
                     embed.setImage(`attachment://${path.basename(imageUrl)}`);
                 } else {
