@@ -25,9 +25,11 @@ module.exports = {
             });
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
+        console.log(`isEventActive?: ${isEventActive()}`);
 
         const teams = createTeam.getTeams();
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
+        console.log(`teamEntry: ${teamEntry}`)
 
         if (!teamEntry) {
             const { embed } = await createEmbed({
