@@ -265,7 +265,7 @@ client.on('messageCreate', async message => {
             // Prepare fields for the embed
             const fields = sortedTeams.map(([teamName, teamData]) => ({
                 name: teamName,
-                value: `Current Tile: ${teamData.currentTile}`,
+                value: `Current Tile: ${teamData.currentTile}\n${teamData.currentTile.description}`,
                 inline: true
             }));
 
