@@ -10,11 +10,11 @@ module.exports = {
         .setDescription('Create a ladder with a bottom and top tile number')
         .addIntegerOption(option => 
             option.setName('bottom')
-                .setDescription('The bottom tile number of the ladder')
+                .setDescription('The bottom tile number of the ladder (e.g. 10)')
                 .setRequired(true))
         .addIntegerOption(option => 
             option.setName('top')
-                .setDescription('The top tile number of the ladder')
+                .setDescription('The top tile number of the ladder (e.g. 15)')
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;

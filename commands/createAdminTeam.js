@@ -9,7 +9,7 @@ module.exports = {
         .setDescription('Create an admin team with specified members')
         .addStringOption(option => 
             option.setName('members')
-                .setDescription('The members to add to the admin team (mention them)')
+                .setDescription('The members to add to the admin team (e.g. @mention @cool-name @coot)')
                 .setRequired(true)),
     async execute(interaction) {
         const adminRoleId = process.env.ADMIN_ROLE_ID;
