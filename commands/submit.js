@@ -176,7 +176,7 @@ module.exports = {
                     if (imagesSubmitted >= imagesNeeded) {
                         console.log(`Updating ${teamName} to be able to roll.`);
                         team.canRoll = true;
-                        await allowRoll(teamName);
+                        await createTeam.allowRoll(teamName);
                     }
 
                     const userMention = `<@${interaction.user.id}>`;
