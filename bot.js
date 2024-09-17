@@ -281,7 +281,7 @@ client.on('messageCreate', async message => {
                 }
             
                 return {
-                    name: `${rankLabel} - ${teamName}`,
+                    name: `${rankLabel}: ${teamName}`,
                     value: `Tile: **${teamData.currentTile}**`,
                     inline: true
                 };
