@@ -54,12 +54,6 @@ module.exports = {
         let existingTeams;
         try {
             existingTeams = await googleSheets.readSheet('Teams!A:G');
-            const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
-            if (teamRow) {
-                team.currentTile = parseInt(teamRow[4], 10);
-            } else {
-                throw new Error('Team not found in Google Sheets');
-            }
         } catch (error) {
             console.error(`Error reading from Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
@@ -73,8 +67,15 @@ module.exports = {
             });
             return interaction.reply({ embeds: [embed] });
         }
-
+        console.log(`existingTeams: ${existingTeams}`);
+        const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
+        console.log(`teamRow: ${teamRow}`);
+        if (teamRow) {
+            team.currentTile = parseInt(teamRow[4], 10);
+            team.canRoll = teamRow[6] === 'TRUE';
+        }
         if (team.currentTile !== 0 && !team.canRoll) {
+            console.log(`team.canRoll: ${team.canRoll}`);
             const { embed } = await createEmbed({
                 command: 'roll',
                 title: `:x: ${teamRole.name} Cannot Roll :x:`,
