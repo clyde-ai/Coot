@@ -49,13 +49,12 @@ module.exports = {
                 .setDescription('The members to add to the team (mention them)')
                 .setRequired(true)),
     async execute(interaction) {
-        let user = interaction.member;
-        await guild.members.fetch({user, force: true});
+        let member = (await guild.members.fetch({ user: user.discord_id, force: true }));
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         console.log(`adminRoleId: ${adminRoleId}`);
-        const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
+        const hasAdminRole = member.roles.cache.has(adminRoleId);
         console.log(`hasAdminRole: ${hasAdminRole}`);
-        const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
+        const hasAdminPermission = member.permissions.has(PermissionsBitField.Flags.Administrator);
         console.log(`hasAdminPermission: ${hasAdminPermission}`);
 
         if (!hasAdminRole || !hasAdminPermission) {
