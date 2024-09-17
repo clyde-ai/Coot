@@ -224,16 +224,28 @@ module.exports = {
     loadTeamsFromSheet,
     isUserOnAnyTeam,
     getTeams,
-    updateTeamTile(teamName, newTile) {
+    async updateTeamTile(teamName, newTile) {
         if (teams[teamName]) {
             teams[teamName].previousTile = teams[teamName].currentTile;
             teams[teamName].currentTile = newTile;
         }
+        console.log(`Updating Teams Sheet for ${teamName}, previousTile: ${teams[teamName].previousTile}`);
+        console.log(`Updating Teams Sheet for ${teamName}, currentTile: ${teams[teamName].currentTile}`);
+        let existingTeams = await googleSheets.readSheet('Teams!A:G');
+        const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
+        await googleSheets.updateCell(`Teams!F${teamIndex + 1}`, teams[teamName].previousTile);
+        await googleSheets.updateCell(`Teams!E${teamIndex + 1}`, teams[teamName].currentTile);
+        console.log(`Updated Teams Sheet for ${teamName}\n previousTile: ${teams[teamName].previousTile}\n currentTile: ${teams[teamName].currentTile}`);
     },
-    resetCanRoll(teamName) {
+    async resetCanRoll(teamName) {
         if (teams[teamName]) {
             teams[teamName].canRoll = false;
         }
+        console.log(`Updating Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
+        let existingTeams = await googleSheets.readSheet('Teams!A:G');
+        const teamIndex = existingTeams.slice(1).findIndex(row => row[0] === teamName) + 1;
+        await googleSheets.updateCell(`Teams!G${teamIndex + 1}`, teams[teamName].canRoll);
+        console.log(`Updated Teams Sheet for ${teamName}, canRoll: ${teams[teamName].canRoll}`);
     },
     async allowRoll(teamName) {
         if (teams[teamName]) {

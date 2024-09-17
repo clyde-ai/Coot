@@ -141,8 +141,8 @@ module.exports = {
         }
 
         const previousTile = team.currentTile;
-        createTeam.updateTeamTile(teamName, newTile);
-        createTeam.resetCanRoll(teamName);
+        await createTeam.updateTeamTile(teamName, newTile);
+        await createTeam.resetCanRoll(teamName);
 
         // Get tile description and image
         let tile = tiles.find(t => t.tileNumber === newTile);
