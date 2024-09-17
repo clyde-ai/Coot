@@ -262,17 +262,23 @@ client.on('messageCreate', async message => {
             // Sort teams by current tile number in descending order for display purposes only
             const sortedTeams = Object.entries(teams).sort(([, a], [, b]) => b.currentTile - a.currentTile);
     
-            // Create an embed message
-            const embed = new Discord.MessageEmbed()
-                .setTitle('Current Team Tiles')
-                .setDescription('Here is the current tile for each team:')
-                .setColor('#8000ff');
-    
-            // Add each team and their current tile to the embed
-            sortedTeams.forEach(([teamName, teamData]) => {
-                embed.addField(teamName, `Current Tile: ${teamData.currentTile}`, true);
+            // Prepare fields for the embed
+            const fields = sortedTeams.map(([teamName, teamData]) => ({
+                name: teamName,
+                value: `Current Tile: ${teamData.currentTile}`,
+                inline: true
+            }));
+
+            const { embed } = await createEmbed({
+                command: 'current',
+                title: 'Current Team Tiles',
+                description: 'Here are the current tiles for each team:',
+                fields: fields,
+                color: '##8000ff',
+                channelId: message.channel.id,
+                messageId: message.id,
+                client: client
             });
-    
             // Send the embed message
             message.channel.send({ embeds: [embed] });
         } catch (error) {
