@@ -27,6 +27,7 @@ module.exports = {
         }
         console.log(`isEventActive?: ${isEventActive()}`);
 
+        await createTeam.loadTeamsFromSheet();
         const teams = createTeam.getTeams();
         console.log(`teams: ${JSON.stringify(teams)}`);
         const teamEntry = Object.entries(teams).find(([_, t]) => t.members.includes(interaction.user.id));
