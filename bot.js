@@ -238,23 +238,20 @@ client.on('messageCreate', async message => {
         }
     } else if (message.content === '!board') {
         try {
-            const imagePath = path.join(__dirname, 'src/images/other/eventBoard.png');
-
-            const { embed, attachment } = await createEmbed({
+            const imageUrl = 'https://imgur.com/a/0FpCe46';
+    
+            const { embed } = await createEmbed({
                 command: 'board',
                 title: 'Snakes and Ladders Board',
                 description: 'Here is the current Snakes and Ladders board for the event.',
-                imageUrl: imagePath,
+                imageUrl: imageUrl,
                 color: '#00FF00',
                 channelId: message.channel.id,
                 messageId: message.id,
                 client: client
             });
-
-            const replyOptions = { embeds: [embed] };
-            if (attachment) {
-                replyOptions.files = [attachment];
-            }
+    
+            message.channel.send({ embeds: [embed] });
 
             message.channel.send(replyOptions);
         } catch (error) {
