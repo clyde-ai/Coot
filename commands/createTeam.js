@@ -56,7 +56,7 @@ module.exports = {
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
         console.log(`hasAdminPermission: ${hasAdminPermission}`);
 
-        if (!hasAdminRole || !hasAdminPermission) {
+        if (!hasAdminRole && !hasAdminPermission) {
             console.log(`User does not have admin role or permissions`);
             const { embed } = await createEmbed({
                 command: 'create-team',
