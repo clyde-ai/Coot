@@ -15,10 +15,11 @@ module.exports = {
                 .setDescription('The name of the team to delete or "ALL" to delete all teams')
                 .setRequired(true)),
     async execute(interaction) {
+        // Check for admin role or admin permissions
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
-
+        // Reply with Access Denied due to no admin role or permissions
         if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'clear-team',
@@ -31,10 +32,10 @@ module.exports = {
             });
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
-
+        // Assign value from interation for team name
         const teamName = interaction.options.getString('teamname');
 
-        // Load teams from Google Sheets
+        // Load current teams from Teams Google Sheet
         await loadTeamsFromSheet();
         teams = await getTeams();
 

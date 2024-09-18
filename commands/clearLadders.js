@@ -8,10 +8,11 @@ module.exports = {
         .setName('clear-ladders')
         .setDescription('Removes all ladders from the board'),
     async execute(interaction) {
+        // Check for admin role or admin permissions
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
         const hasAdminPermission = interaction.member.permissions.has(PermissionsBitField.Flags.Administrator);
-
+        // Reply with Access Denied due to no admin role or permissions
         if (!hasAdminRole && !hasAdminPermission) {
             const { embed } = await createEmbed({
                 command: 'clear-ladders',
@@ -21,7 +22,7 @@ module.exports = {
             });
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
-
+        // Clear ladders and reply
         try {
             await clearLadders();
 
