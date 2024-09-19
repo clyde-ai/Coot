@@ -38,9 +38,8 @@ module.exports = {
         // Load current teams from Teams Google Sheet
         await loadTeamsFromSheet();
         teams = await getTeams();
-
+        // Delete all teams
         if (teamName.toUpperCase() === 'ALL') {
-            // Delete all teams
             for (const team in teams) {
                 const role = interaction.guild.roles.cache.get(teams[team].roleId);
                 if (role) {
@@ -54,7 +53,6 @@ module.exports = {
                 }
                 delete teams[team];
             }
-
             // Clear the Google Sheet
             try {
                 await googleSheets.clearSheet('Teams!A2:G');
@@ -69,6 +67,7 @@ module.exports = {
                 });
                 return interaction.reply({ embeds: [embed] });
             } catch (error) {
+                // Reply if Google Sheets update error
                 console.error(`Error updating Google Sheets: ${error.message}`);
                 const { embed } = await createEmbed({
                     command: 'clear-team',
@@ -84,7 +83,7 @@ module.exports = {
         } else {
             // Delete a specific team
             const team = teams[teamName];
-
+            // Reply if team does not exist
             if (!team) {
                 const { embed } = await createEmbed({
                     command: 'clear-team',
@@ -97,7 +96,7 @@ module.exports = {
                 });
                 return interaction.reply({ embeds: [embed], ephemeral: true });
             }
-
+            // Rply if team role is not found
             const role = interaction.guild.roles.cache.get(team.roleId);
             if (!role) {
                 const { embed } = await createEmbed({
@@ -148,6 +147,7 @@ module.exports = {
 
                 await interaction.reply({ embeds: [embed] });
             } catch (error) {
+                // Reply if Google Sheets update error
                 console.error(`Error updating Google Sheets: ${error.message}`);
                 const { embed } = await createEmbed({
                     command: 'clear-team',
