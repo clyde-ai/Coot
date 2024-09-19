@@ -185,16 +185,16 @@ module.exports = {
 
             const legacyEmoji = "<:Legacy:957020131924525066>";
 
-            let description = `${userMention} rolled **${roll}**. ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+            let description = `${userMention} rolled **${roll}**.\n ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
 
             if (landedOnLadder) {
                 const randomPhrase = ladderPhrases[Math.floor(Math.random() * ladderPhrases.length)];
-                description = `${userMention} rolled **${roll}** ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n You moved to a ladder! :ladder:\n After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+                description = `${userMention} rolled **${roll}**.\n ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n :ladder: You moved to a ladder! :ladder:\n After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
                 const randomPhrase = ladderPhrases[Math.floor(Math.random() * snakePhrases.length)];
-                description = `${userMention} rolled **${roll}** ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n You landed on the head of a snake! :snake:\n Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+                description = `${userMention} rolled **${roll}**.\n ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n :snake: You landed on the head of a snake! :snake:\n Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (newTile === lastTile) {
-                description = `${userMention} rolled the last roll! ${legacyEmoji}${teamRoleMention} moves to the final tile **${newTile}**.${legacyEmoji}\n **${tileDescription}**`;
+                description = `${userMention} rolled the last roll!\n ${legacyEmoji}${teamRoleMention} moves to the final tile **${newTile}**.${legacyEmoji}\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
