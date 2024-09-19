@@ -170,13 +170,31 @@ module.exports = {
                 await googleSheets.updateSheet('Teams', `F${teamIndex + 1}`, [previousTile]); // Update previousTile in the sixth column
             }
 
+            const ladderPhrases = [
+                "Sam and Shordi are on your team",
+                "Got a Renatus Discount Boost",
+                "Auto-Leviathan prayers activated",
+                "@ angry iron man"
+            ];
+
+            const snakePhrases = [
+                "Legacy Crabs",
+                "100 purples to get a Shadow",
+                "No 99 No Gz",
+            ];
+
+            const legacyEmoji = "<:Legacy:957020131924525066>";
+
             let description = `${userMention} rolled **${roll}**. ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+
             if (landedOnLadder) {
-                description = `${userMention} rolled **${roll}** and landed on a ladder! :ladder: After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+                const randomPhrase = ladderPhrases[Math.floor(Math.random() * ladderPhrases.length)];
+                description = `${userMention} rolled **${roll}** ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n You moved to a ladder! :ladder:\n After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
-                description = `${userMention} rolled **${roll}** and landed on the head of a snake! :snake: Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
+                const randomPhrase = ladderPhrases[Math.floor(Math.random() * snakePhrases.length)];
+                description = `${userMention} rolled **${roll}** ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n You landed on the head of a snake! :snake:\n Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (newTile === lastTile) {
-                description = `${userMention} rolled the last roll! ${teamRoleMention} moves to the final tile **${newTile}**.\n **${tileDescription}**`;
+                description = `${userMention} rolled the last roll! ${legacyEmoji}${teamRoleMention} moves to the final tile **${newTile}**.${legacyEmoji}\n **${tileDescription}**`;
             }
 
             const { embed, attachment } = await createEmbed({
