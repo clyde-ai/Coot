@@ -128,7 +128,7 @@ module.exports = {
 
             const eventPassword = await getEventPassword();
             const tile = tiles.find(t => t.tileNumber === tileNumber);
-            const dropMessage = tile ? tile.dropMessage : '';
+            const dropMessage = tile ? tile.dropMessages : [];
 
             const rows = text.split('\n');
             let eventPasswordFound = false;
@@ -141,10 +141,14 @@ module.exports = {
                     console.log(`Detected Event Password: ${row} === ${eventPassword}`);
                     eventPasswordFound = true;
                 }
-                if (dropMessage !== '' && row.includes(dropMessage)) {
-                    console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
-                    dropMessageFound = true;
+                for (const dropMessage of dropMessages) {
+                    if (dropMessage !== '' && row.includes(dropMessage)) {
+                        console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
+                        dropMessageFound = true;
+                        break; // Exit the loop once a drop message is found
+                    }
                 }
+                if (dropMessageFound) break; // Exit the outer loop if a drop message is found
             }
 
             const lastTile = Math.max(...tiles.map(t => t.tileNumber));
