@@ -137,9 +137,10 @@ Requires Discord Server Administrator or self defined Admin Role from environmen
 `teamName` (string) *required*: The name of the team to reroll for.
 
 #### /review
-**Description:** Rerolls a 6-sided dice for a specified team.
+**Description:** Review a player submission using the Submission Link in the Submissions Sheet, writes to the Submissions Sheet with who reviewed the submission and if it was approved or denied. This command will reply to the old submission with the review, and you can re-review submissions if you wish. *Ex: Approve a previously denied submission*
 **Parameters:** 
-`teamName` (string) *required*: The name of the team to reroll for.
+`link` (string) *required*: The Submission Link from the Submissions Sheet.
+`action` (approve/deny) *required*: Approve or Deny the submission.
 
 #### /set-event-password
 **Description:** Sets the password that is used for submitting drops during the event.
