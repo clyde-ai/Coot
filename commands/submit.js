@@ -128,20 +128,20 @@ module.exports = {
 
             const eventPassword = await getEventPassword();
             const tile = tiles.find(t => t.tileNumber === tileNumber);
-            const dropMessage = tile ? tile.dropMessage : [];
+            const dropMessages = tile ? tile.dropMessage : [];
 
             const rows = text.split('\n');
             let eventPasswordFound = false;
             let dropMessageFound = false;
 
-            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessage}, Tile: ${tile.tileNumber}`);
+            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessages}, Tile: ${tile.tileNumber}`);
 
             for (const row of rows) {
                 if (row.includes(eventPassword)) {
                     console.log(`Detected Event Password: ${row} === ${eventPassword}`);
                     eventPasswordFound = true;
                 }
-                for (const dropMessage of dropMessage) {
+                for (const dropMessage of dropMessages) {
                     if (dropMessage !== '' && row.includes(dropMessage)) {
                         console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
                         dropMessageFound = true;
