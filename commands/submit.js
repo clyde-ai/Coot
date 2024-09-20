@@ -39,8 +39,8 @@ module.exports = {
                 .setDescription('Proof of tile completion (image)')
                 .setRequired(true)),
     async execute(interaction) {
-
         await interaction.deferReply();
+
         // Check if the event is active
         const { eventStartTime, eventEndTime } = await getEventTime();
         if (!isEventActive()) {
@@ -53,9 +53,8 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            const reply = await interaction.reply({ embeds: [embed], ephemeral: true, fetchReply: true });
-            const messageId = reply.id;
-            
+            const response = await interaction.reply({ embeds: [embed], ephemeral: true, fetchReply: true });
+            const messageId = response.id;
             return;
         }
 
@@ -74,9 +73,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            const reply = await interaction.editReply({ embeds: [embed], fetchReply: true });
-            const messageId = reply.id;
-
+            await interaction.editReply({ embeds: [embed], fetchReply: true });
             return;
         }
 
@@ -85,7 +82,7 @@ module.exports = {
         // Fetch the current tile from the Teams sheet
         let existingTeams;
         try {
-            existingTeams = await googleSheets.readSheet('Teams!A:G');
+            existingTeams = await makeRequestWithRetry(() => googleSheets.readSheet('Teams!A:G'));
             const teamRow = existingTeams.slice(1).find(row => row[0] === teamName);
             if (teamRow) {
                 team.currentTile = parseInt(teamRow[4], 10);
@@ -103,9 +100,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            const reply = await interaction.editReply({ embeds: [embed], fetchReply: true });
-            const messageId = reply.id;
-
+            await interaction.editReply({ embeds: [embed], fetchReply: true });
             return;
         }
 
@@ -113,7 +108,7 @@ module.exports = {
 
         try {
             // Download the image with increased timeout
-            const response = await fetch(proofAttachment.url, { timeout: 20000 });
+            const response = await makeRequestWithRetry(() => fetch(proofAttachment.url, { timeout: 20000 }));
             const imageBuffer = await response.buffer();
 
             // Preprocess the image
@@ -123,7 +118,7 @@ module.exports = {
                 .toBuffer();
 
             // Perform OCR on the image using Google Cloud Vision API
-            const [result] = await client.textDetection(processedImageBuffer);
+            const [result] = await makeRequestWithRetry(() => client.textDetection(processedImageBuffer));
             const detections = result.textAnnotations;
             const text = detections.length ? detections[0].description : '';
 
@@ -169,7 +164,6 @@ module.exports = {
             // event password or drop message not found
             if (!eventPasswordFound || (!dropMessageFound && dropMessages !== '')) {
                 console.log(`Google Vision API - Did not detect BOTH password and drop message. eventPasswordFound: ${eventPasswordFound}, dropMessageFound: ${dropMessageFound}`);
-                //console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
                 const attempts = failedAttempts.get(userId) || 0;
 
@@ -310,3 +304,19 @@ module.exports = {
         }
     },
 };
+
+async function makeRequestWithRetry(requestFn, retries = 5) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await requestFn();
+        } catch (error) {
+            if (error.response && error.response.status === 503 && i < retries - 1) {
+                const delay = Math.pow(2, i) * 1000;
+                console.log(`Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            } else {
+                throw error;
+            }
+        }
+    }
+}
