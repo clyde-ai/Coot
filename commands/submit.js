@@ -128,27 +128,32 @@ module.exports = {
 
             const eventPassword = await getEventPassword();
             const tile = tiles.find(t => t.tileNumber === tileNumber);
-            const dropMessage = tile ? tile.dropMessage : [];
+            const dropMessages = tile ? tile.dropMessage : [];
 
             const rows = text.split('\n');
+            const dropMessageRows = text.split('\n');
+            console.log(`dropMessageRows: ${dropMessageRows}`);
             let eventPasswordFound = false;
             let dropMessageFound = false;
 
-            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessage}, Tile: ${tile.tileNumber}`);
+            console.log(`PW: ${eventPassword}, DropMsg: ${dropMessages}, Tile: ${tile.tileNumber}`);
 
             for (const row of rows) {
                 if (row.includes(eventPassword)) {
                     console.log(`Detected Event Password: ${row} === ${eventPassword}`);
                     eventPasswordFound = true;
-                }
-                for (const dropMessage of dropMessage) {
-                    if (dropMessage !== '' && row.includes(dropMessage)) {
-                        console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
-                        dropMessageFound = true;
-                        break; // Exit the loop once a drop message is found
+            
+                    // Only search for dropMessage if eventPassword is found
+                    for (const dropMessage of dropMessageRows) {
+                        console.log(`dropMessage: ${dropMessage}`);
+                        if (dropMessages.includes(dropMessage)) {
+                            console.log(`Detected Drop Message: ${dropMessage}`);
+                            dropMessageFound = true;
+                            break; // Exit the loop once a drop message is found
+                        }
                     }
+                    if (dropMessageFound) break; // Exit the outer loop if a drop message is found
                 }
-                if (dropMessageFound) break; // Exit the outer loop if a drop message is found
             }
 
             const lastTile = Math.max(...tiles.map(t => t.tileNumber));
@@ -161,7 +166,7 @@ module.exports = {
             }
 
             // event password or drop message not found
-            if (!eventPasswordFound || (!dropMessageFound && dropMessage !== '')) {
+            if (!eventPasswordFound || (!dropMessageFound && dropMessages !== '')) {
                 console.log(`Google Vision API - Did not detect BOTH password and drop message. eventPasswordFound: ${eventPasswordFound}, dropMessageFound: ${dropMessageFound}`);
                 //console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
@@ -246,6 +251,12 @@ module.exports = {
 
                 const imagesNeeded = tile ? tile.imagesNeeded : 1;
                 const imagesSubmitted = team.proofs[tileNumber].length;
+
+                if (imagesSubmitted >= imagesNeeded) {
+                    console.log(`Updating ${teamName} to be able to roll.`);
+                    team.canRoll = true;
+                    await createTeam.allowRoll(teamName);
+                }
 
                 const userMention = `<@${interaction.user.id}>`;
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
