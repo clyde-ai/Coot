@@ -126,7 +126,7 @@ Requires Discord Server Administrator or self defined Admin Role from environmen
 `tail` (int) *required*: The tail tile number of the snake. Must be lower than head.
 
 #### /create-team
-**Description:** Creates or edits an existing team with specified members, writes to the Teams Sheet. Also creates, assigns and removes custom team role. Role name format: {Team TeamName}
+**Description:** Creates or edits an existing team with specified members, writes to the Teams Sheet. Also creates, assigns and removes custom team role. Role name format: {Team TeamName}. This command must be used in a channel where your @mentions are visible to the bot.
 **Parameters:** 
 `teamName` (string) *required*: The name of the team.
 `members` (@user) *required*: The members to add to the team. @Mention the members in the format <@user_id>. 1-10 members can be assigned to a single team at once.
