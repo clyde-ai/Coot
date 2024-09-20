@@ -529,7 +529,7 @@ const tiles = [
         description: 'Any Nex Unique',
         image: 'src/images/76.png',
         imagesNeeded: 1,
-        dropMessage: ['']
+        dropMessage: ['Zaryte vambraces', 'Nihil horn', 'Torva full helm (damaged)', 'Torva platebody (damaged)', 'Torva platelegs (damaged)', 'Ancient hilt', 'Nexling']
     },
     {
         tileNumber: 77,
