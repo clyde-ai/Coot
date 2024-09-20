@@ -146,7 +146,7 @@ module.exports = {
                     // Only search for dropMessage if eventPassword is found
                     for (const dropMessage of dropMessageRows) {
                         console.log(`dropMessage: ${dropMessage}`);
-                        if (dropMessage.includes(dropMessages)) {
+                        if (dropMessages.includes(dropMessage)) {
                             console.log(`Detected Drop Message: ${dropMessage}`);
                             dropMessageFound = true;
                             break; // Exit the loop once a drop message is found
