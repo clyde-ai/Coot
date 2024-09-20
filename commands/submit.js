@@ -249,6 +249,12 @@ module.exports = {
                 const imagesNeeded = tile ? tile.imagesNeeded : 1;
                 const imagesSubmitted = team.proofs[tileNumber].length;
 
+                if (imagesSubmitted >= imagesNeeded) {
+                    console.log(`Updating ${teamName} to be able to roll.`);
+                    team.canRoll = true;
+                    await createTeam.allowRoll(teamName);
+                }
+
                 const userMention = `<@${interaction.user.id}>`;
                 const teamRoleMention = interaction.guild.roles.cache.find(role => role.name === `Team ${teamName}`);
                 const memberName = interaction.member.displayName;
