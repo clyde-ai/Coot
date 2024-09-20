@@ -225,7 +225,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
         }
     },
 };

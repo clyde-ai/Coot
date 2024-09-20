@@ -53,6 +53,9 @@ module.exports = {
                 .setDescription('The members to add to the team (e.g. @mention @cool-name @coot)')
                 .setRequired(true)),
     async execute(interaction) {
+        // Defer the reply to give more time for processing
+        await interaction.deferReply();
+
         const adminRoleId = process.env.ADMIN_ROLE_ID;
         console.log(`adminRoleId: ${adminRoleId}`);
         const hasAdminRole = interaction.member.roles.cache.has(adminRoleId);
@@ -71,7 +74,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
 
         const teamName = interaction.options.getString('teamname');
@@ -88,7 +91,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.editReply({ embeds: [embed], ephemeral: true });
         }
 
         //set to true if you want to bypass team size limit
@@ -105,7 +108,7 @@ module.exports = {
                     messageId: interaction.id,
                     client: interaction.client
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
         }
 
@@ -123,7 +126,7 @@ module.exports = {
                     messageId: interaction.id,
                     client: interaction.client
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
 
             // Remove the role from all existing members
@@ -151,7 +154,7 @@ module.exports = {
                     messageId: interaction.id,
                     client: interaction.client
                 });
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], ephemeral: true });
             }
             
             // Create a new team
@@ -211,7 +214,7 @@ module.exports = {
                 client: interaction.client
             });
 
-            await interaction.reply({ embeds: [embed], ephemeral: true, files: attachment ? [attachment] : [] });
+            await interaction.editReply({ embeds: [embed], ephemeral: true, files: attachment ? [attachment] : [] });
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
@@ -223,7 +226,7 @@ module.exports = {
                 messageId: interaction.id,
                 client: interaction.client
             });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
     },
     loadTeamsFromSheet,
