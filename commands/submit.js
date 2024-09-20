@@ -131,6 +131,7 @@ module.exports = {
             const dropMessages = tile ? tile.dropMessage : [];
 
             const rows = text.split('\n');
+            const dropMessageRows = text.split('\n');
             let eventPasswordFound = false;
             let dropMessageFound = false;
 
@@ -142,8 +143,8 @@ module.exports = {
                     eventPasswordFound = true;
             
                     // Only search for dropMessage if eventPassword is found
-                    for (const row of rows) {
-                        if (row.includes(dropMessages)) {
+                    for (const dropMessage of dropMessageRows) {
+                        if (dropMessage.includes(dropMessages)) {
                             console.log(`Detected Drop Message: ${row}`);
                             dropMessageFound = true;
                             break; // Exit the loop once a drop message is found
