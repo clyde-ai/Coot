@@ -142,9 +142,9 @@ module.exports = {
                     eventPasswordFound = true;
             
                     // Only search for dropMessage if eventPassword is found
-                    for (const dropMessage of dropMessages) {
-                        if (dropMessage !== '' && row.includes(dropMessage)) {
-                            console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
+                    for (const row of rows) {
+                        if (row.includes(dropMessages)) {
+                            console.log(`Detected Drop Message: ${row}`);
                             dropMessageFound = true;
                             break; // Exit the loop once a drop message is found
                         }
