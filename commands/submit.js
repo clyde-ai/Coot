@@ -132,6 +132,7 @@ module.exports = {
 
             const rows = text.split('\n');
             const dropMessageRows = text.split('\n');
+            console.log(`dropMessageRows: ${dropMessageRows}`);
             let eventPasswordFound = false;
             let dropMessageFound = false;
 
@@ -144,8 +145,9 @@ module.exports = {
             
                     // Only search for dropMessage if eventPassword is found
                     for (const dropMessage of dropMessageRows) {
+                        console.log(`dropMessage: ${dropMessage}`);
                         if (dropMessage.includes(dropMessages)) {
-                            console.log(`Detected Drop Message: ${row}`);
+                            console.log(`Detected Drop Message: ${dropMessage}`);
                             dropMessageFound = true;
                             break; // Exit the loop once a drop message is found
                         }
