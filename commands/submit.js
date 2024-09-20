@@ -39,6 +39,8 @@ module.exports = {
                 .setDescription('Proof of tile completion (image)')
                 .setRequired(true)),
     async execute(interaction) {
+
+        await interaction.deferReply();
         // Check if the event is active
         const { eventStartTime, eventEndTime } = await getEventTime();
         if (!isEventActive()) {
@@ -56,7 +58,6 @@ module.exports = {
             
             return;
         }
-        await interaction.deferReply();
 
         const proofAttachment = interaction.options.getAttachment('proof');
 
