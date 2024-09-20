@@ -140,15 +140,17 @@ module.exports = {
                 if (row.includes(eventPassword)) {
                     console.log(`Detected Event Password: ${row} === ${eventPassword}`);
                     eventPasswordFound = true;
-                }
-                for (const dropMessage of dropMessages) {
-                    if (dropMessage !== '' && row.includes(dropMessage)) {
-                        console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
-                        dropMessageFound = true;
-                        break; // Exit the loop once a drop message is found
+            
+                    // Only search for dropMessage if eventPassword is found
+                    for (const dropMessage of dropMessages) {
+                        if (dropMessage !== '' && row.includes(dropMessage)) {
+                            console.log(`Detected Drop Message: ${row} === ${dropMessage}`);
+                            dropMessageFound = true;
+                            break; // Exit the loop once a drop message is found
+                        }
                     }
+                    if (dropMessageFound) break; // Exit the outer loop if a drop message is found
                 }
-                if (dropMessageFound) break; // Exit the outer loop if a drop message is found
             }
 
             const lastTile = Math.max(...tiles.map(t => t.tileNumber));
