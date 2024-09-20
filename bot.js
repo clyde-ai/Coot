@@ -333,13 +333,15 @@ app.get('/login', (req, res) => {
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
     try {
-        const response = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: redirectUri
-        }), {
+        const response = await makeRequestWithRetry('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            data: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: redirectUri
+            }),
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -350,7 +352,7 @@ app.get('/callback', async (req, res) => {
         process.env.REFRESH_TOKEN = refresh_token;
         process.env.TOKEN_EXPIRY = Date.now() + expires_in * 1000;
 
-        const userInfo = await axios.get('https://discord.com/api/users/@me', {
+        const userInfo = await makeRequestWithRetry('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: `Bearer ${access_token}`
             }
@@ -365,12 +367,14 @@ app.get('/callback', async (req, res) => {
 
 async function refreshToken() {
     try {
-        const response = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            grant_type: 'refresh_token',
-            refresh_token: process.env.REFRESH_TOKEN
-        }), {
+        const response = await makeRequestWithRetry('https://discord.com/api/oauth2/token', {
+            method: 'POST',
+            data: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: 'refresh_token',
+                refresh_token: process.env.REFRESH_TOKEN
+            }),
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -388,6 +392,24 @@ async function refreshToken() {
 async function ensureValidToken() {
     if (Date.now() >= process.env.TOKEN_EXPIRY) {
         await refreshToken();
+    }
+}
+
+async function makeRequestWithRetry(url, options, retries = 5) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await axios(url, options);
+            if (response.status === 503) throw new Error('Service Unavailable');
+            return response;
+        } catch (error) {
+            if (i < retries - 1) {
+                const delay = Math.pow(2, i) * 1000;
+                console.log(`Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            } else {
+                throw error;
+            }
+        }
     }
 }
 
