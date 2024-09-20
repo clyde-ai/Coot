@@ -163,7 +163,7 @@ module.exports = {
             }
 
             // event password or drop message not found
-            if (!eventPasswordFound || (!dropMessageFound && dropMessage !== '')) {
+            if (!eventPasswordFound || (!dropMessageFound && dropMessages !== '')) {
                 console.log(`Google Vision API - Did not detect BOTH password and drop message. eventPasswordFound: ${eventPasswordFound}, dropMessageFound: ${dropMessageFound}`);
                 //console.log(`Google Vision Text Detections: ${text}`);
                 const userId = interaction.user.id;
