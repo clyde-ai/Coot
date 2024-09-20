@@ -96,7 +96,7 @@ module.exports = {
                 });
                 return interaction.reply({ embeds: [embed], ephemeral: true });
             }
-            // Rply if team role is not found
+            // Reply if team role is not found
             const role = interaction.guild.roles.cache.get(team.roleId);
             if (!role) {
                 const { embed } = await createEmbed({
@@ -122,9 +122,6 @@ module.exports = {
             // Delete the role
             await role.delete('Team deleted by command').catch(console.error);
 
-            // Remove the team from the teams object
-            delete teams[teamName];
-
             // Update the Google Sheet
             let existingTeams;
             try {
@@ -144,6 +141,8 @@ module.exports = {
                     messageId: interaction.id,
                     client: interaction.client
                 });
+                // Remove the team from the teams object
+                delete teams[teamName];
 
                 await interaction.reply({ embeds: [embed] });
             } catch (error) {

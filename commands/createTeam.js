@@ -91,17 +91,22 @@ module.exports = {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
+        //set to true if you want to bypass team size limit
+        const bypassMaxTeamSize = true;
+
         if (memberIds.length > 10) {
-            const { embed } = await createEmbed({
-                command: 'create-team',
-                title: ':x: Team Size Exceeded :x:',
-                description: 'A team can have a maximum of 10 members.',
-                color: '#FF0000',
-                channelId: interaction.channelId,
-                messageId: interaction.id,
-                client: interaction.client
-            });
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            if(!bypassMaxTeamSize){
+                const { embed } = await createEmbed({
+                    command: 'create-team',
+                    title: ':x: Team Size Exceeded :x:',
+                    description: 'A team can have a maximum of 10 members.',
+                    color: '#FF0000',
+                    channelId: interaction.channelId,
+                    messageId: interaction.id,
+                    client: interaction.client
+                });
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
         }
 
         let role;
@@ -206,7 +211,7 @@ module.exports = {
                 client: interaction.client
             });
 
-            await interaction.reply({ embeds: [embed], files: attachment ? [attachment] : [] });
+            await interaction.reply({ embeds: [embed], ephemeral: true, files: attachment ? [attachment] : [] });
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
