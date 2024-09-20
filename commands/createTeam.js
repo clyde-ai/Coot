@@ -206,7 +206,7 @@ module.exports = {
                 client: interaction.client
             });
 
-            await interaction.reply({ embeds: [embed], files: attachment ? [attachment] : [] });
+            await interaction.reply({ embeds: [embed], ephemeral: true, files: attachment ? [attachment] : [] });
         } catch (error) {
             console.error(`Error writing to Google Sheets: ${error.message}`);
             const { embed } = await createEmbed({
