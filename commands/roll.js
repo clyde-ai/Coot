@@ -191,7 +191,7 @@ module.exports = {
                 const randomPhrase = ladderPhrases[Math.floor(Math.random() * ladderPhrases.length)];
                 description = `${userMention} rolled **${roll}**.\n ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n :ladder: You moved to a ladder! :ladder:\n After climbing up, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (landedOnSnake) {
-                const randomPhrase = ladderPhrases[Math.floor(Math.random() * snakePhrases.length)];
+                const randomPhrase = snakePhrases[Math.floor(Math.random() * snakePhrases.length)];
                 description = `${userMention} rolled **${roll}**.\n ${legacyEmoji}**${randomPhrase}**${legacyEmoji}\n :snake: You landed on the head of a snake! :snake:\n Sliding back down, ${teamRoleMention} moves to tile **${newTile}**.\n **${tileDescription}**`;
             } else if (newTile === lastTile) {
                 description = `${userMention} rolled the last roll!\n ${legacyEmoji}${teamRoleMention} moves to the final tile **${newTile}**.${legacyEmoji}\n **${tileDescription}**`;
